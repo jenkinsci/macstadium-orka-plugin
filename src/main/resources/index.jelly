@@ -1,0 +1,6 @@
+<?jelly escape-by-default='true'?>
+<div>
+  This plugin integrates Jenkins with 
+  <a href="https://www.macstadium.com/orka">MacStadium Orka</a>, a virtualization layer for Mac build infrastructure built on genuine Apple hardware.
+  It allows you to provision both permanent and ephemeral agents in a MacStadium Orka environment.
+</div>

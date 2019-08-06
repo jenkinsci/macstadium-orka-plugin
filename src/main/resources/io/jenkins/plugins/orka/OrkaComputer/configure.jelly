@@ -1,0 +1,104 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+  <l:layout norefresh="true" permission="${app.ADMINISTER}" title="${it.name} Configuration">
+    <st:include page="sidepanel.jelly"/>
+    <l:main-panel>
+      <f:form method="post" action="configSubmit" name="config">
+        <j:set var="instance" value="${it.node}" />
+        <j:set var="descriptor" value="${instance.descriptor}" />
+
+        <f:entry title="${%Name}">
+           <f:textbox name="name" value="${it.name}" />
+        </f:entry>
+
+        <f:invisibleEntry>
+           <f:readOnlyTextbox name="orkaCredentialsId" value="${instance.orkaCredentialsId}" />
+        </f:invisibleEntry>
+
+        <f:invisibleEntry>
+           <f:readOnlyTextbox name="orkaEndpoint" value="${instance.orkaEndpoint}" />
+        </f:invisibleEntry>
+
+        <f:invisibleEntry>
+           <f:readOnlyTextbox name="host" value="${instance.launcher.host}" />
+        </f:invisibleEntry>
+
+        <f:invisibleEntry>
+          <f:number name="port" value="${instance.launcher.port}" />
+        </f:invisibleEntry>
+
+        <f:section title="${%ORKA VM Details}">
+
+          <f:entry title="${%Node}" field="node">
+            <f:readOnlyTextbox />
+          </f:entry>
+
+          <j:if test="${instance.vm != null and instance.vm != ''}">
+            <f:entry title="${%VM Name}" field="vm">
+              <f:readOnlyTextbox />
+            </f:entry>
+          </j:if>
+
+          <j:if test="${instance.configName != null and instance.configName != ''}">
+            <f:entry title="${%Config Name}" field="configName">
+              <f:readOnlyTextbox />
+            </f:entry>
+          </j:if>
+
+          <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
+            <c:select />
+          </f:entry>
+
+        </f:section>
+
+        <f:section title="${%Slave Details}">
+
+          <f:entry title="${%# of executors}" field="numExecutors">
+              <f:number/>
+          </f:entry>
+
+          <f:entry title="${%Remote FS root}" field="remoteFS">
+              <f:textbox/>
+          </f:entry>
+
+          <f:entry title="${%Labels}" field="labelString">
+              <f:textbox/>
+          </f:entry>
+
+          <f:slave-mode name="mode" node="${it}"/>
+
+          <j:if test="${h.getRetentionStrategyDescriptors().size() gt 1}">
+            <f:dropdownList name="slave.retentionStrategy" title="${%Availability}"
+                            help="/help/system-config/master-slave/availability.html">
+                <j:forEach var="d" items="${h.getRetentionStrategyDescriptors()}">
+                    <j:if test="${d != null}">
+                        <f:dropdownListBlock value="${d.clazz.name}" name="${d.displayName}"
+                                            selected="${it.retentionStrategy.descriptor==d}"
+                                            title="${d.displayName}">
+                            <j:set var="descriptor" value="${d}"/>
+                            <j:set var="instance"
+                                  value="${it.retentionStrategy.descriptor==d ? it.retentionStrategy : null}"/>
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="stapler-class" value="${d.clazz.name}"/>
+                                </td>
+                            </tr>
+                            <st:include from="${d}" page="${d.configPage}" optional="true"/>
+                        </f:dropdownListBlock>
+                    </j:if>
+                </j:forEach>
+            </f:dropdownList>
+          </j:if>
+
+        </f:section>
+
+        <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"
+                          field="nodeProperties"/>
+
+        <f:block>
+          <f:submit value="${%Save}"/>
+        </f:block>
+      </f:form>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

@@ -1,0 +1,15 @@
+.DS_Store
+
+*.iml
+*.ipr
+*.iws
+.idea
+target
+bin
+work
+
+.classpath
+.project
+.settings
+.vscode
+.factorypath

@@ -1,0 +1,67 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly">
+  <table width="100%">
+    <f:section title="${%ORKA VM Details}">
+      <f:entry title="${%VM}" field="vm">
+        <f:select/>
+      </f:entry>
+
+      <f:optionalBlock title="${%Create a new VM config}" field="createNewVMConfig" inline="true">
+        <f:entry title="${%Config name}" field="configName">
+          <f:textbox />
+        </f:entry>
+
+        <f:entry title="${%Base Image}" field="baseImage">
+          <f:select/>
+        </f:entry>
+
+        <f:entry title="${%Image}" field="image">
+          <f:textbox />
+        </f:entry>
+                
+          <f:entry title="${%# of CPUs}" field="numCPUs">
+            <select name="numCPUs">
+              <option value="12">12</option>
+              <option value="24">24</option>
+            </select>
+          </f:entry>
+        </f:optionalBlock>
+
+        <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
+          <c:select />
+        </f:entry>
+
+    </f:section>
+
+    <f:section title="${%Slave Details}">
+
+      <f:entry title="${%# of executors}" field="numExecutors">
+        <f:number/>
+      </f:entry>
+
+      <f:entry title="${%Remote FS root}" field="remoteFS">
+        <f:textbox/>
+      </f:entry>
+
+      <f:entry title="${%Labels}" field="labelString">
+        <f:textbox/>
+      </f:entry>
+
+      <f:entry title="${%Idle termination time}" field="idleTerminationMinutes">
+        <f:number default="30"/>
+      </f:entry>
+
+      <f:slave-mode name="mode" node="${it}"/>
+
+      </f:section>
+
+      <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"
+                            field="nodeProperties"/>
+
+      <f:entry title="">
+        <div align="right">
+          <f:repeatableDeleteButton value="${%Delete Orka Template}"/>
+        </div>
+      </f:entry>
+  </table>
+</j:jelly>

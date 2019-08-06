@@ -1,0 +1,26 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly">
+
+  <f:section title="${%ORKA Config}">
+
+    <f:entry title="${%Name of this Cloud}" field="name">
+        <f:textbox/>
+    </f:entry>
+
+    <f:entry field="credentialsId" title="${%Orka Credentials}" description="Credentials used to access Orka">
+      <c:select />
+    </f:entry>
+
+    <f:entry title="${%Orka Endpoint}" field="endpoint" description="Orka Endpoint">
+      <f:textbox />
+    </f:entry>
+
+  </f:section>
+
+    <f:entry title="${%Templates}" description="${%List of VMs to be created as slaves}">
+        <f:repeatable field="templates" header="${%Template}" add="${%Add Orka Template}">
+            <st:include page="config.jelly" class="${descriptor.clazz}"/>
+        </f:repeatable>
+    </f:entry>
+
+</j:jelly>

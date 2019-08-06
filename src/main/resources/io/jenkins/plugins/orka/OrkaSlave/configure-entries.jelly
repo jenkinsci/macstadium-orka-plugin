@@ -1,0 +1,97 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly">
+
+  <f:section title="${%ORKA Config}">
+
+    <f:entry field="orkaCredentialsId" title="${%Orka Credentials}" description="Credentials used to access Orka">
+      <c:select />
+    </f:entry>
+
+    <f:entry title="${%Orka Endpoint}" field="orkaEndpoint" description="Orka Endpoint">
+      <f:textbox />
+    </f:entry>
+
+  </f:section>
+
+  <f:section title="${%ORKA VM Details}">
+
+    <f:entry title="${%Node}" field="node">
+      <f:select/>
+    </f:entry>
+
+    <f:entry title="${%VM}" field="vm">
+      <f:select/>
+    </f:entry>
+
+    <f:optionalBlock title="${%Create a new VM config}" field="createNewVMConfig" inline="true">
+      <f:entry title="${%Config name}" field="configName">
+        <f:textbox />
+      </f:entry>
+
+      <f:entry title="${%Base Image}" field="baseImage">
+        <f:select/>
+      </f:entry>
+
+      <f:entry title="${%Image}" field="image">
+        <f:textbox />
+      </f:entry>
+      
+      <f:entry title="${%# of CPUs}" field="numCPUs">
+          <select name="numCPUs">
+              <option value="12">12</option>
+              <option value="24">24</option>
+          </select>
+      </f:entry>
+    </f:optionalBlock>
+
+    <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
+      <c:select />
+    </f:entry>
+
+  </f:section>
+
+  <f:section title="${%Slave Details}">
+
+    <f:entry title="${%# of executors}" field="numExecutors">
+        <f:number/>
+    </f:entry>
+
+    <f:entry title="${%Remote FS root}" field="remoteFS">
+        <f:textbox/>
+    </f:entry>
+
+    <f:entry title="${%Labels}" field="labelString">
+        <f:textbox/>
+    </f:entry>
+
+    <f:slave-mode name="mode" node="${it}"/>
+
+    <j:if test="${h.getRetentionStrategyDescriptors().size() gt 1}">
+        <f:dropdownList name="slave.retentionStrategy" title="${%Availability}"
+                        help="/help/system-config/master-slave/availability.html">
+            <j:forEach var="d" items="${h.getRetentionStrategyDescriptors()}">
+                <j:if test="${d != null}">
+                    <f:dropdownListBlock value="${d.clazz.name}" name="${d.displayName}"
+                                         selected="${it.retentionStrategy.descriptor==d}"
+                                         title="${d.displayName}">
+                        <j:set var="descriptor" value="${d}"/>
+                        <j:set var="instance"
+                               value="${it.retentionStrategy.descriptor==d ? it.retentionStrategy : null}"/>
+                        <tr>
+                            <td>
+                                <input type="hidden" name="stapler-class" value="${d.clazz.name}"/>
+                            </td>
+                        </tr>
+                        <st:include from="${d}" page="${d.configPage}" optional="true"/>
+                    </f:dropdownListBlock>
+                </j:if>
+            </j:forEach>
+        </f:dropdownList>
+    </j:if>
+
+  </f:section>
+
+  <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"
+                    field="nodeProperties"/>
+
+</j:jelly>
