@@ -30,18 +30,18 @@
         <f:section title="${%ORKA VM Details}">
 
           <f:entry title="${%Node}" field="node">
-            <f:readOnlyTextbox />
+            <f:readOnlyTextbox checkMethod="post"/>
           </f:entry>
 
           <j:if test="${instance.vm != null and instance.vm != ''}">
             <f:entry title="${%VM Name}" field="vm">
-              <f:readOnlyTextbox />
+              <f:readOnlyTextbox checkMethod="post"/>
             </f:entry>
           </j:if>
 
           <j:if test="${instance.configName != null and instance.configName != ''}">
             <f:entry title="${%Config Name}" field="configName">
-              <f:readOnlyTextbox />
+              <f:readOnlyTextbox checkMethod="post"/>
             </f:entry>
           </j:if>
 

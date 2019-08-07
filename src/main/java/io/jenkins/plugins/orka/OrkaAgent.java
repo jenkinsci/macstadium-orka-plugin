@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 public class OrkaAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = 6363583313270146174L;
@@ -135,12 +136,14 @@ public class OrkaAgent extends AbstractCloudSlave {
             return true;
         }
 
+        @POST
         public FormValidation doCheckConfigName(@QueryParameter String configName, @QueryParameter String orkaEndpoint,
                 @QueryParameter String orkaCredentialsId, @QueryParameter boolean createNewVMConfig) {
 
             return this.formValidator.doCheckConfigName(configName, orkaEndpoint, orkaCredentialsId, createNewVMConfig);
         }
-
+        
+        @POST
         public FormValidation doCheckNode(@QueryParameter String value, @QueryParameter String orkaEndpoint,
                 @QueryParameter String orkaCredentialsId, @QueryParameter String vm,
                 @QueryParameter boolean createNewVMConfig, @QueryParameter int numCPUs) {
@@ -163,12 +166,14 @@ public class OrkaAgent extends AbstractCloudSlave {
             return this.infoHelper.doFillNodeItems(orkaEndpoint, orkaCredentialsId);
         }
 
+        @POST
         public ListBoxModel doFillVmItems(@QueryParameter String orkaEndpoint, @QueryParameter String orkaCredentialsId,
                 @QueryParameter boolean createNewVMConfig) {
 
             return this.infoHelper.doFillVmItems(orkaEndpoint, orkaCredentialsId, createNewVMConfig);
         }
 
+        @POST
         public ListBoxModel doFillBaseImageItems(@QueryParameter String orkaEndpoint,
                 @QueryParameter String orkaCredentialsId, @QueryParameter boolean createNewVMConfig) {
 
