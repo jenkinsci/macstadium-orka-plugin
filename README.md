@@ -1,4 +1,4 @@
-# MacStadium Orka Plugin
+# MacStadium Orka Jenkins Plugin
 
 Jenkins Plugin working with MacStadium Orka.
 
