@@ -17,7 +17,7 @@
 
   </f:section>
 
-    <f:entry title="${%Templates}" description="${%List of VMs to be created as slaves}">
+    <f:entry title="${%Templates}" description="${%List of VMs to be created as agents}">
         <f:repeatable field="templates" header="${%Template}" add="${%Add Orka Template}">
             <st:include page="config.jelly" class="${descriptor.clazz}"/>
         </f:repeatable>

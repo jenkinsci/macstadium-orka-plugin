@@ -56,8 +56,8 @@ public class ConfigNameCheckTest {
     }
 
     @Test
-    public void when_check_config_name_in_orka_slave_should_return_correct_validation_kind() throws IOException {
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+    public void when_check_config_name_in_orka_agent_should_return_correct_validation_kind() throws IOException {
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientFactory(this.factory);
 
         FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", true);
@@ -66,8 +66,8 @@ public class ConfigNameCheckTest {
     }
 
     @Test
-    public void when_check_config_name_in_slave_template_should_return_correct_validation_kind() throws IOException {
-        SlaveTemplate.DescriptorImpl descriptor = new SlaveTemplate.DescriptorImpl();
+    public void when_check_config_name_in_agent_template_should_return_correct_validation_kind() throws IOException {
+        AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setClientFactory(this.factory);
 
         FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", true);

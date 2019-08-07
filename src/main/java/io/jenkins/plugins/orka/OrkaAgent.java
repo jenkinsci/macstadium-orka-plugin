@@ -24,7 +24,7 @@ import java.util.List;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-public class OrkaSlave extends AbstractCloudSlave {
+public class OrkaAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = 6363583313270146174L;
 
     public String orkaCredentialsId;
@@ -39,7 +39,7 @@ public class OrkaSlave extends AbstractCloudSlave {
     private transient int numCPUs;
 
     @DataBoundConstructor
-    public OrkaSlave(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, boolean createNewVMConfig, String configName, String baseImage, String image, int numCPUs,
             int numExecutors, String host, int port, String remoteFS, Mode mode, String labelString,
             RetentionStrategy retentionStrategy, List<? extends NodeProperty<?>> nodeProperties)
@@ -127,7 +127,7 @@ public class OrkaSlave extends AbstractCloudSlave {
         }
 
         public String getDisplayName() {
-            return "Slave running under MacStadium ORKA";
+            return "Agent running under Orka by MacStadium";
         }
 
         @Override

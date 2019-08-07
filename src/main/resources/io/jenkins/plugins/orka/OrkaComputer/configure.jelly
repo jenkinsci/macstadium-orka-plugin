@@ -51,7 +51,7 @@
 
         </f:section>
 
-        <f:section title="${%Slave Details}">
+        <f:section title="${%Agent Details}">
 
           <f:entry title="${%# of executors}" field="numExecutors">
               <f:number/>

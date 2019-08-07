@@ -22,9 +22,9 @@ import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class OrkaProvisionedSlave extends AbstractCloudSlave {
+public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = -2841785002270403074L;
-    private static final Logger logger = Logger.getLogger(OrkaProvisionedSlave.class.getName());
+    private static final Logger logger = Logger.getLogger(OrkaProvisionedAgent.class.getName());
 
     private String cloudId;
     private String vmId;
@@ -35,7 +35,7 @@ public class OrkaProvisionedSlave extends AbstractCloudSlave {
     private int idleTerminationMinutes;
 
     @DataBoundConstructor
-    public OrkaProvisionedSlave(String cloudId, String vmId, String node, String host, int sshPort,
+    public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
             int idleTerminationMinutes, List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
@@ -84,7 +84,7 @@ public class OrkaProvisionedSlave extends AbstractCloudSlave {
 
     @Override
     protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
-        logger.info("Terminating slave ");
+        logger.info("Terminating agent ");
 
         this.getCloud().deleteVM(this.vmId, this.node);
     }
@@ -107,7 +107,7 @@ public class OrkaProvisionedSlave extends AbstractCloudSlave {
 
         @Override
         public String getDisplayName() {
-            return "Slave created in Orka";
+            return "Agent created in Orka";
         }
 
         public ListBoxModel doFillVmCredentialsIdItems() {

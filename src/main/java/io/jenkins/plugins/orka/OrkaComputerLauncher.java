@@ -55,32 +55,32 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     public synchronized void launch(SlaveComputer slaveComputer, TaskListener listener)
             throws IOException, InterruptedException {
 
-        OrkaSlave slave = (OrkaSlave) slaveComputer.getNode();
+        OrkaAgent agent = (OrkaAgent) slaveComputer.getNode();
 
         if (this.vmExists()) {
             if (this.launcher == null) {
-                this.launcher = this.getLauncher(slave.getVmCredentialsId());
+                this.launcher = this.getLauncher(agent.getVmCredentialsId());
             }
 
             this.launcher.launch(slaveComputer, listener);
             return;
         }
 
-        OrkaClient client = new ClientFactory().getOrkaClient(slave.getOrkaEndpoint(), slave.getOrkaCredentialsId());
+        OrkaClient client = new ClientFactory().getOrkaClient(agent.getOrkaEndpoint(), agent.getOrkaCredentialsId());
         PrintStream logger = listener.getLogger();
 
-        if (!createConfiguration(slave, client, logger)) {
+        if (!createConfiguration(agent, client, logger)) {
             return;
         }
 
-        DeploymentResponse deploymentResponse = this.deployVM(slave, client, logger);
+        DeploymentResponse deploymentResponse = this.deployVM(agent, client, logger);
         if (deploymentResponse == null) {
             return;
         }
 
         this.host = deploymentResponse.getHost();
         this.port = deploymentResponse.getSSHPort();
-        this.launcher = this.getLauncher(slave.getVmCredentialsId());
+        this.launcher = this.getLauncher(agent.getVmCredentialsId());
         Jenkins.getInstance().updateNode(slaveComputer.getNode());
 
         listener.getLogger().println("Waiting for VM to boot");
@@ -108,12 +108,12 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return !StringHelper.nullOrEmpty(this.host) && this.port != 0;
     }
 
-    private boolean createConfiguration(OrkaSlave slave, OrkaClient client, PrintStream logger) throws IOException {
-        if (slave.getCreateNewVMConfig()) {
-            String configName = slave.getConfigName();
-            String image = slave.getImage();
-            String baseImage = slave.getBaseImage();
-            int numCPUs = slave.getNumCPUs();
+    private boolean createConfiguration(OrkaAgent agent, OrkaClient client, PrintStream logger) throws IOException {
+        if (agent.getCreateNewVMConfig()) {
+            String configName = agent.getConfigName();
+            String image = agent.getImage();
+            String baseImage = agent.getBaseImage();
+            int numCPUs = agent.getNumCPUs();
 
             ConfigurationResponse configResponse = client.createConfiguration(configName, image, baseImage, template,
                     numCPUs);
@@ -128,12 +128,12 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return true;
     }
 
-    private DeploymentResponse deployVM(OrkaSlave slave, OrkaClient client, PrintStream logger) throws IOException {
-        String vmName = slave.getCreateNewVMConfig() ? slave.getConfigName() : slave.getVm();
+    private DeploymentResponse deployVM(OrkaAgent agent, OrkaClient client, PrintStream logger) throws IOException {
+        String vmName = agent.getCreateNewVMConfig() ? agent.getConfigName() : agent.getVm();
 
-        DeploymentResponse deploymentResponse = client.deployVM(vmName, slave.getNode());
+        DeploymentResponse deploymentResponse = client.deployVM(vmName, agent.getNode());
         if (deploymentResponse.hasErrors()) {
-            logger.println(String.format(deploymentErrorFormat, Utils.getTimestamp(), vmName, slave.getNode(),
+            logger.println(String.format(deploymentErrorFormat, Utils.getTimestamp(), vmName, agent.getNode(),
                     Arrays.toString(deploymentResponse.getErrors())));
             return null;
         }

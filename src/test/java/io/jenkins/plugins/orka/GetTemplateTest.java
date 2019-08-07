@@ -48,11 +48,11 @@ public class GetTemplateTest {
 
     @Test
     public void when_get_template_should_find_template_with_label() throws IOException, ANTLRException {
-        SlaveTemplate slaveTemplate = this.getSlaveTemplate(this.mode, this.label);
-        OrkaCloud cloud = new OrkaCloud("cloud", "credentialsId", "endpoint", Arrays.asList(slaveTemplate));
+        AgentTemplate AgentTemplate = this.getAgentTemplate(this.mode, this.label);
+        OrkaCloud cloud = new OrkaCloud("cloud", "credentialsId", "endpoint", Arrays.asList(AgentTemplate));
 
         Label label = this.labelToLookFor != null ? Label.parseExpression(this.labelToLookFor) : null;
-        SlaveTemplate resultTemplate = cloud.getTemplate(label);
+        AgentTemplate resultTemplate = cloud.getTemplate(label);
 
         String result = resultTemplate == null ? null : resultTemplate.getLabelString();
         boolean canProvisionResult = cloud.canProvision(label);
@@ -61,8 +61,8 @@ public class GetTemplateTest {
         assertEquals(this.expectedCanProvision, canProvisionResult);
     }
 
-    private SlaveTemplate getSlaveTemplate(Mode mode, String label) {
-        return new SlaveTemplate("vmCredentialsId", "name", false, "configName", "baseImage", "image", 12, 1,
+    private AgentTemplate getAgentTemplate(Mode mode, String label) {
+        return new AgentTemplate("vmCredentialsId", "name", false, "configName", "baseImage", "image", 12, 1,
                 "remoteFS", this.mode, this.label, 5, Collections.emptyList());
     }
 }

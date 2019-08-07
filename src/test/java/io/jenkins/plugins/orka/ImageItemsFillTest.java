@@ -55,8 +55,8 @@ public class ImageItemsFillTest {
     }
 
     @Test
-    public void when_fill_image_items_in_orka_slave_should_return_correct_result_size() throws IOException {
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+    public void when_fill_image_items_in_orka_agent_should_return_correct_result_size() throws IOException {
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientFactory(this.factory);
 
         ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials,
@@ -66,8 +66,8 @@ public class ImageItemsFillTest {
     }
 
     @Test
-    public void when_fill_image_items_in_slave_template_should_return_correct_result_size() throws IOException {
-        SlaveTemplate.DescriptorImpl descriptor = new SlaveTemplate.DescriptorImpl();
+    public void when_fill_image_items_in_agent_template_should_return_correct_result_size() throws IOException {
+        AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setClientFactory(this.factory);
 
         ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials,

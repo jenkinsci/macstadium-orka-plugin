@@ -84,7 +84,7 @@ public class NodeResourcesCheckTest {
         when(client.getNodes()).thenReturn(response);
         when(client.getVMs()).thenReturn(vmResponse);
 
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientFactory(factory);
 
         FormValidation validation = descriptor.doCheckNode(this.selectedNode, "endpoint", "credentialsId", this.vm,
