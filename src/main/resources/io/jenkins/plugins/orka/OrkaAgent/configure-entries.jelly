@@ -16,20 +16,20 @@
   <f:section title="${%ORKA VM Details}">
 
     <f:entry title="${%Node}" field="node">
-      <f:select/>
+      <f:select checkMethod="post"/>
     </f:entry>
 
     <f:entry title="${%VM}" field="vm">
-      <f:select/>
+      <f:select checkMethod="post"/>
     </f:entry>
 
     <f:optionalBlock title="${%Create a new VM config}" field="createNewVMConfig" inline="true">
       <f:entry title="${%Config name}" field="configName">
-        <f:textbox />
+        <f:textbox checkMethod="post"/>
       </f:entry>
 
       <f:entry title="${%Base Image}" field="baseImage">
-        <f:select/>
+        <f:select checkMethod="post"/>
       </f:entry>
 
       <f:entry title="${%Image}" field="image">

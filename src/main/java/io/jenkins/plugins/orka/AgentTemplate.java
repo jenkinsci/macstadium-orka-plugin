@@ -23,16 +23,14 @@ import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 public class AgentTemplate implements Describable<AgentTemplate> {
-    private static final Logger logger = Logger.getLogger(AgentTemplate.class.getName());
-
     private String vmCredentialsId;
     private boolean createNewVMConfig;
     private String vm;
@@ -174,6 +172,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             this.infoHelper = new OrkaInfoHelper(this.clientFactory);
         }
 
+        @POST
         public FormValidation doCheckConfigName(@QueryParameter String configName,
                 @QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
@@ -194,12 +193,14 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
+        @POST
         public ListBoxModel doFillVmItems(@QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
 
             return this.infoHelper.doFillVmItems(endpoint, credentialsId, createNewVMConfig);
         }
 
+        @POST
         public ListBoxModel doFillBaseImageItems(@QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
 
