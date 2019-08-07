@@ -4,6 +4,7 @@ import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 public class OrkaInfoHelper {
     private static final Logger logger = Logger.getLogger(OrkaInfoHelper.class.getName());
@@ -18,7 +19,7 @@ public class OrkaInfoHelper {
         ListBoxModel model = new ListBoxModel();
 
         try {
-            if (!StringHelper.nullOrEmpty(orkaEndpoint) && orkaCredentialsId != null) {
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint, orkaCredentialsId);
                 client.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .forEach(n -> model.add(n.getHostname()));
@@ -35,7 +36,7 @@ public class OrkaInfoHelper {
         ListBoxModel model = new ListBoxModel();
 
         try {
-            if (!StringHelper.nullOrEmpty(orkaEndpoint) && !createNewVMConfig && orkaCredentialsId != null) {
+            if (StringUtils.isNotBlank(orkaEndpoint) && !createNewVMConfig && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint, orkaCredentialsId);
                 client.getVMs().forEach(vm -> model.add(vm.getVMName()));
             }
@@ -50,7 +51,7 @@ public class OrkaInfoHelper {
 
         ListBoxModel model = new ListBoxModel();
         try {
-            if (!StringHelper.nullOrEmpty(orkaEndpoint) && createNewVMConfig && orkaCredentialsId != null) {
+            if (StringUtils.isNotBlank(orkaEndpoint) && createNewVMConfig && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint, orkaCredentialsId);
                 client.getImages().forEach(image -> model.add(image));
             }

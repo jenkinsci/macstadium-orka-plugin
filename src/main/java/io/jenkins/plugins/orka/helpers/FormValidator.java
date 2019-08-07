@@ -5,6 +5,7 @@ import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
@@ -26,7 +27,7 @@ public class FormValidator {
             }
 
             try {
-                if (!StringHelper.nullOrEmpty(orkaEndpoint) && orkaCredentialsId != null) {
+                if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                     OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint, orkaCredentialsId);
                     boolean alreadyInUse = client.getVMs().stream()
                             .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
@@ -51,7 +52,7 @@ public class FormValidator {
         int availableCPU = 0;
 
         try {
-            if (!StringHelper.nullOrEmpty(orkaEndpoint) && orkaCredentialsId != null) {
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint, orkaCredentialsId);
                 hasAvailableNodes = client.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .anyMatch(n -> true);
@@ -87,7 +88,7 @@ public class FormValidator {
     }
 
     public FormValidation doCheckIdleTerminationMinutes(String value) {
-        if (StringHelper.nullOrEmpty(value)) {
+        if (StringUtils.isBlank(value)) {
             return FormValidation.ok();
         }
         try {
