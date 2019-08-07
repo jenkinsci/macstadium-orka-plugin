@@ -5,6 +5,7 @@ import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
@@ -20,6 +21,7 @@ public class FormValidator {
 
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
             boolean createNewVMConfig) {
+        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
         if (createNewVMConfig) {
             if (configName.length() < 5) {
@@ -45,7 +47,8 @@ public class FormValidator {
 
     public FormValidation doCheckNode(String node, String orkaEndpoint, String orkaCredentialsId, String vm,
             boolean createNewConfig, int numCPUs) {
-
+        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+    
         boolean hasAvailableNodes = true;
         boolean canDeployVM = true;
         int requiredCPU = 0;

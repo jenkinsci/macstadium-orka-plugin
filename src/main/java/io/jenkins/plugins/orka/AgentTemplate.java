@@ -177,7 +177,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         public FormValidation doCheckConfigName(@QueryParameter String configName,
                 @QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
-
+            Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
             return formValidator.doCheckConfigName(configName, endpoint, credentialsId, createNewVMConfig);
         }
 
@@ -190,6 +190,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }
 
         public ListBoxModel doFillVmCredentialsIdItems() {
+            Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
