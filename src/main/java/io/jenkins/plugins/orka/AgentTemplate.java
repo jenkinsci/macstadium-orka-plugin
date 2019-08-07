@@ -30,8 +30,8 @@ import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-public class SlaveTemplate implements Describable<SlaveTemplate> {
-    private static final Logger logger = Logger.getLogger(SlaveTemplate.class.getName());
+public class AgentTemplate implements Describable<AgentTemplate> {
+    private static final Logger logger = Logger.getLogger(AgentTemplate.class.getName());
 
     private String vmCredentialsId;
     private boolean createNewVMConfig;
@@ -50,7 +50,7 @@ public class SlaveTemplate implements Describable<SlaveTemplate> {
     private transient OrkaCloud parent;
 
     @DataBoundConstructor
-    public SlaveTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, String image, int numCPUs, int numExecutors, String remoteFS, Mode mode,
             String labelString, int idleTerminationMinutes, List<? extends NodeProperty<?>> nodeProperties) {
         this.vmCredentialsId = vmCredentialsId;
@@ -132,16 +132,16 @@ public class SlaveTemplate implements Describable<SlaveTemplate> {
         return this.nodeProperties;
     }
 
-    public Descriptor<SlaveTemplate> getDescriptor() {
+    public Descriptor<AgentTemplate> getDescriptor() {
         return Jenkins.getInstance().getDescriptor(getClass());
     }
 
-    public OrkaProvisionedSlave provision(String node) throws IOException, FormException {
+    public OrkaProvisionedAgent provision(String node) throws IOException, FormException {
         this.ensureConfigurationExist();
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
         DeploymentResponse response = this.parent.deployVM(vmName, node);
 
-        return new OrkaProvisionedSlave(this.parent.getDisplayName(), response.getId(), node, response.getHost(),
+        return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), node, response.getHost(),
                 response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
                 this.labelString, this.idleTerminationMinutes, this.nodeProperties);
     }
@@ -162,7 +162,7 @@ public class SlaveTemplate implements Describable<SlaveTemplate> {
     }
 
     @Extension
-    public static final class DescriptorImpl extends Descriptor<SlaveTemplate> {
+    public static final class DescriptorImpl extends Descriptor<AgentTemplate> {
         private ClientFactory clientFactory = new ClientFactory();
         private FormValidator formValidator = new FormValidator(this.clientFactory);
         private OrkaInfoHelper infoHelper = new OrkaInfoHelper(this.clientFactory);

@@ -66,7 +66,7 @@ public class NodeItemsFillTest {
         when(factory.getOrkaClient(anyString(), anyString())).thenReturn(client);
         when(client.getNodes()).thenReturn(response);
 
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientFactory(factory);
 
         ListBoxModel nodes = descriptor.doFillNodeItems(this.endpoint, this.credentials);

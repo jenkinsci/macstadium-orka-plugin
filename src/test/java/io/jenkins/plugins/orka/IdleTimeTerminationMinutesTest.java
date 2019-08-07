@@ -36,7 +36,7 @@ public class IdleTimeTerminationMinutesTest {
 
     @Test
     public void when_check_idle_value_termination_minutes_should_return_correct_validation_kind() throws IOException {
-        SlaveTemplate.DescriptorImpl descriptor = new SlaveTemplate.DescriptorImpl();
+        AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
 
         FormValidation validation = descriptor.doCheckIdleTerminationMinutes(this.idleValue);
 

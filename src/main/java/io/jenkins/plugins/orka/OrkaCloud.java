@@ -43,10 +43,10 @@ public class OrkaCloud extends Cloud {
     private String credentialsId;
     private String endpoint;
 
-    private final List<? extends SlaveTemplate> templates;
+    private final List<? extends AgentTemplate> templates;
 
     @DataBoundConstructor
-    public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends SlaveTemplate> templates) {
+    public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
@@ -70,7 +70,7 @@ public class OrkaCloud extends Cloud {
         return this.endpoint;
     }
 
-    public List<? extends SlaveTemplate> getTemplates() {
+    public List<? extends AgentTemplate> getTemplates() {
         return this.templates;
     }
 
@@ -79,7 +79,7 @@ public class OrkaCloud extends Cloud {
         return getTemplate(label) != null;
     }
 
-    public SlaveTemplate getTemplate(Label label) {
+    public AgentTemplate getTemplate(Label label) {
         return templates.stream().filter(t -> normalModeOrMatches(t, label) || exclusiveModeAndMatches(t, label))
                 .findFirst().orElse(null);
     }
@@ -110,7 +110,7 @@ public class OrkaCloud extends Cloud {
         try {
             logger.info("Provisioning for label " + label.getName() + ". Workload: " + excessWorkload);
 
-            SlaveTemplate template = this.getTemplate(label);
+            AgentTemplate template = this.getTemplate(label);
 
             if (template == null) {
                 logger.log(Level.INFO,
@@ -126,7 +126,7 @@ public class OrkaCloud extends Cloud {
             int possibleVMsToProvision = freeNodes.stream().mapToInt(n -> n.getVmCapacity()).sum();
 
             if (possibleVMsToProvision < vmsToProvision) {
-                logger.info("There are not enough free nodes. Provisioning " + possibleVMsToProvision + " slaves");
+                logger.info("There are not enough free nodes. Provisioning " + possibleVMsToProvision + " agents");
             }
 
             return freeNodes.stream().flatMap(node -> {
@@ -143,14 +143,14 @@ public class OrkaCloud extends Cloud {
         return Collections.emptyList();
     }
 
-    private Callable<Node> provisionNode(SlaveTemplate template, OrkaNode node) {
+    private Callable<Node> provisionNode(AgentTemplate template, OrkaNode node) {
         return new Callable<Node>() {
             @Override
             public Node call() throws Exception {
-                OrkaProvisionedSlave slave = template.provision(node.getName());
+                OrkaProvisionedAgent agent = template.provision(node.getName());
                 Thread.sleep(TimeUnit.SECONDS.toMillis(launchWaitTime));
-                Jenkins.getInstance().addNode(slave);
-                return slave;
+                Jenkins.getInstance().addNode(agent);
+                return agent;
             }
         };
     }
@@ -166,11 +166,11 @@ public class OrkaCloud extends Cloud {
         return Collections.emptyList();
     }
 
-    private boolean normalModeOrMatches(SlaveTemplate template, Label label) {
+    private boolean normalModeOrMatches(AgentTemplate template, Label label) {
         return template.getMode() == Node.Mode.NORMAL && (label == null || label.matches(template.getLabelSet()));
     }
 
-    private boolean exclusiveModeAndMatches(SlaveTemplate template, Label label) {
+    private boolean exclusiveModeAndMatches(AgentTemplate template, Label label) {
         return template.getMode() == Node.Mode.EXCLUSIVE && (label != null && label.matches(template.getLabelSet()));
     }
 

@@ -61,7 +61,7 @@ public class NodeNameCheckTest {
         when(factory.getOrkaClient(anyString(), anyString())).thenReturn(client);
         when(client.getNodes()).thenReturn(response);
 
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientFactory(factory);
         
         FormValidation validation = descriptor.doCheckNode(null, "endpoint", "credentialsId", null, false, 12);

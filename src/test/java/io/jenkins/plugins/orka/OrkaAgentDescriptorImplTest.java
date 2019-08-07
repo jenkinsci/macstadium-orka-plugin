@@ -16,7 +16,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
-public class OrkaSlaveDescriptorImplTest {
+public class OrkaAgentDescriptorImplTest {
     @ClassRule
     public static JenkinsRule r = new JenkinsRule();
 
@@ -27,7 +27,7 @@ public class OrkaSlaveDescriptorImplTest {
 
     @Test
     public void when_not_creating_new_config_should_return_ok() throws IOException {
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         
         FormValidation validation = descriptor.doCheckConfigName("a", "127.0.0.1", "credentialsId", false);
 
@@ -36,7 +36,7 @@ public class OrkaSlaveDescriptorImplTest {
 
     @Test
     public void when_do_fill_orka_credentials_id_items_with_no_credentials_should_return_empty_credentials() throws IOException {
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
 
         ListBoxModel model = descriptor.doFillOrkaCredentialsIdItems();
         assertEquals(1, model.size());
@@ -45,7 +45,7 @@ public class OrkaSlaveDescriptorImplTest {
 
     @Test
     public void when_do_fill_orka_credentials_id_items_with_one_credential_should_return_two_credentials() throws IOException {
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         UsernamePasswordCredentialsImpl credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM, "uniqueId", "description", "foo", "bar");
         SystemCredentialsProvider.getInstance().getCredentials().add(credentials);        
         SystemCredentialsProvider.getInstance().save();
@@ -58,7 +58,7 @@ public class OrkaSlaveDescriptorImplTest {
 
     @Test
     public void when_do_fill_vm_credentials_id_items_with_no_credentials_should_return_empty_credentials() throws IOException {
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
 
         ListBoxModel model = descriptor.doFillVmCredentialsIdItems();
         assertEquals(1, model.size());
@@ -67,7 +67,7 @@ public class OrkaSlaveDescriptorImplTest {
 
     @Test
     public void when_do_fill_vm_credentials_id_items_with_one_credential_should_return_two_credentials() throws IOException {
-        OrkaSlave.DescriptorImpl descriptor = new OrkaSlave.DescriptorImpl();
+        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         UsernamePasswordCredentialsImpl credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM, "uniqueId", "description", "foo", "bar");
         SystemCredentialsProvider.getInstance().getCredentials().add(credentials);        
         SystemCredentialsProvider.getInstance().save();
