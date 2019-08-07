@@ -9,7 +9,6 @@ import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.helpers.ClientFactory;
-import io.jenkins.plugins.orka.helpers.StringHelper;
 import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
@@ -17,6 +16,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import jenkins.model.Jenkins;
+
+import org.apache.commons.lang.StringUtils;
 
 public final class OrkaComputerLauncher extends ComputerLauncher {
     private static String configurationErrorFormat = "%s: Creating configuration with configName: %s, image: %s, "
@@ -105,7 +106,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     }
 
     private boolean vmExists() {
-        return !StringHelper.nullOrEmpty(this.host) && this.port != 0;
+        return StringUtils.isNotBlank(this.host) && this.port != 0;
     }
 
     private boolean createConfiguration(OrkaAgent agent, OrkaClient client, PrintStream logger) throws IOException {
