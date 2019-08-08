@@ -31,13 +31,13 @@ public class OrkaAgent extends AbstractCloudSlave {
     public String orkaCredentialsId;
     public String orkaEndpoint;
     public String vmCredentialsId;
-    private transient boolean createNewVMConfig;
+    private boolean createNewVMConfig;
     private String vm;
     private String node;
     private String configName;
-    private transient String baseImage;
-    private transient String image;
-    private transient int numCPUs;
+    private String baseImage;
+    private String image;
+    private int numCPUs;
 
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,

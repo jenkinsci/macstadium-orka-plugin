@@ -10,7 +10,7 @@ public class ConfigurationResponse {
     }
 
     public OrkaError[] getErrors() {
-        return this.errors;
+        return this.errors.clone();
     }
 
     public boolean hasErrors() {

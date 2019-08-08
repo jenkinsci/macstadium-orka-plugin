@@ -7,6 +7,10 @@ public class OrkaError {
         return this.message;
     }
 
+    public void setMessage(String message) {
+        this.message = message;;
+    }
+
     @Override
     public String toString() {
         return this.message;
