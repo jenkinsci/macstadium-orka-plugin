@@ -20,7 +20,7 @@ public class DeploymentResponse {
         this.host = host;
         this.sshPort = sshPort;
         this.id = id;
-        this.errors = errors;
+        this.errors = errors != null ? errors.clone() : new OrkaError[] {};
         this.message = message;
     }
 
@@ -37,7 +37,7 @@ public class DeploymentResponse {
     }
 
     public OrkaError[] getErrors() {
-        return this.errors;
+        return this.errors.clone();
     }
 
     public String getMessage() {

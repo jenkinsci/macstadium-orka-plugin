@@ -79,10 +79,6 @@ public class FormValidator {
         }
 
         if (hasAvailableNodes) {
-            if (canDeployVM) {
-                return FormValidation.ok();
-            }
-
             return canDeployVM ? FormValidation.ok()
                     : FormValidation.error(String.format(NOT_ENOUGH_RESOURCES_FORMAT, requiredCPU, availableCPU));
         }

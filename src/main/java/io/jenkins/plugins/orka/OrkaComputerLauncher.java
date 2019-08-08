@@ -53,7 +53,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     }
 
     @Override
-    public synchronized void launch(SlaveComputer slaveComputer, TaskListener listener)
+    public void launch(SlaveComputer slaveComputer, TaskListener listener)
             throws IOException, InterruptedException {
 
         OrkaAgent agent = (OrkaAgent) slaveComputer.getNode();
