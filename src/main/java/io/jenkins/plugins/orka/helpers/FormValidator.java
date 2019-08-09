@@ -97,6 +97,6 @@ public class FormValidator {
             }
         } catch (NumberFormatException e) {
         }
-        return FormValidation.error("Idle Termination time must be a greater than 0 (or empty)");
+        return FormValidation.error("Idle termination minutes must be a greater than 0 (or empty)");
     }
 }

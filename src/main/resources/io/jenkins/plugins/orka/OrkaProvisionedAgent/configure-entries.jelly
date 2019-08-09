@@ -45,7 +45,7 @@
 
     <f:slave-mode name="mode" node="${it}"/>
 
-    <f:entry title="${%Idle termination time}" field="idleTerminationMinutes">
+    <f:entry title="${%Idle termination minutes}" field="idleTerminationMinutes">
       <f:number />
     </f:entry>
 
