@@ -1,5 +1,7 @@
 # MacStadium Orka Jenkins Plugin
 
+[![Jenkins](https://ci.jenkins.io/job/Plugins/job/macstadium-orka-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/macstadium-orka-plugin/job/master/)
+
 Jenkins Plugin working with MacStadium Orka.
 
 The plugin provides two functionalities:  
