@@ -1,50 +1,51 @@
-# MacStadium Orka Jenkins Plugin
+# Orka by MacStadium Jenkins Plugin
 
 [![Jenkins](https://ci.jenkins.io/job/Plugins/job/macstadium-orka-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/macstadium-orka-plugin/job/master/)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/macstadium-orka.svg)](https://plugins.jenkins.io/macstadium-orka)
 
-Jenkins Plugin working with MacStadium Orka.
+This readme provides information about how to build, package, or run the plugin locally. For usage information, see the Jenkins pluin [tutorial][tutorial].
 
 The plugin provides two functionalities:  
 
-* Provision agents in MacStadium per request - This is done via `Manage Jenkins` -> `Manage Nodes`
-* Provision agents in MacStadium on-demand - Done via `Manage Jenkins` -> `Configure System` -> `Add Cloud`
+* Provision permanent agents in MacStadium - Via `Manage Jenkins` -> `Manage Nodes`
+* Provision ephemeral agents in MacStadium - Via `Manage Jenkins` -> `Configure System` -> `Add a new cloud`
 
-## Build Requirements
+## Build requirements
 
 * [Maven 3][maven]
 * JDK 8
 
 ## Building, packaging and testing the plugin
 
-To build the plugin use:  
+To build the plugin, run:  
 
     mvn install
 
-This will run [checkstyle][checkstyle] validation and will build the plugin.
+This runs [checkstyle][checkstyle] validation and builds the plugin.
 
-To package the plugin use:
+To package the plugin, run:
 
     mvn package
 
-This will run checkstyle validation, build and package the plugin.
-It will produce an `hpi` file located in the `target` folder.
+This runs checkstyle validation, build and package the plugin.
+It produces an `hpi` file located in the `target` folder.
 
-To run tests use:
+To run tests, run:
 
     mvn test
 
-If you want to run checkstyle only run:
+To run checkstyle, run:
 
     mvn validate
 
 ## Running the plugin locally
 
-The easiest way to use Jenkins with the latest version of the plugin is to run:
+To use the plugin locally, run:
 
     mvn hpi:run
 
-This will boot a Jenkins master, package the plugin and install it. To run the Jenkins master open http://localhost:8080.
+This boots a Jenkins master, package the plugin and install it. To run the Jenkins master open http://localhost:8080.
 
 [maven]: http://maven.apache.org/
 [checkstyle]: http://checkstyle.sourceforge.net/
+[tutorial]: https://wiki.jenkins.io/display/JENKINS/Plugin+tutorial
