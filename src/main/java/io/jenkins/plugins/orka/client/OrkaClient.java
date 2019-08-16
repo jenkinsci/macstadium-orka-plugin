@@ -70,7 +70,7 @@ public class OrkaClient {
 
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
-        String responseJson = jsonObject.get("folder").toString();
+        String responseJson = jsonObject.get("images").toString();
 
         Type listType = new TypeToken<List<String>>() {
         }.getType();
