@@ -68,7 +68,7 @@ public class OrkaClientTest {
     public void when_calling_getimages_should_get_all_images() throws IOException {
         String[] images = { "Mojave.img", "SnowLeopard.img" };
         String arrayJson = new Gson().toJson(images);
-        String response = "{ \"folder\": " + arrayJson + "}";
+        String response = "{ \"images\": " + arrayJson + "}";
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.get(anyString())).thenReturn(response);
