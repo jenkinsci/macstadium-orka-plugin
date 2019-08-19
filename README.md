@@ -3,7 +3,7 @@
 [![Jenkins](https://ci.jenkins.io/job/Plugins/job/macstadium-orka-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/macstadium-orka-plugin/job/master/)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/macstadium-orka.svg)](https://plugins.jenkins.io/macstadium-orka)
 
-This readme provides information about how to build, package, or run the plugin locally. For usage information, see the Jenkins pluin [tutorial][tutorial].
+This readme provides information about how to build, package, or run the plugin locally. For usage information, see the Jenkins plugin [tutorial][tutorial].
 
 The plugin provides two functionalities:  
 
