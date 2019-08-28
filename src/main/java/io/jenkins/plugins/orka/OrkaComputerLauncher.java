@@ -112,7 +112,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     private boolean createConfiguration(OrkaAgent agent, OrkaClient client, PrintStream logger) throws IOException {
         if (agent.getCreateNewVMConfig()) {
             String configName = agent.getConfigName();
-            String image = agent.getImage();
+            String image = configName;
             String baseImage = agent.getBaseImage();
             int numCPUs = agent.getNumCPUs();
 
