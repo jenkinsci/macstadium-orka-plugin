@@ -31,10 +31,6 @@
       <f:entry title="${%Base Image}" field="baseImage">
         <f:select checkMethod="post"/>
       </f:entry>
-
-      <f:entry title="${%Image}" field="image">
-        <f:textbox />
-      </f:entry>
       
       <f:entry title="${%# of CPUs}" field="numCPUs">
           <select name="numCPUs">

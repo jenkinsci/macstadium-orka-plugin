@@ -36,12 +36,11 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String node;
     private String configName;
     private String baseImage;
-    private String image;
     private int numCPUs;
 
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
-            String node, boolean createNewVMConfig, String configName, String baseImage, String image, int numCPUs,
+            String node, boolean createNewVMConfig, String configName, String baseImage, int numCPUs,
             int numExecutors, String host, int port, String remoteFS, Mode mode, String labelString,
             RetentionStrategy retentionStrategy, List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
@@ -57,7 +56,6 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.createNewVMConfig = createNewVMConfig;
         this.configName = configName;
         this.baseImage = baseImage;
-        this.image = image;
         this.numCPUs = numCPUs;
     }
 
@@ -91,10 +89,6 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     public String getBaseImage() {
         return this.baseImage;
-    }
-
-    public String getImage() {
-        return this.image;
     }
 
     public int getNumCPUs() {

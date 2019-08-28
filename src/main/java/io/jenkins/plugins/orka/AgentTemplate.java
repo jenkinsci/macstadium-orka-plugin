@@ -36,7 +36,6 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String vm;
     private String configName;
     private String baseImage;
-    private String image;
     private int numCPUs;
     private int numExecutors;
     private Mode mode;
@@ -49,14 +48,13 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, String image, int numCPUs, int numExecutors, String remoteFS, Mode mode,
+            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode,
             String labelString, int idleTerminationMinutes, List<? extends NodeProperty<?>> nodeProperties) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
         this.configName = configName;
         this.baseImage = baseImage;
-        this.image = image;
         this.numCPUs = numCPUs;
         this.numExecutors = numExecutors;
         this.remoteFS = remoteFS;
@@ -92,10 +90,6 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public String getBaseImage() {
         return this.baseImage;
-    }
-
-    public String getImage() {
-        return this.image;
     }
 
     public int getNumCPUs() {
@@ -149,8 +143,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             boolean configExist = parent.getVMs().stream().anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
 
             if (!configExist) {
-                parent.createConfiguration(this.configName, this.image, this.baseImage, Constants.DEFAULT_CONFIG_NAME,
-                        this.numCPUs);
+                parent.createConfiguration(this.configName, this.configName, this.baseImage, 
+                    Constants.DEFAULT_CONFIG_NAME, this.numCPUs);
             }
         }
     }

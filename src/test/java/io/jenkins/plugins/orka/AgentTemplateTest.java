@@ -47,7 +47,7 @@ public class AgentTemplateTest {
     }
 
     private AgentTemplate getAgentTemplate() {
-        return new AgentTemplate("vmCredentialsId", "my-vm", false, "configName", "baseImage", "image", 12, 1,
+        return new AgentTemplate("vmCredentialsId", "my-vm", false, "configName", "baseImage", 12, 1,
                 "remoteFS", Mode.NORMAL, "label", 5, Collections.emptyList());
     }
 }
