@@ -12,6 +12,7 @@ import hudson.model.Label;
 import hudson.model.Node.Mode;
 import hudson.model.labels.LabelAtom;
 import hudson.slaves.NodeProperty;
+import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
@@ -19,8 +20,10 @@ import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
+import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -41,15 +44,18 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private Mode mode;
     private String remoteFS;
     private String labelString;
-    private int idleTerminationMinutes;
+    private RetentionStrategy<?> retentionStrategy;
     private List<? extends NodeProperty<?>> nodeProperties;
+
+    @Deprecated
+    private transient int idleTerminationMinutes;
 
     private transient OrkaCloud parent;
 
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode,
-            String labelString, int idleTerminationMinutes, List<? extends NodeProperty<?>> nodeProperties) {
+            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
+            RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
@@ -60,7 +66,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.remoteFS = remoteFS;
         this.mode = mode;
         this.labelString = labelString;
-        this.idleTerminationMinutes = idleTerminationMinutes;
+        this.retentionStrategy = retentionStrategy;
         this.nodeProperties = nodeProperties;
     }
 
@@ -116,8 +122,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.remoteFS;
     }
 
-    public int getIdleTerminationMinutes() {
-        return this.idleTerminationMinutes;
+    public RetentionStrategy<?> getRetentionStrategy() {
+        return this.retentionStrategy;
     }
 
     public List<? extends NodeProperty<?>> getNodeProperties() {
@@ -135,7 +141,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), node, response.getHost(),
                 response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
-                this.labelString, this.idleTerminationMinutes, this.nodeProperties);
+                this.labelString, this.retentionStrategy, this.nodeProperties);
     }
 
     private void ensureConfigurationExist() throws IOException {
@@ -143,14 +149,21 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             boolean configExist = parent.getVMs().stream().anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
 
             if (!configExist) {
-                parent.createConfiguration(this.configName, this.configName, this.baseImage, 
-                    Constants.DEFAULT_CONFIG_NAME, this.numCPUs);
+                parent.createConfiguration(this.configName, this.configName, this.baseImage,
+                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs);
             }
         }
     }
 
     void setParent(OrkaCloud parent) {
         this.parent = parent;
+    }
+
+    protected Object readResolve() {
+        if (this.retentionStrategy == null) {
+            this.retentionStrategy = new IdleTimeCloudRetentionStrategy(this.idleTerminationMinutes);
+        }
+        return this;
     }
 
     @Extension
@@ -178,10 +191,6 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return FormValidation.validatePositiveInteger(value);
         }
 
-        public FormValidation doCheckIdleTerminationMinutes(@QueryParameter String value) {
-            return this.formValidator.doCheckIdleTerminationMinutes(value);
-        }
-
         public ListBoxModel doFillVmCredentialsIdItems() {
             Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
@@ -199,6 +208,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
 
             return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, createNewVMConfig);
+        }
+
+        public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {
+            return OrkaRetentionStrategy.getRetentionStrategyDescriptors();
         }
     }
 }

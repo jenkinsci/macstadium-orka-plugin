@@ -43,9 +43,20 @@
         <f:textbox/>
       </f:entry>
 
-      <f:entry title="${%Idle termination minutes}" field="idleTerminationMinutes">
-        <f:number default="30"/>
-      </f:entry>
+      <f:dropdownList name="retentionStrategy" title="${%Retention Strategy}" help="${descriptor.getHelpFile('retentionStrategy')}">
+        <j:forEach var="d" items="${descriptor.getRetentionStrategyDescriptors()}">
+          <f:dropdownListBlock value="${d.clazz.name}" name="${d.displayName}"
+                               selected="${instance.retentionStrategy!=null and d.equals(instance.retentionStrategy.descriptor)}"
+                               title="${d.displayName}">
+            <j:set var="descriptor" value="${d}"/>
+            <j:set var="instance" value="${(instance.retentionStrategy!=null and d.equals(instance.retentionStrategy.descriptor)) ? instance.retentionStrategy : null}"/>
+            <f:invisibleEntry>
+              <input type="hidden" name="stapler-class" value="${d.clazz.name}"/>
+            </f:invisibleEntry>
+            <st:include from="${d}" page="${d.configPage}" optional="true"/>
+          </f:dropdownListBlock>
+        </j:forEach>
+      </f:dropdownList>
 
       <f:slave-mode name="mode" node="${it}"/>
 
