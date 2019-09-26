@@ -1,0 +1,14 @@
+<div>
+  <ul>
+    <li>
+      <b>Use agent only once</b>: Run a single job on the agent. The agent is terminated when the job completes.
+      Use this option if you want to have a new agent for every build job.
+      In case of an unexpected failure, the agent will terminate automatically when the specified idle time expires.
+      The number of executors must be 1 if you use this strategy.
+    </li>
+    <li>
+      <b>Keep until idle time expires</b>: Run multiple jobs on the agent. The agent is terminated when the specified idle time expires.
+      Use this option if you want to reuse the agent instead of creating a new one for each job.
+    </li>
+  </ul>
+</div>

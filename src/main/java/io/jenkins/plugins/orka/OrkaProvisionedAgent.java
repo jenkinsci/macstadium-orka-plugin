@@ -9,10 +9,11 @@ import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
-import hudson.slaves.CloudRetentionStrategy;
 import hudson.slaves.NodeProperty;
+import hudson.slaves.RetentionStrategy;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
+import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,18 +33,16 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private String host;
     private int sshPort;
     private String vmCredentialsId;
-    private int idleTerminationMinutes;
 
     @DataBoundConstructor
     public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
-            int idleTerminationMinutes, List<? extends NodeProperty<?>> nodeProperties)
+            RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
 
-        super(vmId, null, remoteFS, numExecutors, mode, labelString,
-                new SSHLauncher(host, sshPort, vmCredentialsId, null, null, null, null, 300, 3, 30,
-                        new NonVerifyingKeyVerificationStrategy()),
-                new CloudRetentionStrategy(idleTerminationMinutes), nodeProperties);
+        super(vmId, null, remoteFS, numExecutors, mode, labelString, new SSHLauncher(host, sshPort, vmCredentialsId,
+                null, null, null, null, 300, 3, 30, new NonVerifyingKeyVerificationStrategy()), retentionStrategy,
+                nodeProperties);
 
         this.cloudId = cloudId;
         this.vmId = vmId;
@@ -51,7 +50,6 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         this.host = host;
         this.sshPort = sshPort;
         this.vmCredentialsId = vmCredentialsId;
-        this.idleTerminationMinutes = idleTerminationMinutes;
     }
 
     public String getCloudId() {
@@ -76,10 +74,6 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     public String getVmCredentialsId() {
         return this.vmCredentialsId;
-    }
-
-    public int getIdleTerminationMinutes() {
-        return this.idleTerminationMinutes;
     }
 
     @Override
@@ -112,6 +106,10 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
         public ListBoxModel doFillVmCredentialsIdItems() {
             return CredentialsHelper.getCredentials(StandardCredentials.class);
+        }
+
+        public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {
+            return OrkaRetentionStrategy.getRetentionStrategyDescriptors();
         }
     }
 

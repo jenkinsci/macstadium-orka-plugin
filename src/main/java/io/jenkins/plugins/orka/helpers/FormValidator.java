@@ -85,18 +85,4 @@ public class FormValidator {
 
         return FormValidation.error("There are no available nodes");
     }
-
-    public FormValidation doCheckIdleTerminationMinutes(String value) {
-        if (StringUtils.isBlank(value)) {
-            return FormValidation.ok();
-        }
-        try {
-            int val = Integer.parseInt(value);
-            if (val > 0) {
-                return FormValidation.ok();
-            }
-        } catch (NumberFormatException e) {
-        }
-        return FormValidation.error("Idle termination minutes must be a greater than 0 (or empty)");
-    }
 }
