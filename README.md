@@ -76,4 +76,12 @@ This is how a template with an existing VM looks like:
 This is how a template with a new VM config looks like:
 <img src="images/cloud-new-config.png" width="600"/>
 
+## Changelog
+
+After version `1.4` [here][changelog].
+
+Prior to version `1.4` [here][old-changelog].
+
 [orka]: https://www.macstadium.com/orka
+[changelog]: https://github.com/jenkinsci/macstadium-orka-plugin/releases
+[old-changelog]: https://wiki.jenkins.io/display/JENKINS/Orka+Change+Log
