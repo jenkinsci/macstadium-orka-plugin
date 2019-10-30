@@ -24,7 +24,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <url>https://wiki.jenkins.io/display/JENKINS/Orka+by+MacStadium</url>
+    <url>https://github.com/jenkinsci/macstadium-orka-plugin</url>
     <scm>
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
