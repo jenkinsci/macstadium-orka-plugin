@@ -17,6 +17,10 @@
                 
           <f:entry title="${%# of CPUs}" field="numCPUs">
             <select name="numCPUs">
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
               <option value="12">12</option>
               <option value="24">24</option>
             </select>
