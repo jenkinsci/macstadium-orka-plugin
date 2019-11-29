@@ -17,7 +17,8 @@ The plugin allows you to create permanent agents, running on [Orka by MacStadium
 ### Usage
 
 To create a permanent agent:
-* Go to `Manage Jenkins` → `Manage Nodes`
+* Go to `Manage Jenkins` → `Manage Nodes`  
+**Note** If you are using Jenkins 2.205 or later go to `Manage Jenkins` → `Manage Nodes and Clouds`
 * Select `New Node`
 * Provide a `Node name`
 * Select `Agent running under Orka by MacStadium`
@@ -55,7 +56,8 @@ A new agent is automatically created by Jenkins if the build load is too high an
 ### Usage
 
 To configure:
-* Go to `Manage Jenkins` → `Configure System` → `Add a new cloud`
+* Go to `Manage Jenkins` → `Configure System` → `Add a new cloud`  
+**Note** If you are using Jenkins 2.205 or later go to `Manage Jenkins` → `Manage Nodes and Clouds` → `Configure Clouds` → `Add a new cloud`
 * Select `Orka Cloud`
 * Configure the cloud by providing values for:
     * Name of this Cloud - The name of the cloud
