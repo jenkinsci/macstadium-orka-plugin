@@ -36,12 +36,14 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     private int retryWaitTime = 30;
 
     private transient SSHLauncher launcher;
+    private transient String redirectHost;
     private String host;
     private int port;
 
-    public OrkaComputerLauncher(String host, int port) {
+    public OrkaComputerLauncher(String host, int port, String redirectHost) {
         this.host = host;
         this.port = port;
+        this.redirectHost = redirectHost;
     }
 
     public String getHost() {
@@ -53,8 +55,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     }
 
     @Override
-    public void launch(SlaveComputer slaveComputer, TaskListener listener)
-            throws IOException, InterruptedException {
+    public void launch(SlaveComputer slaveComputer, TaskListener listener) throws IOException, InterruptedException {
 
         OrkaAgent agent = (OrkaAgent) slaveComputer.getNode();
 
@@ -79,7 +80,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
-        this.host = deploymentResponse.getHost();
+        this.host = StringUtils.isNotBlank(this.redirectHost) ? redirectHost : deploymentResponse.getHost();
         this.port = deploymentResponse.getSSHPort();
         this.launcher = this.getLauncher(agent.getVmCredentialsId());
         Jenkins.getInstance().updateNode(slaveComputer.getNode());

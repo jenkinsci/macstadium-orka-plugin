@@ -19,6 +19,12 @@
       <f:select checkMethod="post"/>
     </f:entry>
 
+    <f:advanced>
+      <f:entry title="Public Host" field="redirectHost">
+        <f:textbox />
+      </f:entry>
+    </f:advanced>
+
     <f:entry title="${%VM}" field="vm">
       <f:select checkMethod="post"/>
     </f:entry>

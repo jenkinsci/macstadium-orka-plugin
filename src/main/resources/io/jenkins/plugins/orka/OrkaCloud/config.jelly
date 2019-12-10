@@ -15,6 +15,14 @@
       <f:textbox />
     </f:entry>
 
+    <f:advanced>
+      <f:entry title="${%Node Mappings}" description="${%List of Orka node mappings}">
+          <f:repeatable field="mappings" header="${%Mapping}" add="${%Add mapping}">
+              <st:include page="config.jelly" class="${descriptor.clazz}"/>
+          </f:repeatable>
+      </f:entry>
+    </f:advanced>
+
   </f:section>
 
     <f:entry title="${%Templates}" description="${%List of VMs to be created as agents}">

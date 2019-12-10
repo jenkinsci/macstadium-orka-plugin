@@ -40,12 +40,12 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
-            String node, boolean createNewVMConfig, String configName, String baseImage, int numCPUs,
-            int numExecutors, String host, int port, String remoteFS, Mode mode, String labelString,
+            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
+            int numCPUs, int numExecutors, String host, int port, String remoteFS, Mode mode, String labelString,
             RetentionStrategy retentionStrategy, List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
 
-        super(name, null, remoteFS, numExecutors, mode, labelString, new OrkaComputerLauncher(host, port),
+        super(name, null, remoteFS, numExecutors, mode, labelString, new OrkaComputerLauncher(host, port, redirectHost),
                 retentionStrategy, nodeProperties);
 
         this.orkaCredentialsId = orkaCredentialsId;
@@ -136,7 +136,7 @@ public class OrkaAgent extends AbstractCloudSlave {
 
             return this.formValidator.doCheckConfigName(configName, orkaEndpoint, orkaCredentialsId, createNewVMConfig);
         }
-        
+
         @POST
         public FormValidation doCheckNode(@QueryParameter String value, @QueryParameter String orkaEndpoint,
                 @QueryParameter String orkaCredentialsId, @QueryParameter String vm,
