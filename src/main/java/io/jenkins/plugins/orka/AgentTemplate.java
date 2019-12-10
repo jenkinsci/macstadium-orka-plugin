@@ -138,8 +138,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.ensureConfigurationExist();
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
         DeploymentResponse response = this.parent.deployVM(vmName, node);
+        String host = this.parent.getRealHost(response.getHost());
 
-        return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), node, response.getHost(),
+        return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), node, host,
                 response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
                 this.labelString, this.retentionStrategy, this.nodeProperties);
     }

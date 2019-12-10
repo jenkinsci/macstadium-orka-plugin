@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -43,15 +44,18 @@ public class OrkaCloud extends Cloud {
     private String credentialsId;
     private String endpoint;
 
+    private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
 
     @DataBoundConstructor
-    public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends AgentTemplate> templates) {
+    public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends AddressMapper> mappings,
+            List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
         this.endpoint = endpoint;
 
+        this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
 
         readResolve();
@@ -59,6 +63,8 @@ public class OrkaCloud extends Cloud {
 
     protected Object readResolve() {
         this.templates.forEach(t -> t.setParent(this));
+        this.mappings = this.mappings == null ? Collections.emptyList() : this.mappings;
+
         return this;
     }
 
@@ -68,6 +74,10 @@ public class OrkaCloud extends Cloud {
 
     public String getEndpoint() {
         return this.endpoint;
+    }
+
+    public List<? extends AddressMapper> getMappings() {
+        return this.mappings;
     }
 
     public List<? extends AgentTemplate> getTemplates() {
@@ -103,6 +113,11 @@ public class OrkaCloud extends Cloud {
     public void deleteVM(String name, String node) throws IOException {
         OrkaClient client = new ClientFactory().getOrkaClient(this.endpoint, this.credentialsId);
         client.deleteVM(name, node);
+    }
+
+    public String getRealHost(String host) {
+        return this.mappings.stream().filter(m -> m.getDefaultHost().equalsIgnoreCase(host)).findFirst()
+                .map(m -> m.getRedirectHost()).orElse(host);
     }
 
     @Override
