@@ -33,6 +33,8 @@ To create a permanent agent:
     * Orka Credentials - The credentials used to connect to the Orka environment. Created by running orka user create
     * Orka Endpoint - The endpoint used by the plugin to connect to the Orka environment
     * Node - The Orka node which the agent will be deployed on
+    * Public Host (Optional) - Public node address as provided by the MacStadium team. Leave empty if you want to use the default node address. This addressed is used to connect to the Orka VM.  
+    **Note** The public node addresses are provided by MacStadium.
     * VM (Optional) - The VM to be deployed. The field is inactive if `Create a new VM Config` is selected
     * Create a new VM config (Optional) - Tells the plugin to create a new VM config and deploy it as an agent
         * Config name (Optional) - The name of the new config. The field is inactive if `Create a new VM Config` is not selected
@@ -63,6 +65,8 @@ To configure:
     * Name of this Cloud - The name of the cloud
     * Orka Credentials - The credentials used to connect to the Orka environment. Created by running orka user create
     * Orka Endpoint - The endpoint used by the plugin to connect to the Orka environment
+    * Node Mappings (Optional) - Overwrite the default host address used to connect to an Orka VM. By default, the plugin uses the private node address. Provide a mapping to a public host address if you wish to change this behavior.  
+    **Note** The public node addresses are provided by MacStadium.
 * Click Add Orka Template. An Orka template is the agent template, Jenkins will use to create a new agent.
 * Fill the following values:
     * VM (Optional) - The VM to be deployed. The field is inactive if `Create a new VM Config` is selected
