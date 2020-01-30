@@ -19,6 +19,7 @@ import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.ProvisioningHelper;
+import io.jenkins.plugins.orka.helpers.SSHUtil;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -39,13 +40,16 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
-    private static final int launchWaitTime = 15;
 
     private String credentialsId;
     private String endpoint;
 
+    private int maxRetries = 12;
+    private int retryWaitTime = 15;
+
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
+    private final SSHUtil sshUtil;
 
     @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends AddressMapper> mappings,
@@ -57,6 +61,7 @@ public class OrkaCloud extends Cloud {
 
         this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
+        this.sshUtil = new SSHUtil();
 
         readResolve();
     }
@@ -163,7 +168,11 @@ public class OrkaCloud extends Cloud {
             @Override
             public Node call() throws Exception {
                 OrkaProvisionedAgent agent = template.provision(node.getName());
-                Thread.sleep(TimeUnit.SECONDS.toMillis(launchWaitTime));
+
+                String host = agent.getHost();
+                int sshPort = agent.getSshPort();
+
+                sshUtil.waitForSSH(host, sshPort, maxRetries, retryWaitTime);
                 Jenkins.getInstance().addNode(agent);
                 return agent;
             }

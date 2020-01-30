@@ -9,6 +9,7 @@ import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.helpers.ClientFactory;
+import io.jenkins.plugins.orka.helpers.SSHUtil;
 import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
@@ -30,7 +31,8 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
     private static final String template = Constants.DEFAULT_CONFIG_NAME;
 
-    private int launchWaitTime = 15;
+    private final SSHUtil sshUtil;
+
     private int launchTimeoutSeconds = 300;
     private int maxRetries = 3;
     private int retryWaitTime = 30;
@@ -44,6 +46,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         this.host = host;
         this.port = port;
         this.redirectHost = redirectHost;
+        this.sshUtil = new SSHUtil();
     }
 
     public String getHost() {
@@ -86,8 +89,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         Jenkins.getInstance().updateNode(slaveComputer.getNode());
 
         listener.getLogger().println("Waiting for VM to boot");
-
-        Thread.sleep(TimeUnit.SECONDS.toMillis(this.launchWaitTime));
+        this.waitForVM(this.host, this.port);
 
         this.launcher.launch(slaveComputer, listener);
     }
@@ -104,6 +106,12 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         if (launcher != null) {
             this.launcher.beforeDisconnect(computer, listener);
         }
+    }
+
+    private void waitForVM(String host, int sshPort) throws InterruptedException, IOException {
+        int retries = 12;
+        int secondsBetweenRetries = 15;
+        this.sshUtil.waitForSSH(host, sshPort, retries, secondsBetweenRetries);
     }
 
     private boolean vmExists() {
