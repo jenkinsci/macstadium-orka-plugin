@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
 public class SSHUtil {
-    public boolean waitForSSH(String host, int sshPort, int retries, int secondsBetweenRetries)
+    public static boolean waitForSSH(String host, int sshPort, int retries, int secondsBetweenRetries)
             throws IOException, InterruptedException {
         int attempts = 0;
         while (attempts < retries) {

@@ -47,7 +47,6 @@ public class OrkaCloud extends Cloud {
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
-    private final SSHUtil sshUtil;
 
     @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends AddressMapper> mappings,
@@ -59,7 +58,6 @@ public class OrkaCloud extends Cloud {
 
         this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
-        this.sshUtil = new SSHUtil();
 
         readResolve();
     }
@@ -170,7 +168,7 @@ public class OrkaCloud extends Cloud {
                 String host = agent.getHost();
                 int sshPort = agent.getSshPort();
 
-                sshUtil.waitForSSH(host, sshPort, maxRetries, retryWaitTime);
+                SSHUtil.waitForSSH(host, sshPort, maxRetries, retryWaitTime);
                 Jenkins.getInstance().addNode(agent);
                 return agent;
             }

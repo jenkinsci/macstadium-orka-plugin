@@ -31,8 +31,6 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
     private static final String template = Constants.DEFAULT_CONFIG_NAME;
 
-    private final SSHUtil sshUtil;
-
     private int launchTimeoutSeconds = 300;
     private int maxRetries = 3;
     private int retryWaitTime = 30;
@@ -46,7 +44,6 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         this.host = host;
         this.port = port;
         this.redirectHost = redirectHost;
-        this.sshUtil = new SSHUtil();
     }
 
     public String getHost() {
@@ -111,7 +108,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     private void waitForVM(String host, int sshPort) throws InterruptedException, IOException {
         int retries = 12;
         int secondsBetweenRetries = 15;
-        this.sshUtil.waitForSSH(host, sshPort, retries, secondsBetweenRetries);
+        SSHUtil.waitForSSH(host, sshPort, retries, secondsBetweenRetries);
     }
 
     private boolean vmExists() {
