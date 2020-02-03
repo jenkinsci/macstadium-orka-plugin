@@ -15,7 +15,6 @@ import io.jenkins.plugins.orka.helpers.Utils;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
