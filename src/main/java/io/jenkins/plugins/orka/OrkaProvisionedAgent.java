@@ -5,8 +5,6 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
-import hudson.plugins.sshslaves.SSHLauncher;
-import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.NodeProperty;
@@ -40,9 +38,8 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
             RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
 
-        super(vmId, null, remoteFS, numExecutors, mode, labelString, new SSHLauncher(host, sshPort, vmCredentialsId,
-                null, null, null, null, 300, 3, 30, new NonVerifyingKeyVerificationStrategy()), retentionStrategy,
-                nodeProperties);
+        super(vmId, null, remoteFS, numExecutors, mode, labelString,
+                new WaitSSHLauncher(host, sshPort, vmCredentialsId), retentionStrategy, nodeProperties);
 
         this.cloudId = cloudId;
         this.vmId = vmId;

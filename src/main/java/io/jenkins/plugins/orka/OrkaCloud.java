@@ -18,7 +18,6 @@ import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
-import io.jenkins.plugins.orka.helpers.SSHUtil;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -41,9 +40,6 @@ public class OrkaCloud extends Cloud {
 
     private String credentialsId;
     private String endpoint;
-
-    private int maxRetries = 12;
-    private int retryWaitTime = 15;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
@@ -154,11 +150,6 @@ public class OrkaCloud extends Cloud {
             @Override
             public Node call() throws Exception {
                 OrkaProvisionedAgent agent = template.provision();
-
-                String host = agent.getHost();
-                int sshPort = agent.getSshPort();
-
-                SSHUtil.waitForSSH(host, sshPort, maxRetries, retryWaitTime);
                 Jenkins.getInstance().addNode(agent);
                 return agent;
             }
