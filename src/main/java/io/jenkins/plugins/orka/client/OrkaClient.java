@@ -91,6 +91,10 @@ public class OrkaClient {
         return gson.fromJson(response, ConfigurationResponse.class);
     }
 
+    public DeploymentResponse deployVM(String vmName) throws IOException {
+        return this.deployVM(vmName, null);
+    }
+
     public DeploymentResponse deployVM(String vmName, String node) throws IOException {
         Gson gson = new Gson();
 
@@ -99,6 +103,10 @@ public class OrkaClient {
         String response = this.post(this.endpoint + VM_PATH + DEPLOY_PATH, deploymentRequestJson);
 
         return gson.fromJson(response, DeploymentResponse.class);
+    }
+
+    public DeletionResponse deleteVM(String vmName) throws IOException {
+        return this.deleteVM(vmName, null);
     }
 
     public DeletionResponse deleteVM(String vmName, String node) throws IOException {

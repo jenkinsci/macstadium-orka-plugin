@@ -134,13 +134,13 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return Jenkins.getInstance().getDescriptor(getClass());
     }
 
-    public OrkaProvisionedAgent provision(String node) throws IOException, FormException {
+    public OrkaProvisionedAgent provision() throws IOException, FormException {
         this.ensureConfigurationExist();
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
-        DeploymentResponse response = this.parent.deployVM(vmName, node);
+        DeploymentResponse response = this.parent.deployVM(vmName);
         String host = this.parent.getRealHost(response.getHost());
 
-        return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), node, host,
+        return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
                 response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
                 this.labelString, this.retentionStrategy, this.nodeProperties);
     }
