@@ -18,13 +18,13 @@ import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
-import io.jenkins.plugins.orka.helpers.ProvisioningHelper;
 import io.jenkins.plugins.orka.helpers.SSHUtil;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -106,14 +106,14 @@ public class OrkaCloud extends Cloud {
         return client.createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
-    public DeploymentResponse deployVM(String name, String node) throws IOException {
+    public DeploymentResponse deployVM(String name) throws IOException {
         OrkaClient client = new ClientFactory().getOrkaClient(this.endpoint, this.credentialsId);
-        return client.deployVM(name, node);
+        return client.deployVM(name);
     }
 
-    public void deleteVM(String name, String node) throws IOException {
+    public void deleteVM(String name) throws IOException {
         OrkaClient client = new ClientFactory().getOrkaClient(this.endpoint, this.credentialsId);
-        client.deleteVM(name, node);
+        client.deleteVM(name);
     }
 
     public String getRealHost(String host) {
@@ -136,21 +136,11 @@ public class OrkaCloud extends Cloud {
 
             int vmsToProvision = Math.max(excessWorkload / template.getNumExecutors(), 1);
 
-            List<OrkaNode> freeNodes = getFreeNodes(vmsToProvision, template.getNumCPUs(), this.endpoint,
-                    this.credentialsId);
-
-            int possibleVMsToProvision = freeNodes.stream().mapToInt(n -> n.getVmCapacity()).sum();
-
-            if (possibleVMsToProvision < vmsToProvision) {
-                logger.info("There are not enough free nodes. Provisioning " + possibleVMsToProvision + " agents");
-            }
-
-            return freeNodes.stream().flatMap(node -> {
-                return IntStream.range(0, node.getVmCapacity()).mapToObj(i -> {
-                    Callable<Node> provisionNodeCallable = this.provisionNode(template, node);
-                    Future<Node> provisionNodeTask = Computer.threadPoolForRemoting.submit(provisionNodeCallable);
-                    return new PlannedNode(node.getName(), provisionNodeTask, template.getNumExecutors());
-                });
+            return IntStream.range(0, vmsToProvision).mapToObj(i -> {
+                String nodeName = UUID.randomUUID().toString();
+                Callable<Node> provisionNodeCallable = this.provisionNode(template);
+                Future<Node> provisionNodeTask = Computer.threadPoolForRemoting.submit(provisionNodeCallable);
+                return new PlannedNode(nodeName, provisionNodeTask, template.getNumExecutors());
             }).collect(Collectors.toList());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception during provisioning", e);
@@ -159,11 +149,11 @@ public class OrkaCloud extends Cloud {
         return Collections.emptyList();
     }
 
-    private Callable<Node> provisionNode(AgentTemplate template, OrkaNode node) {
+    private Callable<Node> provisionNode(AgentTemplate template) {
         return new Callable<Node>() {
             @Override
             public Node call() throws Exception {
-                OrkaProvisionedAgent agent = template.provision(node.getName());
+                OrkaProvisionedAgent agent = template.provision();
 
                 String host = agent.getHost();
                 int sshPort = agent.getSshPort();
@@ -173,17 +163,6 @@ public class OrkaCloud extends Cloud {
                 return agent;
             }
         };
-    }
-
-    @VisibleForTesting
-    List<OrkaNode> getFreeNodes(int vmsToProvision, int requiredCPU, String endpoint, String credentialsId) {
-        try {
-            ProvisioningHelper provisioningHelper = new ProvisioningHelper(endpoint, credentialsId);
-            return provisioningHelper.getFreeNodes(vmsToProvision, requiredCPU);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Couldn't create provisioning helper. No free nodes found.", e);
-        }
-        return Collections.emptyList();
     }
 
     private boolean normalModeOrMatches(AgentTemplate template, Label label) {

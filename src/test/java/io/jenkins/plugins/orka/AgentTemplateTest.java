@@ -28,13 +28,11 @@ public class AgentTemplateTest {
         String id = "vm-machine";
 
         OrkaCloud cloud = mock(OrkaCloud.class);
-        when(cloud.deployVM(anyString(), anyString())).thenReturn(new DeploymentResponse(ip, sshPort, id, null, null));
+        when(cloud.deployVM(anyString())).thenReturn(new DeploymentResponse(ip, sshPort, id, null, null));
         when(cloud.getRealHost(anyString())).thenReturn(ip);
         AgentTemplate.setParent(cloud);
 
-        String node = "macpro-1";
-
-        OrkaProvisionedAgent provisionedAgent = AgentTemplate.provision(node);
+        OrkaProvisionedAgent provisionedAgent = AgentTemplate.provision();
 
         assertEquals(AgentTemplate.getLabelString(), provisionedAgent.getLabelString());
         assertEquals(AgentTemplate.getMode(), provisionedAgent.getMode());
@@ -44,7 +42,6 @@ public class AgentTemplateTest {
         assertEquals(ip, provisionedAgent.getHost());
         assertEquals(sshPort, provisionedAgent.getSshPort());
         assertEquals(id, provisionedAgent.getVmId());
-        assertEquals(node, provisionedAgent.getNode());
     }
 
     private AgentTemplate getAgentTemplate() {
