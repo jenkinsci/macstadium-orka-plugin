@@ -18,6 +18,7 @@ import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
+import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -149,6 +150,10 @@ public class OrkaCloud extends Cloud {
         return new Callable<Node>() {
             @Override
             public Node call() throws Exception {
+
+                logger.log(Level.INFO, "Provisioning Node with template:");
+                logger.log(Level.INFO, Utils.getAsString(template));
+
                 OrkaProvisionedAgent agent = template.provision();
                 Jenkins.getInstance().addNode(agent);
                 return agent;

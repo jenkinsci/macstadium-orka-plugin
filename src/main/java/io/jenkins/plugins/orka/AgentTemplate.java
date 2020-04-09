@@ -15,17 +15,21 @@ import hudson.slaves.NodeProperty;
 import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
+import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
@@ -34,6 +38,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
 public class AgentTemplate implements Describable<AgentTemplate> {
+    private static final Logger logger = Logger.getLogger(AgentTemplate.class.getName());
     private String vmCredentialsId;
     private boolean createNewVMConfig;
     private String vm;
@@ -137,7 +142,13 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     public OrkaProvisionedAgent provision() throws IOException, FormException {
         this.ensureConfigurationExist();
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
+        
+        logger.log(Level.INFO, "Deploying VM with name " + vmName);
         DeploymentResponse response = this.parent.deployVM(vmName);
+
+        logger.log(Level.INFO, "Result deploying VM " + vmName + ":");
+        logger.log(Level.INFO, Utils.getAsString(response));
+
         String host = this.parent.getRealHost(response.getHost());
 
         return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,

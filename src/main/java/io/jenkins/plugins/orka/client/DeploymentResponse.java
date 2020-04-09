@@ -47,5 +47,4 @@ public class DeploymentResponse {
     public boolean hasErrors() {
         return this.errors != null && this.errors.length > 0;
     }
-
 }
