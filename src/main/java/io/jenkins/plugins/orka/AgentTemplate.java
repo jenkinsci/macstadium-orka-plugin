@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
@@ -143,11 +142,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.ensureConfigurationExist();
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
         
-        logger.log(Level.INFO, "Deploying VM with name " + vmName);
+        logger.fine("Deploying VM with name " + vmName);
         DeploymentResponse response = this.parent.deployVM(vmName);
 
-        logger.log(Level.INFO, "Result deploying VM " + vmName + ":");
-        logger.log(Level.INFO, Utils.getAsString(response));
+        logger.fine("Result deploying VM " + vmName + ":");
+        logger.fine(Utils.getAsString(response));
 
         String host = this.parent.getRealHost(response.getHost());
 

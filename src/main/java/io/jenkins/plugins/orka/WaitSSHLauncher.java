@@ -9,7 +9,6 @@ import io.jenkins.plugins.orka.helpers.SSHUtil;
 
 import java.io.IOException;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class WaitSSHLauncher extends ComputerLauncher {
@@ -37,12 +36,12 @@ public final class WaitSSHLauncher extends ComputerLauncher {
         int retryWaitTime = 15;
 
         listener.getLogger().println("Waiting for SSH to be enabled");
-        logger.log(Level.INFO, "Waiting for SSH to be enabled");
+        logger.fine("Waiting for SSH to be enabled");
 
         SSHUtil.waitForSSH(this.launcher.getHost(), this.launcher.getPort(), maxRetries, retryWaitTime);
 
         listener.getLogger().println("SSH enabled");
-        logger.log(Level.INFO, "SSH enabled");
+        logger.fine("SSH enabled");
 
         this.launcher.launch(slaveComputer, listener);
     }

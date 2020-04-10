@@ -163,7 +163,7 @@ public class OrkaClient {
     }
 
     private String executeCall(Request request) throws IOException {
-        logger.log(Level.INFO,"Executing request to Orka API: " + '/' + request.method()  + ' ' + request.url());
+        logger.fine("Executing request to Orka API: " + '/' + request.method()  + ' ' + request.url());
 
         try (Response response = client.newCall(request).execute()) {
             String stringResponse =  response.body().string();

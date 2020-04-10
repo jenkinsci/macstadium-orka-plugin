@@ -126,8 +126,7 @@ public class OrkaCloud extends Cloud {
             AgentTemplate template = this.getTemplate(label);
 
             if (template == null) {
-                logger.log(Level.INFO,
-                        "Couldn't find template for label " + label.getName() + ". Stopping provisioning.");
+                logger.fine("Couldn't find template for label " + label.getName() + ". Stopping provisioning.");
                 return Collections.emptyList();
             }
 
@@ -151,13 +150,13 @@ public class OrkaCloud extends Cloud {
             @Override
             public Node call() throws Exception {
 
-                logger.log(Level.INFO, "Provisioning Node with template:");
-                logger.log(Level.INFO, Utils.getAsString(template));
+                logger.fine("Provisioning Node with template:");
+                logger.fine(Utils.getAsString(template));
 
                 OrkaProvisionedAgent agent = template.provision();
 
-                logger.log(Level.INFO, "Adding Node to Jenkins:");
-                logger.log(Level.INFO, Utils.getAsString(agent));
+                logger.fine("Adding Node to Jenkins:");
+                logger.fine(Utils.getAsString(agent));
 
                 Jenkins.getInstance().addNode(agent);
                 
