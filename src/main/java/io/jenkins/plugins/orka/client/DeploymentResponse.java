@@ -2,6 +2,8 @@ package io.jenkins.plugins.orka.client;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Arrays;
+
 public class DeploymentResponse {
     @SerializedName("ip")
     private String host;
@@ -46,5 +48,11 @@ public class DeploymentResponse {
 
     public boolean hasErrors() {
         return this.errors != null && this.errors.length > 0;
+    }
+
+    @Override
+    public String toString() {
+        return "DeploymentResponse [errors=" + Arrays.toString(errors) + ", host=" + host + ", id=" + id + ", message="
+                + message + ", sshPort=" + sshPort + "]";
     }
 }

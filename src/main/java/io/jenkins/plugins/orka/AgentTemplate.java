@@ -141,12 +141,12 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     public OrkaProvisionedAgent provision() throws IOException, FormException {
         this.ensureConfigurationExist();
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
-        
+
         logger.fine("Deploying VM with name " + vmName);
         DeploymentResponse response = this.parent.deployVM(vmName);
 
         logger.fine("Result deploying VM " + vmName + ":");
-        logger.fine(Utils.getAsString(response));
+        logger.fine(response.toString());
 
         String host = this.parent.getRealHost(response.getHost());
 
@@ -224,5 +224,15 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {
             return OrkaRetentionStrategy.getRetentionStrategyDescriptors();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "AgentTemplate [baseImage=" + baseImage + ", configName=" + configName + ", createNewVMConfig="
+                + createNewVMConfig + ", idleTerminationMinutes=" + idleTerminationMinutes + ", labelString="
+                + labelString + ", mode=" + mode + ", nodeProperties=" + nodeProperties + ", numCPUs=" + numCPUs
+                + ", numExecutors=" + numExecutors + ", parent=" + parent + ", remoteFS=" + remoteFS
+                + ", retentionStrategy=" + retentionStrategy + ", vm=" + vm + ", vmCredentialsId=" + vmCredentialsId
+                + "]";
     }
 }

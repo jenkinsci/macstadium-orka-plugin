@@ -121,19 +121,17 @@ public class OrkaCloud extends Cloud {
     @Override
     public Collection<PlannedNode> provision(final Label label, int excessWorkload) {
         String provisionIdString = "[provisionId=" + UUID.randomUUID().toString() + "] ";
-        
+
         try {
-            
-            logger.info(provisionIdString + "Provisioning for label " 
-                + label.getName() + ". Workload: " 
-                + excessWorkload);
+
+            logger.info(
+                    provisionIdString + "Provisioning for label " + label.getName() + ". Workload: " + excessWorkload);
 
             AgentTemplate template = this.getTemplate(label);
 
             if (template == null) {
-                logger.fine(provisionIdString + "Couldn't find template for label " 
-                    + label.getName() 
-                    + ". Stopping provisioning.");
+                logger.fine(provisionIdString + "Couldn't find template for label " + label.getName()
+                        + ". Stopping provisioning.");
                 return Collections.emptyList();
             }
 
@@ -160,15 +158,15 @@ public class OrkaCloud extends Cloud {
             public Node call() throws Exception {
 
                 logger.fine(provisionIdString + "Provisioning Node with template:");
-                logger.fine(Utils.getAsString(template));
+                logger.fine(template.toString());
 
                 OrkaProvisionedAgent agent = template.provision();
 
                 logger.fine(provisionIdString + "Adding Node to Jenkins:");
-                logger.fine(Utils.getAsString(agent));
+                logger.fine(agent.toString());
 
                 Jenkins.getInstance().addNode(agent);
-                
+
                 return agent;
             }
         };

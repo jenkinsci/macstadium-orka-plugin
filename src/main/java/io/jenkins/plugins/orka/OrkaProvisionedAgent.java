@@ -113,4 +113,10 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private OrkaCloud getCloud() {
         return (OrkaCloud) Jenkins.getInstance().getCloud(cloudId);
     }
+
+    @Override
+    public String toString() {
+        return "OrkaProvisionedAgent [cloudId=" + cloudId + ", host=" + host + ", node=" + node + ", sshPort=" + sshPort
+                + ", vmCredentialsId=" + vmCredentialsId + ", vmId=" + vmId + "]";
+    }
 }
