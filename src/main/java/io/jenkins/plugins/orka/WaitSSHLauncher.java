@@ -35,13 +35,16 @@ public final class WaitSSHLauncher extends ComputerLauncher {
         int maxRetries = 12;
         int retryWaitTime = 15;
 
-        listener.getLogger().println("Waiting for SSH to be enabled");
-        logger.fine("Waiting for SSH to be enabled");
+        String host = launcher.getHost();
+        int port = launcher.getPort();
 
-        SSHUtil.waitForSSH(this.launcher.getHost(), this.launcher.getPort(), maxRetries, retryWaitTime);
+        listener.getLogger().println("Waiting for SSH to be enabled");
+        logger.fine("Waiting for SSH to be enabled on host  "  + host + " on port " + port);
+
+        SSHUtil.waitForSSH(host, port, maxRetries, retryWaitTime);
 
         listener.getLogger().println("SSH enabled");
-        logger.fine("SSH enabled");
+        logger.fine("SSH enabled on host " + host + " on port " + port);
 
         this.launcher.launch(slaveComputer, listener);
     }
