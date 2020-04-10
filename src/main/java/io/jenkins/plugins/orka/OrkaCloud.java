@@ -120,42 +120,51 @@ public class OrkaCloud extends Cloud {
 
     @Override
     public Collection<PlannedNode> provision(final Label label, int excessWorkload) {
+        String provisionIdString = "[provisionId=" + UUID.randomUUID().toString() + "] ";
+        
         try {
-            logger.info("Provisioning for label " + label.getName() + ". Workload: " + excessWorkload);
+            
+            logger.info(provisionIdString + "Provisioning for label " 
+                + label.getName() + ". Workload: " 
+                + excessWorkload);
 
             AgentTemplate template = this.getTemplate(label);
 
             if (template == null) {
-                logger.fine("Couldn't find template for label " + label.getName() + ". Stopping provisioning.");
+                logger.fine(provisionIdString + "Couldn't find template for label " 
+                    + label.getName() 
+                    + ". Stopping provisioning.");
                 return Collections.emptyList();
             }
 
             int vmsToProvision = Math.max(excessWorkload / template.getNumExecutors(), 1);
+            logger.fine(provisionIdString + "VMs to provision: " + vmsToProvision);
 
             return IntStream.range(0, vmsToProvision).mapToObj(i -> {
                 String nodeName = UUID.randomUUID().toString();
-                Callable<Node> provisionNodeCallable = this.provisionNode(template);
+                Callable<Node> provisionNodeCallable = this.provisionNode(template, provisionIdString);
                 Future<Node> provisionNodeTask = Computer.threadPoolForRemoting.submit(provisionNodeCallable);
+
                 return new PlannedNode(nodeName, provisionNodeTask, template.getNumExecutors());
             }).collect(Collectors.toList());
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception during provisioning", e);
+            logger.log(Level.WARNING, provisionIdString + "Exception during provisioning", e);
         }
 
         return Collections.emptyList();
     }
 
-    private Callable<Node> provisionNode(AgentTemplate template) {
+    private Callable<Node> provisionNode(AgentTemplate template, String provisionIdString) {
         return new Callable<Node>() {
             @Override
             public Node call() throws Exception {
 
-                logger.fine("Provisioning Node with template:");
+                logger.fine(provisionIdString + "Provisioning Node with template:");
                 logger.fine(Utils.getAsString(template));
 
                 OrkaProvisionedAgent agent = template.provision();
 
-                logger.fine("Adding Node to Jenkins:");
+                logger.fine(provisionIdString + "Adding Node to Jenkins:");
                 logger.fine(Utils.getAsString(agent));
 
                 Jenkins.getInstance().addNode(agent);
