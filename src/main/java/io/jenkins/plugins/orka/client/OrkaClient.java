@@ -166,8 +166,7 @@ public class OrkaClient {
         logger.fine("Executing request to Orka API: " + '/' + request.method()  + ' ' + request.url());
 
         try (Response response = client.newCall(request).execute()) {
-            String stringResponse =  response.body().string();
-            return stringResponse;
+            return response.body().string();
         }
     }
 }
