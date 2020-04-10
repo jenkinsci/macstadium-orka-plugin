@@ -75,7 +75,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     @Override
     protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
-        logger.info("Terminating agent ");
+        logger.info("Terminating agent. VM id: " + this.vmId);
 
         this.getCloud().deleteVM(this.vmId);
     }
@@ -112,5 +112,11 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     private OrkaCloud getCloud() {
         return (OrkaCloud) Jenkins.getInstance().getCloud(cloudId);
+    }
+
+    @Override
+    public String toString() {
+        return "OrkaProvisionedAgent [cloudId=" + cloudId + ", host=" + host + ", node=" + node + ", sshPort=" + sshPort
+                + ", vmCredentialsId=" + vmCredentialsId + ", vmId=" + vmId + "]";
     }
 }

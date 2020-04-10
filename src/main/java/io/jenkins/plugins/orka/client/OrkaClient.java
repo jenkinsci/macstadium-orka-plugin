@@ -5,10 +5,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import io.jenkins.plugins.orka.helpers.Utils;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -19,6 +24,7 @@ import okhttp3.Response;
 
 public class OrkaClient {
     private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(60, TimeUnit.SECONDS).build();
+    private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final String LOGIN_PATH = "/token";
@@ -135,6 +141,7 @@ public class OrkaClient {
     String post(String url, String body) throws IOException {
         RequestBody requestBody = RequestBody.create(JSON, body);
         Request request = this.getAuthenticatedBuilder(url).post(requestBody).build();
+
         return executeCall(request);
     }
 
@@ -156,6 +163,8 @@ public class OrkaClient {
     }
 
     private String executeCall(Request request) throws IOException {
+        logger.fine("Executing request to Orka API: " + '/' + request.method()  + ' ' + request.url());
+
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }

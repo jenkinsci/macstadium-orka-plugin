@@ -9,7 +9,11 @@ import io.jenkins.plugins.orka.helpers.SSHUtil;
 
 import java.io.IOException;
 
+import java.util.logging.Logger;
+
 public final class WaitSSHLauncher extends ComputerLauncher {
+    private static final Logger logger = Logger.getLogger(WaitSSHLauncher.class.getName());
+
     private SSHLauncher launcher;
 
     public WaitSSHLauncher(String host, int sshPort, String vmCredentialsId) {
@@ -30,9 +34,17 @@ public final class WaitSSHLauncher extends ComputerLauncher {
     public void launch(SlaveComputer slaveComputer, TaskListener listener) throws IOException, InterruptedException {
         int maxRetries = 12;
         int retryWaitTime = 15;
+
+        String host = launcher.getHost();
+        int port = launcher.getPort();
+
         listener.getLogger().println("Waiting for SSH to be enabled");
-        SSHUtil.waitForSSH(this.launcher.getHost(), this.launcher.getPort(), maxRetries, retryWaitTime);
+        logger.fine("Waiting for SSH to be enabled on host  "  + host + " on port " + port);
+
+        SSHUtil.waitForSSH(host, port, maxRetries, retryWaitTime);
+
         listener.getLogger().println("SSH enabled");
+        logger.fine("SSH enabled on host " + host + " on port " + port);
 
         this.launcher.launch(slaveComputer, listener);
     }
