@@ -75,7 +75,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     @Override
     protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
-        logger.info("Terminating agent ");
+        logger.info("Terminating agent. VM id: " + this.vmId);
 
         this.getCloud().deleteVM(this.vmId);
     }
