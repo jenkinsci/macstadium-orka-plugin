@@ -162,10 +162,12 @@ public class OrkaCloud extends Cloud {
 
                 OrkaProvisionedAgent agent = template.provision();
 
-                logger.fine(provisionIdString + "Adding Node to Jenkins:");
-                logger.fine(agent.toString());
+                if (agent != null) {
+                    logger.fine(provisionIdString + "Adding Node to Jenkins:");
+                    logger.fine(agent.toString());
 
-                Jenkins.getInstance().addNode(agent);
+                    Jenkins.getInstance().addNode(agent);
+                }
 
                 return agent;
             }

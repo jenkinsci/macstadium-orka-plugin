@@ -148,6 +148,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         logger.fine("Result deploying VM " + vmName + ":");
         logger.fine(response.toString());
 
+        if (response.hasErrors()) {
+            logger.warning("Deploying VM failed with: " + Arrays.toString(response.getErrors()));
+            return null;
+        }
+
         String host = this.parent.getRealHost(response.getHost());
 
         return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
