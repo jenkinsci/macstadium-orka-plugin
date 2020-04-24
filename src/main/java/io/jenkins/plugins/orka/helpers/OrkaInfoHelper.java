@@ -2,6 +2,8 @@ package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.OrkaClient;
+
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
@@ -9,6 +11,8 @@ import org.apache.commons.lang.StringUtils;
 public class OrkaInfoHelper {
     private static final Logger logger = Logger.getLogger(OrkaInfoHelper.class.getName());
     private ClientFactory clientFactory;
+
+    private static final String[] supportedCPUs = new String[] { "3", "4", "6", "8", "12", "24" };
 
     public OrkaInfoHelper(ClientFactory clientFactory) {
         this.clientFactory = clientFactory;
@@ -59,6 +63,12 @@ public class OrkaInfoHelper {
             logger.log(Level.WARNING, "Exception in doFillBaseImageItems", e);
         }
 
+        return model;
+    }
+
+    public ListBoxModel doFillNumCPUsItems() {
+        ListBoxModel model = new ListBoxModel();
+        Arrays.stream(supportedCPUs).forEach(cpu -> model.add(cpu));
         return model;
     }
 }

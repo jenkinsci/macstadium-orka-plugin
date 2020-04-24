@@ -212,6 +212,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
+        public ListBoxModel doFillNumCPUsItems() {
+            return this.infoHelper.doFillNumCPUsItems();
+        }
+
         @POST
         public ListBoxModel doFillVmItems(@QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
