@@ -14,17 +14,11 @@
         <f:entry title="${%Base Image}" field="baseImage">
           <f:select checkMethod="post"/>
         </f:entry>
-                
-          <f:entry title="${%# of CPUs}" field="numCPUs">
-            <select name="numCPUs">
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="6">6</option>
-              <option value="8">8</option>
-              <option value="12">12</option>
-              <option value="24">24</option>
-            </select>
-          </f:entry>
+
+        <f:entry title="${%# of CPUs}" field="numCPUs">
+          <c:select />
+        </f:entry>
+
         </f:optionalBlock>
 
         <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">

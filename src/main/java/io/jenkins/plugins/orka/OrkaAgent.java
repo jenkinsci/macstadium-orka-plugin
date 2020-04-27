@@ -160,6 +160,10 @@ public class OrkaAgent extends AbstractCloudSlave {
             return this.infoHelper.doFillNodeItems(orkaEndpoint, orkaCredentialsId);
         }
 
+        public ListBoxModel doFillNumCPUsItems() {
+            return this.infoHelper.doFillNumCPUsItems();
+        }
+
         @POST
         public ListBoxModel doFillVmItems(@QueryParameter String orkaEndpoint, @QueryParameter String orkaCredentialsId,
                 @QueryParameter boolean createNewVMConfig) {
