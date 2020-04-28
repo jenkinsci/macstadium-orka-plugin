@@ -2,7 +2,6 @@ package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.NodeResponse;
-import io.jenkins.plugins.orka.client.OrkaClient;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
@@ -13,10 +12,10 @@ public class FormValidator {
     private static final String NOT_ENOUGH_RESOURCES_FORMAT = 
         "Not enough resources on node. Required %s CPU, available %s";
 
-    private ClientFactory clientFactory;
+    private OrkaClientProxy clientProxy;
 
-    public FormValidator(ClientFactory clientFactory) {
-        this.clientFactory = clientFactory;
+    public FormValidator(OrkaClientProxy clientProxy) {
+        this.clientProxy = clientProxy;
     }
 
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
@@ -30,8 +29,8 @@ public class FormValidator {
 
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                    OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint, orkaCredentialsId);
-                    boolean alreadyInUse = client.getVMs().stream()
+                    this.clientProxy.setData(orkaEndpoint, orkaCredentialsId);
+                    boolean alreadyInUse = clientProxy.getVMs().stream()
                             .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
                     if (alreadyInUse) {
                         return FormValidation.error("Configuration name is already in use");
@@ -48,7 +47,7 @@ public class FormValidator {
     public FormValidation doCheckNode(String node, String orkaEndpoint, String orkaCredentialsId, String vm,
             boolean createNewConfig, int numCPUs) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-    
+
         boolean hasAvailableNodes = true;
         boolean canDeployVM = true;
         int requiredCPU = 0;
@@ -56,18 +55,22 @@ public class FormValidator {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint, orkaCredentialsId);
-                hasAvailableNodes = client.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
+                this.clientProxy.setData(orkaEndpoint, orkaCredentialsId);
+
+                hasAvailableNodes = clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .anyMatch(n -> true);
 
                 if (hasAvailableNodes) {
                     requiredCPU = numCPUs;
                     if (!createNewConfig) {
-                        requiredCPU = client.getVMs().stream().filter(v -> v.getVMName().equals(vm)).findFirst().get()
+                        requiredCPU = clientProxy.getVMs()
+                                .stream().filter(v -> v.getVMName().equals(vm))
+                                .findFirst()
+                                .get()
                                 .getCPUCount();
                     }
 
-                    NodeResponse nodeDetails = client.getNodes().stream().filter(n -> n.getHostname().equals(node))
+                    NodeResponse nodeDetails = clientProxy.getNodes().stream().filter(n -> n.getHostname().equals(node))
                             .findFirst().get();
                     canDeployVM = ProvisioningHelper.canDeployOnNode(nodeDetails, requiredCPU);
                     availableCPU = nodeDetails.getAvailableCPU();

@@ -1,7 +1,6 @@
 package io.jenkins.plugins.orka;
 
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
-import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
 import hudson.model.Computer;
@@ -14,11 +13,9 @@ import hudson.util.ListBoxModel;
 
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.client.VMResponse;
-import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
-import io.jenkins.plugins.orka.helpers.Utils;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -93,24 +90,21 @@ public class OrkaCloud extends Cloud {
     }
 
     public List<VMResponse> getVMs() throws IOException {
-        OrkaClient client = new ClientFactory().getOrkaClient(this.endpoint, this.credentialsId);
-        return client.getVMs();
+        return new OrkaClientProxy(this.endpoint, this.credentialsId).getVMs();
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
-        OrkaClient client = new ClientFactory().getOrkaClient(this.endpoint, this.credentialsId);
-        return client.createConfiguration(name, image, baseImage, configTemplate, cpuCount);
+        return new OrkaClientProxy(this.endpoint, this.credentialsId)
+            .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
-        OrkaClient client = new ClientFactory().getOrkaClient(this.endpoint, this.credentialsId);
-        return client.deployVM(name);
+        return new OrkaClientProxy(this.endpoint, this.credentialsId).deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
-        OrkaClient client = new ClientFactory().getOrkaClient(this.endpoint, this.credentialsId);
-        client.deleteVM(name);
+        new OrkaClientProxy(this.endpoint, this.credentialsId).deleteVM(name);
     }
 
     public String getRealHost(String host) {
@@ -123,7 +117,6 @@ public class OrkaCloud extends Cloud {
         String provisionIdString = "[provisionId=" + UUID.randomUUID().toString() + "] ";
 
         try {
-
             logger.info(
                     provisionIdString + "Provisioning for label " + label.getName() + ". Workload: " + excessWorkload);
 

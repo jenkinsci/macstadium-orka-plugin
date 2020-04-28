@@ -1,7 +1,6 @@
 package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,8 +15,7 @@ import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.ListBoxModel;
-import io.jenkins.plugins.orka.client.OrkaClient;
-import io.jenkins.plugins.orka.helpers.ClientFactory;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 
 @RunWith(Parameterized.class)
 public class ImageItemsFillTest {
@@ -31,7 +29,7 @@ public class ImageItemsFillTest {
                         { true, null, "credentials", 0 }, { true, "endpoint", null, 0 }, });
     }
 
-    private ClientFactory factory;
+    private OrkaClientProxy clientProxy;
     private final boolean createNewConfig;
     private final String endpoint;
     private final String credentials;
@@ -47,17 +45,15 @@ public class ImageItemsFillTest {
     @Before
     public void initialize() throws IOException {
         String[] response = { "Mojave.img", "SnowLeopard.img" };
-        OrkaClient client = mock(OrkaClient.class);
 
-        this.factory = mock(ClientFactory.class);
-        when(factory.getOrkaClient(anyString(), anyString())).thenReturn(client);
-        when(client.getImages()).thenReturn(Arrays.asList((response)));
+        this.clientProxy = mock(OrkaClientProxy.class);
+        when(clientProxy.getImages()).thenReturn(Arrays.asList((response)));
     }
 
     @Test
     public void when_fill_image_items_in_orka_agent_should_return_correct_result_size() throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientFactory(this.factory);
+        descriptor.setClientProxy(this.clientProxy);
 
         ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials,
                 this.createNewConfig);
@@ -68,7 +64,7 @@ public class ImageItemsFillTest {
     @Test
     public void when_fill_image_items_in_agent_template_should_return_correct_result_size() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
-        descriptor.setClientFactory(this.factory);
+        descriptor.setClientProxy(this.clientProxy);
 
         ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials,
                 this.createNewConfig);

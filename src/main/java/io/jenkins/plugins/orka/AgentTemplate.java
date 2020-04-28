@@ -17,12 +17,11 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
-import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -184,15 +183,15 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<AgentTemplate> {
-        private ClientFactory clientFactory = new ClientFactory();
-        private FormValidator formValidator = new FormValidator(this.clientFactory);
-        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(this.clientFactory);
+        private OrkaClientProxy clientProxy = new OrkaClientProxy();
+        private FormValidator formValidator = new FormValidator(this.clientProxy);
+        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(this.clientProxy);
 
         @VisibleForTesting
-        void setClientFactory(ClientFactory clientFactory) {
-            this.clientFactory = clientFactory;
-            this.formValidator = new FormValidator(this.clientFactory);
-            this.infoHelper = new OrkaInfoHelper(this.clientFactory);
+        void setClientProxy(OrkaClientProxy clientProxy) {
+            this.clientProxy = clientProxy;
+            this.formValidator = new FormValidator(this.clientProxy);
+            this.infoHelper = new OrkaInfoHelper(this.clientProxy);
         }
 
         @POST

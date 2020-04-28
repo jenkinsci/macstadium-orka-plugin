@@ -17,9 +17,8 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.NodeResponse;
-import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.client.VMResponse;
-import io.jenkins.plugins.orka.helpers.ClientFactory;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 
 @RunWith(Parameterized.class)
 public class NodeResourcesCheckTest {
@@ -77,15 +76,13 @@ public class NodeResourcesCheckTest {
 
         List<VMResponse> vmResponse = Arrays.asList(firstVM, secondVM);
 
-        ClientFactory factory = mock(ClientFactory.class);
-        OrkaClient client = mock(OrkaClient.class);
+        OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
-        when(factory.getOrkaClient(anyString(), anyString())).thenReturn(client);
-        when(client.getNodes()).thenReturn(response);
-        when(client.getVMs()).thenReturn(vmResponse);
+        when(clientProxy.getNodes()).thenReturn(response);
+        when(clientProxy.getVMs()).thenReturn(vmResponse);
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientFactory(factory);
+        descriptor.setClientProxy(clientProxy);
 
         FormValidation validation = descriptor.doCheckNode(this.selectedNode, "endpoint", "credentialsId", this.vm,
                 this.createNewVMConfig, this.requiredCPU);
