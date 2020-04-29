@@ -165,8 +165,6 @@ public class OrkaCloud extends Cloud {
                 if (agent != null) {
                     logger.fine(provisionIdString + "Adding Node to Jenkins:");
                     logger.fine(agent.toString());
-
-                    Jenkins.getInstance().addNode(agent);
                 }
 
                 return agent;
