@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +18,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
 @RunWith(Parameterized.class)
 public class NodeNameCheckTest {
@@ -53,11 +55,14 @@ public class NodeNameCheckTest {
         NodeResponse thirdNode = new NodeResponse("macpro-3", "127.0.0.3", 24, this.thirdNodeAvailableCPU, "64Gi", "32Gi", "macpro-3", "ready");
         List<NodeResponse> response = Arrays.asList(firstNode, secondNode, thirdNode);
 
+        OrkaClientProxyFactory factory = mock(OrkaClientProxyFactory.class);
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
+
+        when(factory.getOrkaClientProxy(anyString(), anyString())).thenReturn(clientProxy);
         when(clientProxy.getNodes()).thenReturn(response);
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientProxy(clientProxy);
+        descriptor.setClientProxyFactory(factory);
         
         FormValidation validation = descriptor.doCheckNode(null, "endpoint", "credentialsId", null, false, 12);
 

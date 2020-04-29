@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
 @RunWith(Parameterized.class)
 public class VMItemsFillTest {
@@ -31,7 +33,7 @@ public class VMItemsFillTest {
                         { false, null, "credentials", 0 }, { false, "endpoint", null, 0 }, });
     }
 
-    private OrkaClientProxy clientProxy;
+    private OrkaClientProxyFactory clientProxyFactory;
     private final boolean createNewConfig;
     private final String endpoint;
     private final String credentials;
@@ -50,14 +52,17 @@ public class VMItemsFillTest {
         VMResponse secondVM = new VMResponse("second", "not deployed", 24, "Mojave.img", "secondImage", "default");
         List<VMResponse> response = Arrays.asList(firstVM, secondVM);
 
-        this.clientProxy = mock(OrkaClientProxy.class);
-        when(clientProxy.getVMs()).thenReturn(response);
+        OrkaClientProxy client = mock(OrkaClientProxy.class);
+
+        this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString())).thenReturn(client);
+        when(client.getVMs()).thenReturn(response);
     }
 
     @Test
     public void when_fill_vm_items_in_orka_agent_should_return_correct_vm_size() throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientProxy(this.clientProxy);
+        descriptor.setClientProxyFactory(this.clientProxyFactory);
 
         ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, this.createNewConfig);
 
@@ -67,7 +72,7 @@ public class VMItemsFillTest {
     @Test
     public void when_fill_vm_items_in_agent_template_should_return_correct_vm_size() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
-        descriptor.setClientProxy(this.clientProxy);
+        descriptor.setClientProxyFactory(this.clientProxyFactory);
 
         ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, this.createNewConfig);
 

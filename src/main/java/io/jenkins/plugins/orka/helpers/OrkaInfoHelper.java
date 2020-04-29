@@ -9,12 +9,12 @@ import org.apache.commons.lang.StringUtils;
 
 public class OrkaInfoHelper {
     private static final Logger logger = Logger.getLogger(OrkaInfoHelper.class.getName());
-    private OrkaClientProxy clientProxy;
+    private OrkaClientProxyFactory clientProxyFactory;
 
     private static final String[] supportedCPUs = new String[] { "3", "4", "6", "8", "12", "24" };
 
-    public OrkaInfoHelper(OrkaClientProxy clientProxy) {
-        this.clientProxy = clientProxy;
+    public OrkaInfoHelper(OrkaClientProxyFactory clientProxyFactory) {
+        this.clientProxyFactory = clientProxyFactory;
     }
 
     public ListBoxModel doFillNodeItems(String orkaEndpoint, String orkaCredentialsId) {
@@ -23,8 +23,9 @@ public class OrkaInfoHelper {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                this.clientProxy.setData(orkaEndpoint, orkaCredentialsId);
-                this.clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
+                OrkaClientProxy clientProxy = this.clientProxyFactory
+                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
+                clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .forEach(n -> model.add(n.getHostname()));
             }
         } catch (Exception e) {
@@ -40,8 +41,9 @@ public class OrkaInfoHelper {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && !createNewVMConfig && orkaCredentialsId != null) {
-                this.clientProxy.setData(orkaEndpoint, orkaCredentialsId);
-                this.clientProxy.getVMs().forEach(vm -> model.add(vm.getVMName()));
+                OrkaClientProxy clientProxy = this.clientProxyFactory
+                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
+                clientProxy.getVMs().forEach(vm -> model.add(vm.getVMName()));
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception in doFillVmItems", e);
@@ -55,8 +57,9 @@ public class OrkaInfoHelper {
         ListBoxModel model = new ListBoxModel();
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && createNewVMConfig && orkaCredentialsId != null) {
-                this.clientProxy.setData(orkaEndpoint, orkaCredentialsId);
-                this.clientProxy.getImages().forEach(image -> model.add(image));
+                OrkaClientProxy clientProxy = this.clientProxyFactory
+                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
+                clientProxy.getImages().forEach(image -> model.add(image));
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception in doFillBaseImageItems", e);

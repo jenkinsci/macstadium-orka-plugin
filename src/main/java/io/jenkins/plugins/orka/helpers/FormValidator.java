@@ -12,10 +12,10 @@ public class FormValidator {
     private static final String NOT_ENOUGH_RESOURCES_FORMAT = 
         "Not enough resources on node. Required %s CPU, available %s";
 
-    private OrkaClientProxy clientProxy;
+    private OrkaClientProxyFactory clientProxyFactory;
 
-    public FormValidator(OrkaClientProxy clientProxy) {
-        this.clientProxy = clientProxy;
+    public FormValidator(OrkaClientProxyFactory clientProxyFactory) {
+        this.clientProxyFactory = clientProxyFactory;
     }
 
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
@@ -29,7 +29,8 @@ public class FormValidator {
 
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                    this.clientProxy.setData(orkaEndpoint, orkaCredentialsId);
+                    OrkaClientProxy clientProxy = this.clientProxyFactory
+                        .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
                     boolean alreadyInUse = clientProxy.getVMs().stream()
                             .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
                     if (alreadyInUse) {
@@ -55,8 +56,8 @@ public class FormValidator {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                this.clientProxy.setData(orkaEndpoint, orkaCredentialsId);
-
+                OrkaClientProxy clientProxy = this.clientProxyFactory
+                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
                 hasAvailableNodes = clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .anyMatch(n -> true);
 
