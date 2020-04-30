@@ -15,7 +15,7 @@ import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -90,21 +90,21 @@ public class OrkaCloud extends Cloud {
     }
 
     public List<VMResponse> getVMs() throws IOException {
-        return new OrkaClientProxy(this.endpoint, this.credentialsId).getVMs();
+        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).getVMs();
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
-        return new OrkaClientProxy(this.endpoint, this.credentialsId)
+        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId)
             .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
-        return new OrkaClientProxy(this.endpoint, this.credentialsId).deployVM(name);
+        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
-        new OrkaClientProxy(this.endpoint, this.credentialsId).deleteVM(name);
+        new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).deleteVM(name);
     }
 
     public String getRealHost(String host) {

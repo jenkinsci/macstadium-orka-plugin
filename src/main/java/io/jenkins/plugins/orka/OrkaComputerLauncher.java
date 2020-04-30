@@ -8,6 +8,7 @@ import hudson.slaves.SlaveComputer;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 import io.jenkins.plugins.orka.helpers.SSHUtil;
 import io.jenkins.plugins.orka.helpers.Utils;
 
@@ -66,7 +67,9 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
-        OrkaClientProxy client = new OrkaClientProxy(agent.getOrkaEndpoint(), agent.getOrkaCredentialsId());
+        OrkaClientProxy client = new OrkaClientProxyFactory().getOrkaClientProxy(agent.getOrkaEndpoint(),
+                agent.getOrkaCredentialsId());
+
         PrintStream logger = listener.getLogger();
 
         if (!createConfiguration(agent, client, logger)) {
