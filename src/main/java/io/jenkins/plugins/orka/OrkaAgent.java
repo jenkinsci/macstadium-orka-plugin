@@ -13,9 +13,9 @@ import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
-import io.jenkins.plugins.orka.helpers.ClientFactory;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 
 import java.io.IOException;
@@ -106,19 +106,19 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     @Extension
     public static final class DescriptorImpl extends SlaveDescriptor {
-        private ClientFactory clientFactory = new ClientFactory();
-        private FormValidator formValidator = new FormValidator(this.clientFactory);
-        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(this.clientFactory);
+        private OrkaClientProxyFactory clientProxyFactory = new OrkaClientProxyFactory();
+        private FormValidator formValidator = new FormValidator(clientProxyFactory);
+        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(clientProxyFactory);
 
         public DescriptorImpl() {
             load();
         }
 
         @VisibleForTesting
-        void setClientFactory(ClientFactory clientFactory) {
-            this.clientFactory = clientFactory;
-            this.formValidator = new FormValidator(this.clientFactory);
-            this.infoHelper = new OrkaInfoHelper(this.clientFactory);
+        void setClientProxyFactory(OrkaClientProxyFactory clientProxyFactory) {
+            this.clientProxyFactory = clientProxyFactory;
+            this.formValidator = new FormValidator(this.clientProxyFactory);
+            this.infoHelper = new OrkaInfoHelper(this.clientProxyFactory);
         }
 
         public String getDisplayName() {

@@ -17,8 +17,8 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.NodeResponse;
-import io.jenkins.plugins.orka.client.OrkaClient;
-import io.jenkins.plugins.orka.helpers.ClientFactory;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
 @RunWith(Parameterized.class)
 public class NodeItemsFillTest {
@@ -60,14 +60,14 @@ public class NodeItemsFillTest {
         NodeResponse thirdNode = new NodeResponse("macpro-3", "127.0.0.3", 24, this.thirdNodeAvailableCPU, "64Gi", "32Gi", "macpro-3", "ready");
         List<NodeResponse> response = Arrays.asList(firstNode, secondNode, thirdNode);
 
-        ClientFactory factory = mock(ClientFactory.class);
-        OrkaClient client = mock(OrkaClient.class);
+        OrkaClientProxyFactory clientProxyFactory = mock(OrkaClientProxyFactory.class);
+        OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
-        when(factory.getOrkaClient(anyString(), anyString())).thenReturn(client);
-        when(client.getNodes()).thenReturn(response);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString())).thenReturn(clientProxy);
+        when(clientProxy.getNodes()).thenReturn(response);
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientFactory(factory);
+        descriptor.setClientProxyFactory(clientProxyFactory);
 
         ListBoxModel nodes = descriptor.doFillNodeItems(this.endpoint, this.credentials);
 

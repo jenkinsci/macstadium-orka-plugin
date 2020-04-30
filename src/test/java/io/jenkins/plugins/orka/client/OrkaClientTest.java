@@ -2,7 +2,12 @@ package io.jenkins.plugins.orka.client;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.endsWith;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -122,5 +127,17 @@ public class OrkaClientTest {
         DeletionResponse actualResponse = client.deleteVM("newVm", "macpro-2");
 
         assertEquals(message, actualResponse.getMessage());
+    }
+
+    @Test
+    public void when_calling_close_should_call_delete() throws IOException {
+        OrkaClient client = mock(OrkaClient.class);
+
+        doCallRealMethod().when(client).close();
+
+        client.close();
+
+        verify(client, times(1)).delete(anyString(), anyString());
+        verify(client, times(1)).delete(endsWith("/token"), eq(""));
     }
 }

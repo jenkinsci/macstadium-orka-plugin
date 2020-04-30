@@ -5,14 +5,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import io.jenkins.plugins.orka.helpers.Utils;
-
 import java.io.IOException;
+import java.lang.AutoCloseable;
 import java.lang.reflect.Type;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import okhttp3.MediaType;
@@ -22,12 +21,12 @@ import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class OrkaClient {
+public class OrkaClient implements AutoCloseable {
     private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(60, TimeUnit.SECONDS).build();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private static final String LOGIN_PATH = "/token";
+    private static final String TOKEN_PATH = "/token";
     private static final String RESOURCE_PATH = "/resources";
     private static final String VM_PATH = RESOURCE_PATH + "/vm";
     private static final String NODE_PATH = RESOURCE_PATH + "/node";
@@ -125,13 +124,17 @@ public class OrkaClient {
         return gson.fromJson(response, DeletionResponse.class);
     }
 
+    public void close() throws IOException {
+        this.delete(this.endpoint + TOKEN_PATH, "");
+    }
+
     @VisibleForTesting
     String getToken(String email, String password) throws IOException {
         TokenRequest tokenRequest = new TokenRequest(email, password);
         Gson gson = new Gson();
         String tokenRequestJson = new Gson().toJson(tokenRequest);
 
-        String tokenResponseJson = this.post(this.endpoint + LOGIN_PATH, tokenRequestJson);
+        String tokenResponseJson = this.post(this.endpoint + TOKEN_PATH, tokenRequestJson);
         TokenResponse response = gson.fromJson(tokenResponseJson, TokenResponse.class);
 
         return response.getToken();
@@ -163,7 +166,7 @@ public class OrkaClient {
     }
 
     private String executeCall(Request request) throws IOException {
-        logger.fine("Executing request to Orka API: " + '/' + request.method()  + ' ' + request.url());
+        logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
 
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();

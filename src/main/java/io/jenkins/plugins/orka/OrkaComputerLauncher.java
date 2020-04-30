@@ -7,8 +7,8 @@ import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.client.OrkaClient;
-import io.jenkins.plugins.orka.helpers.ClientFactory;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 import io.jenkins.plugins.orka.helpers.SSHUtil;
 import io.jenkins.plugins.orka.helpers.Utils;
 
@@ -67,7 +67,9 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
-        OrkaClient client = new ClientFactory().getOrkaClient(agent.getOrkaEndpoint(), agent.getOrkaCredentialsId());
+        OrkaClientProxy client = new OrkaClientProxyFactory().getOrkaClientProxy(agent.getOrkaEndpoint(),
+                agent.getOrkaCredentialsId());
+
         PrintStream logger = listener.getLogger();
 
         if (!createConfiguration(agent, client, logger)) {
@@ -114,15 +116,16 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return StringUtils.isNotBlank(this.host) && this.port != 0;
     }
 
-    private boolean createConfiguration(OrkaAgent agent, OrkaClient client, PrintStream logger) throws IOException {
+    private boolean createConfiguration(OrkaAgent agent, OrkaClientProxy clientProxy, PrintStream logger)
+            throws IOException {
         if (agent.getCreateNewVMConfig()) {
             String configName = agent.getConfigName();
             String image = configName;
             String baseImage = agent.getBaseImage();
             int numCPUs = agent.getNumCPUs();
 
-            ConfigurationResponse configResponse = client.createConfiguration(configName, image, baseImage, template,
-                    numCPUs);
+            ConfigurationResponse configResponse = clientProxy.createConfiguration(configName, image, baseImage,
+                    template, numCPUs);
             if (configResponse.hasErrors()) {
                 logger.println(String.format(configurationErrorFormat, Utils.getTimestamp(), configName, image,
                         baseImage, template, numCPUs, Arrays.toString(configResponse.getErrors())));
@@ -134,10 +137,11 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return true;
     }
 
-    private DeploymentResponse deployVM(OrkaAgent agent, OrkaClient client, PrintStream logger) throws IOException {
+    private DeploymentResponse deployVM(OrkaAgent agent, OrkaClientProxy clientProxy, PrintStream logger)
+            throws IOException {
         String vmName = agent.getCreateNewVMConfig() ? agent.getConfigName() : agent.getVm();
 
-        DeploymentResponse deploymentResponse = client.deployVM(vmName, agent.getNode());
+        DeploymentResponse deploymentResponse = clientProxy.deployVM(vmName, agent.getNode());
         if (deploymentResponse.hasErrors()) {
             logger.println(String.format(deploymentErrorFormat, Utils.getTimestamp(), vmName, agent.getNode(),
                     Arrays.toString(deploymentResponse.getErrors())));
