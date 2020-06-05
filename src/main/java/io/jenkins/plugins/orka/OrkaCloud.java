@@ -29,8 +29,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import jenkins.model.Jenkins;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class OrkaCloud extends Cloud {
@@ -117,13 +115,14 @@ public class OrkaCloud extends Cloud {
         String provisionIdString = "[provisionId=" + UUID.randomUUID().toString() + "] ";
 
         try {
+            String labelName = label != null ? label.getName() : "";
             logger.info(
-                    provisionIdString + "Provisioning for label " + label.getName() + ". Workload: " + excessWorkload);
+                    provisionIdString + "Provisioning for label " + labelName + ". Workload: " + excessWorkload);
 
             AgentTemplate template = this.getTemplate(label);
 
             if (template == null) {
-                logger.fine(provisionIdString + "Couldn't find template for label " + label.getName()
+                logger.fine(provisionIdString + "Couldn't find template for label " + labelName
                         + ". Stopping provisioning.");
                 return Collections.emptyList();
             }
@@ -154,7 +153,6 @@ public class OrkaCloud extends Cloud {
                 logger.fine(template.toString());
 
                 OrkaProvisionedAgent agent = template.provision();
-
                 if (agent != null) {
                     logger.fine(provisionIdString + "Adding Node to Jenkins:");
                     logger.fine(agent.toString());
