@@ -67,29 +67,30 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
-        OrkaClientProxy client = new OrkaClientProxyFactory().getOrkaClientProxy(agent.getOrkaEndpoint(),
-                agent.getOrkaCredentialsId());
+        try (OrkaClientProxy client = new OrkaClientProxyFactory().getOrkaClientProxy(agent.getOrkaEndpoint(),
+                agent.getOrkaCredentialsId())) {
 
-        PrintStream logger = listener.getLogger();
+            PrintStream logger = listener.getLogger();
 
-        if (!createConfiguration(agent, client, logger)) {
-            return;
+            if (!createConfiguration(agent, client, logger)) {
+                return;
+            }
+
+            DeploymentResponse deploymentResponse = this.deployVM(agent, client, logger);
+            if (deploymentResponse == null) {
+                return;
+            }
+
+            this.host = StringUtils.isNotBlank(this.redirectHost) ? redirectHost : deploymentResponse.getHost();
+            this.port = deploymentResponse.getSSHPort();
+            this.launcher = this.getLauncher(agent.getVmCredentialsId());
+            Jenkins.getInstance().updateNode(slaveComputer.getNode());
+
+            listener.getLogger().println("Waiting for VM to boot");
+            this.waitForVM(this.host, this.port);
+
+            this.launcher.launch(slaveComputer, listener);
         }
-
-        DeploymentResponse deploymentResponse = this.deployVM(agent, client, logger);
-        if (deploymentResponse == null) {
-            return;
-        }
-
-        this.host = StringUtils.isNotBlank(this.redirectHost) ? redirectHost : deploymentResponse.getHost();
-        this.port = deploymentResponse.getSSHPort();
-        this.launcher = this.getLauncher(agent.getVmCredentialsId());
-        Jenkins.getInstance().updateNode(slaveComputer.getNode());
-
-        listener.getLogger().println("Waiting for VM to boot");
-        this.waitForVM(this.host, this.port);
-
-        this.launcher.launch(slaveComputer, listener);
     }
 
     @Override

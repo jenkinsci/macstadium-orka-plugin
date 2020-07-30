@@ -6,82 +6,80 @@ import hudson.util.Secret;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeletionResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
+import io.jenkins.plugins.orka.client.ImageResponse;
 import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.client.TokenResponse;
 import io.jenkins.plugins.orka.client.VMResponse;
 
 import java.io.IOException;
-import java.util.List;
 
-public class OrkaClientProxy {
-
-    private StandardUsernamePasswordCredentials credentials;
+public class OrkaClientProxy implements AutoCloseable {
+    private transient String credentialsId;
     private String endpoint;
+    private Secret token;
+    private transient OrkaClient client;
 
-    public OrkaClientProxy() {
-    }
-
-    public OrkaClientProxy(String endpoint, String credentialsId) {
-        this.setData(endpoint, credentialsId);
-    }
-
-    public void setData(String endpoint, String credentialsId) {
-        this.credentials = CredentialsHelper.lookupSystemCredentials(credentialsId);
+    public OrkaClientProxy(String endpoint, String credentialsId) throws IOException {
+        this.credentialsId = credentialsId;
         this.endpoint = endpoint;
+        this.client = new OrkaClient(this.endpoint);
+
+        StandardUsernamePasswordCredentials credentials = CredentialsHelper.lookupSystemCredentials(this.credentialsId);
+        this.token = Secret.fromString(this.getToken(credentials).getToken());
+        this.client.setToken(Secret.toString(this.token));
     }
 
-    public List<VMResponse> getVMs() throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.getVMs();
-        }
+    protected Object readResolve() throws IOException {
+        this.client = new OrkaClient(this.endpoint);
+        this.client.setToken(Secret.toString(this.token));
+
+        return this;
     }
 
-    public List<NodeResponse> getNodes() throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.getNodes();
-        }
+    public VMResponse getVMs() throws IOException {
+        return this.client.getVMs();
     }
 
-    public List<String> getImages() throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.getImages();
-        }
+    public NodeResponse getNodes() throws IOException {
+        return this.client.getNodes();
+    }
+
+    public ImageResponse getImages() throws IOException {
+        return this.client.getImages();
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount) throws IOException {
-
-        try (OrkaClient client = getOrkaClient()) {
-            return client.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount);
-        }
+        return this.client.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String vmName) throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.deployVM(vmName);
-        }
+        return this.client.deployVM(vmName);
     }
 
     public DeploymentResponse deployVM(String vmName, String node) throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.deployVM(vmName, node);
-        }
+        return this.client.deployVM(vmName, node);
     }
 
     public DeletionResponse deleteVM(String vmName) throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.deleteVM(vmName);
-        }
+        return this.client.deleteVM(vmName);
     }
 
     public DeletionResponse deleteVM(String vmName, String node) throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.deleteVM(vmName, node);
-        }
+        return this.client.deleteVM(vmName, node);
     }
 
-    private OrkaClient getOrkaClient() throws IOException {
-        return new OrkaClient(this.endpoint, this.credentials.getUsername(),
-                Secret.toString(credentials.getPassword()));
+    private TokenResponse getToken(StandardUsernamePasswordCredentials credentials) throws IOException {
+        return this.client.requestToken(credentials.getUsername(), Secret.toString(credentials.getPassword()));
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (this.client != null) {
+            this.client.close();
+            this.client = null;
+            this.token = null;
+        }
     }
 }

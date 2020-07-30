@@ -17,6 +17,8 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.NodeResponse;
+import io.jenkins.plugins.orka.client.OrkaNode;
+import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
@@ -66,16 +68,16 @@ public class NodeResourcesCheckTest {
 
     @Test
     public void when_check_node_should_return_correct_validation_type() throws IOException {
-        NodeResponse firstNode = new NodeResponse(FIRST_NODE, "127.0.0.1", 12, 12, "32Gi", "20Gi", FIRST_NODE, "ready");
-        NodeResponse secondNode = new NodeResponse(SECOND_NODE, "127.0.0.2", 24, 12, "64Gi", "32Gi", SECOND_NODE,
-                "ready");
-        NodeResponse thirdNode = new NodeResponse(THIRD_NODE, "127.0.0.3", 24, 0, "64Gi", "32Gi", THIRD_NODE, "ready");
-        List<NodeResponse> response = Arrays.asList(firstNode, secondNode, thirdNode);
+        OrkaNode firstNode = new OrkaNode(FIRST_NODE, "127.0.0.1", 12, 12, "32Gi", "20Gi", FIRST_NODE, "ready");
+        OrkaNode secondNode = new OrkaNode(SECOND_NODE, "127.0.0.2", 24, 12, "64Gi", "32Gi", SECOND_NODE, "ready");
+        OrkaNode thirdNode = new OrkaNode(THIRD_NODE, "127.0.0.3", 24, 0, "64Gi", "32Gi", THIRD_NODE, "ready");
+        List<OrkaNode> nodes = Arrays.asList(firstNode, secondNode, thirdNode);
+        NodeResponse response = new NodeResponse(nodes, "", null);
 
-        VMResponse firstVM = new VMResponse(BIG_VM, "not deployed", 24, "Mojave.img", "firstImage", "default");
-        VMResponse secondVM = new VMResponse(SMALL_VM, "not deployed", 12, "Mojave.img", "secondImage", "default");
-
-        List<VMResponse> vmResponse = Arrays.asList(firstVM, secondVM);
+        OrkaVM firstVM = new OrkaVM(BIG_VM, "not deployed", 24, "Mojave.img", "firstImage", "default");
+        OrkaVM secondVM = new OrkaVM(SMALL_VM, "not deployed", 12, "Mojave.img", "secondImage", "default");
+        List<OrkaVM> vms = Arrays.asList(firstVM, secondVM);
+        VMResponse vmResponse = new VMResponse(vms, "", null);
 
         OrkaClientProxyFactory factory = mock(OrkaClientProxyFactory.class);
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);

@@ -6,7 +6,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -16,6 +18,7 @@ import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.ListBoxModel;
+import io.jenkins.plugins.orka.client.ImageResponse;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
@@ -46,13 +49,14 @@ public class ImageItemsFillTest {
 
     @Before
     public void initialize() throws IOException {
-        String[] response = { "Mojave.img", "SnowLeopard.img" };
+        List<String> images = Arrays.asList("Mojave.img", "SnowLeopard.img");
+        ImageResponse response = new ImageResponse(images, "", null);
 
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
         this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
         when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString())).thenReturn(clientProxy);
-        when(clientProxy.getImages()).thenReturn(Arrays.asList((response)));
+        when(clientProxy.getImages()).thenReturn(response);
     }
 
     @Test

@@ -17,6 +17,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.NodeResponse;
+import io.jenkins.plugins.orka.client.OrkaNode;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
@@ -30,18 +31,17 @@ public class NodeNameCheckTest {
 
     @Parameterized.Parameters(name = "{index}: Test with firstNodeAvailableCPU={0}, secondNodeAvailableCPU={1}, thirdNodeAvailableCPU={2}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-            { HAS_CPU_LEFT, NO_CPU_LEFT, HAS_CPU_LEFT, FormValidation.Kind.OK },
-            { NO_CPU_LEFT, NO_CPU_LEFT, NO_CPU_LEFT, FormValidation.Kind.ERROR },
-        });
+        return Arrays.asList(new Object[][] { { HAS_CPU_LEFT, NO_CPU_LEFT, HAS_CPU_LEFT, FormValidation.Kind.OK },
+                { NO_CPU_LEFT, NO_CPU_LEFT, NO_CPU_LEFT, FormValidation.Kind.ERROR }, });
     }
 
     private final int firstNodeAvailableCPU;
     private final int secondNodeAvailableCPU;
     private final int thirdNodeAvailableCPU;
     private final FormValidation.Kind validationKind;
-    
-    public NodeNameCheckTest(int firstNodeAvailableCPU, int secondNodeAvailableCPU, int thirdNodeAvailableCPU, FormValidation.Kind validationKind) {
+
+    public NodeNameCheckTest(int firstNodeAvailableCPU, int secondNodeAvailableCPU, int thirdNodeAvailableCPU,
+            FormValidation.Kind validationKind) {
         this.firstNodeAvailableCPU = firstNodeAvailableCPU;
         this.secondNodeAvailableCPU = secondNodeAvailableCPU;
         this.thirdNodeAvailableCPU = thirdNodeAvailableCPU;
@@ -50,10 +50,14 @@ public class NodeNameCheckTest {
 
     @Test
     public void when_check_node_should_return_correct_validation_type() throws IOException {
-        NodeResponse firstNode = new NodeResponse("macpro-1", "127.0.0.1", 12, this.firstNodeAvailableCPU, "32Gi", "20Gi", "macpro-1", "ready");
-        NodeResponse secondNode = new NodeResponse("macpro-2", "127.0.0.2", 24, this.secondNodeAvailableCPU, "64Gi", "32Gi", "macpro2", "ready");
-        NodeResponse thirdNode = new NodeResponse("macpro-3", "127.0.0.3", 24, this.thirdNodeAvailableCPU, "64Gi", "32Gi", "macpro-3", "ready");
-        List<NodeResponse> response = Arrays.asList(firstNode, secondNode, thirdNode);
+        OrkaNode firstNode = new OrkaNode("macpro-1", "127.0.0.1", 12, this.firstNodeAvailableCPU, "32Gi", "20Gi",
+                "macpro-1", "ready");
+        OrkaNode secondNode = new OrkaNode("macpro-2", "127.0.0.2", 24, this.secondNodeAvailableCPU, "64Gi", "32Gi",
+                "macpro2", "ready");
+        OrkaNode thirdNode = new OrkaNode("macpro-3", "127.0.0.3", 24, this.thirdNodeAvailableCPU, "64Gi", "32Gi",
+                "macpro-3", "ready");
+        List<OrkaNode> nodes = Arrays.asList(firstNode, secondNode, thirdNode);
+        NodeResponse response = new NodeResponse(nodes, "", null);
 
         OrkaClientProxyFactory factory = mock(OrkaClientProxyFactory.class);
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
@@ -63,7 +67,7 @@ public class NodeNameCheckTest {
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(factory);
-        
+
         FormValidation validation = descriptor.doCheckNode(null, "endpoint", "credentialsId", null, false, 12);
 
         assertEquals(this.validationKind, validation.kind);

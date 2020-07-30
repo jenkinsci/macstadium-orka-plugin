@@ -24,47 +24,56 @@ public class OrkaClientTest {
     @Test
     public void when_creating_client_should_get_correct_token() throws IOException {
         String token = "private-token";
-        String tokenResponse = "{\"token\": \"" + token + "\"}";
+        String body = "{\"token\": \"" + token + "\"}";
+        int code = 200;
+        boolean isSuccessful = true;
+        HttpResponse response = new HttpResponse(body, code, isSuccessful);
 
         OrkaClient client = mock(OrkaClient.class);
-        when(client.post(anyString(), anyString())).thenReturn(tokenResponse);
-        when(client.getToken(anyString(), anyString())).thenCallRealMethod();
+        when(client.post(anyString(), anyString())).thenReturn(response);
+        when(client.requestToken(anyString(), anyString())).thenCallRealMethod();
 
-        String actualToken = client.getToken("email", "password");
+        String actualToken = client.requestToken("email", "password").getToken();
 
         assertEquals(token, actualToken);
     }
 
     @Test
     public void when_calling_getvms_should_get_all_vms() throws IOException {
-        VMResponse firstVM = new VMResponse("first", "deployed", 12, "Mojave.img", "firstImage", "default");
-        VMResponse secondVM = new VMResponse("second", "not deployed", 24, "Mojave.img", "secondImage", "default");
-        VMResponse[] vms = { firstVM, secondVM };
+        OrkaVM firstVM = new OrkaVM("first", "deployed", 12, "Mojave.img", "firstImage", "default");
+        OrkaVM secondVM = new OrkaVM("second", "not deployed", 24, "Mojave.img", "secondImage", "default");
+        OrkaVM[] vms = { firstVM, secondVM };
         String arrayJson = new Gson().toJson(vms);
-        String response = "{ \"virtual_machine_resources\": " + arrayJson + "}";
+        String body = "{ \"message\": \"Success\", \"virtual_machine_resources\": " + arrayJson + "}";
+        int code = 200;
+        boolean isSuccessful = true;
+        HttpResponse response = new HttpResponse(body, code, isSuccessful);
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.get(anyString())).thenReturn(response);
         when(client.getVMs()).thenCallRealMethod();
 
-        List<VMResponse> actualResponse = client.getVMs();
+        VMResponse actualResponse = client.getVMs();
 
-        assertArrayEquals(vms, actualResponse.toArray());
+        assertArrayEquals(vms, actualResponse.getVMs().toArray());
     }
 
     @Test
     public void when_calling_getnodes_should_get_all_nodes() throws IOException {
-        NodeResponse firstNode = new NodeResponse("macpro-1", "127.0.0.1", 12, 12, "66Gi", "66Gi", "macpro-1", "ready");
-        NodeResponse secondNode = new NodeResponse("macpro-2", "127.0.0.2", 24, 24, "66Gi", "33Gi", "macpro2","ready");
-        NodeResponse[] nodes = { firstNode, secondNode };
+        OrkaNode firstNode = new OrkaNode("macpro-1", "127.0.0.1", 12, 12, "66Gi", "66Gi", "macpro-1", "ready");
+        OrkaNode secondNode = new OrkaNode("macpro-2", "127.0.0.2", 24, 24, "66Gi", "33Gi", "macpro2", "ready");
+        OrkaNode[] nodes = { firstNode, secondNode };
         String arrayJson = new Gson().toJson(nodes);
-        String response = "{ \"nodes\": " + arrayJson + "}";
+        String body = "{ \"message\": \"Success\", \"nodes\": " + arrayJson + "}";
+        int code = 200;
+        boolean isSuccessful = true;
+        HttpResponse response = new HttpResponse(body, code, isSuccessful);
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.get(anyString())).thenReturn(response);
         when(client.getNodes()).thenCallRealMethod();
 
-        List<NodeResponse> actualResponse = client.getNodes();
+        List<OrkaNode> actualResponse = client.getNodes().getNodes();
 
         assertArrayEquals(nodes, actualResponse.toArray());
     }
@@ -73,13 +82,16 @@ public class OrkaClientTest {
     public void when_calling_getimages_should_get_all_images() throws IOException {
         String[] images = { "Mojave.img", "SnowLeopard.img" };
         String arrayJson = new Gson().toJson(images);
-        String response = "{ \"images\": " + arrayJson + "}";
+        String body = "{ \"message\": \"Success\", \"images\": " + arrayJson + "}";
+        int code = 200;
+        boolean isSuccessful = true;
+        HttpResponse response = new HttpResponse(body, code, isSuccessful);
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.get(anyString())).thenReturn(response);
         when(client.getImages()).thenCallRealMethod();
 
-        List<String> actualResponse = client.getImages();
+        List<String> actualResponse = client.getImages().getImages();
 
         assertArrayEquals(images, actualResponse.toArray());
     }
@@ -87,7 +99,10 @@ public class OrkaClientTest {
     @Test
     public void when_calling_create_configuration_should_return_success() throws IOException {
         String message = "Succesfully Created";
-        String response = "{ \"message\": \"" + message + "\"}";
+        String body = "{ \"message\": \"" + message + "\"}";
+        int code = 200;
+        boolean isSuccessful = true;
+        HttpResponse response = new HttpResponse(body, code, isSuccessful);
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
@@ -103,7 +118,10 @@ public class OrkaClientTest {
     public void when_calling_deploy_vm_should_return_ip_and_ssh_port() throws IOException {
         String ip = "199.92.12.1";
         int sshPort = 9281;
-        String response = "{ \"ip\": \"" + ip + "\", \"ssh_port\": \"" + sshPort + "\"}";
+        String body = "{ \"ip\": \"" + ip + "\", \"ssh_port\": \"" + sshPort + "\"}";
+        int code = 200;
+        boolean isSuccessful = true;
+        HttpResponse response = new HttpResponse(body, code, isSuccessful);
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
@@ -118,7 +136,10 @@ public class OrkaClientTest {
     @Test
     public void when_calling_delete_vm_should_return_status() throws IOException {
         String message = "Success";
-        String response = "{ \"message\": \"" + message + "\" }";
+        String body = "{ \"message\": \"" + message + "\" }";
+        int code = 200;
+        boolean isSuccessful = true;
+        HttpResponse response = new HttpResponse(body, code, isSuccessful);
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.delete(anyString(), anyString())).thenReturn(response);
@@ -132,7 +153,7 @@ public class OrkaClientTest {
     @Test
     public void when_calling_close_should_call_delete() throws IOException {
         OrkaClient client = mock(OrkaClient.class);
-
+        when(client.getToken()).thenReturn("token");
         doCallRealMethod().when(client).close();
 
         client.close();

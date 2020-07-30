@@ -2,14 +2,9 @@ package io.jenkins.plugins.orka.client;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.AutoCloseable;
-import java.lang.reflect.Type;
-
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import java.util.logging.Logger;
@@ -39,48 +34,44 @@ public class OrkaClient implements AutoCloseable {
     private String endpoint;
     private String token;
 
-    public OrkaClient(String endpoint, String email, String password) throws IOException {
+    public OrkaClient(String endpoint) {
         this.endpoint = endpoint;
-        this.token = this.getToken(email, password);
     }
 
-    public List<VMResponse> getVMs() throws IOException {
-        String response = this.get(this.endpoint + VM_PATH + LIST_PATH);
-
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
-        String responseJson = jsonObject.get("virtual_machine_resources").toString();
-
-        Type listType = new TypeToken<List<VMResponse>>() {
-        }.getType();
-
-        return gson.fromJson(responseJson, listType);
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    public List<NodeResponse> getNodes() throws IOException {
-        String response = this.get(this.endpoint + NODE_PATH + LIST_PATH);
-
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
-        String responseJson = jsonObject.get("nodes").toString();
-
-        Type listType = new TypeToken<List<NodeResponse>>() {
-        }.getType();
-
-        return gson.fromJson(responseJson, listType);
+    @VisibleForTesting
+    public String getToken() {
+        return this.token;
     }
 
-    public List<String> getImages() throws IOException {
-        String response = this.get(this.endpoint + IMAGE_PATH + LIST_PATH);
+    public VMResponse getVMs() throws IOException {
+        HttpResponse httpResponse = this.get(this.endpoint + VM_PATH + LIST_PATH);
 
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
-        String responseJson = jsonObject.get("images").toString();
+        VMResponse response = gson.fromJson(httpResponse.getBody(), VMResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
+    }
 
-        Type listType = new TypeToken<List<String>>() {
-        }.getType();
+    public NodeResponse getNodes() throws IOException {
+        HttpResponse httpResponse = this.get(this.endpoint + NODE_PATH + LIST_PATH);
 
-        return gson.fromJson(responseJson, listType);
+        Gson gson = new Gson();
+        NodeResponse response = gson.fromJson(httpResponse.getBody(), NodeResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
+    }
+
+    public ImageResponse getImages() throws IOException {
+        HttpResponse httpResponse = this.get(this.endpoint + IMAGE_PATH + LIST_PATH);
+
+        Gson gson = new Gson();
+        ImageResponse response = gson.fromJson(httpResponse.getBody(), ImageResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
@@ -91,9 +82,11 @@ public class OrkaClient implements AutoCloseable {
                 cpuCount);
 
         String configRequestJson = gson.toJson(configRequest);
-        String response = this.post(this.endpoint + VM_PATH + CREATE_PATH, configRequestJson);
+        HttpResponse httpResponse = this.post(this.endpoint + VM_PATH + CREATE_PATH, configRequestJson);
 
-        return gson.fromJson(response, ConfigurationResponse.class);
+        ConfigurationResponse response = gson.fromJson(httpResponse.getBody(), ConfigurationResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
     }
 
     public DeploymentResponse deployVM(String vmName) throws IOException {
@@ -105,9 +98,11 @@ public class OrkaClient implements AutoCloseable {
 
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmName, node);
         String deploymentRequestJson = gson.toJson(deploymentRequest);
-        String response = this.post(this.endpoint + VM_PATH + DEPLOY_PATH, deploymentRequestJson);
+        HttpResponse httpResponse = this.post(this.endpoint + VM_PATH + DEPLOY_PATH, deploymentRequestJson);
 
-        return gson.fromJson(response, DeploymentResponse.class);
+        DeploymentResponse response = gson.fromJson(httpResponse.getBody(), DeploymentResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
     }
 
     public DeletionResponse deleteVM(String vmName) throws IOException {
@@ -119,57 +114,62 @@ public class OrkaClient implements AutoCloseable {
 
         DeletionRequest deletionRequest = new DeletionRequest(vmName, node);
         String deletionRequestJson = gson.toJson(deletionRequest);
-        String response = this.delete(this.endpoint + VM_PATH + DELETE_PATH, deletionRequestJson);
+        HttpResponse httpResponse = this.delete(this.endpoint + VM_PATH + DELETE_PATH, deletionRequestJson);
 
-        return gson.fromJson(response, DeletionResponse.class);
+        DeletionResponse response = gson.fromJson(httpResponse.getBody(), DeletionResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
     }
 
     public void close() throws IOException {
-        this.delete(this.endpoint + TOKEN_PATH, "");
+        if (this.getToken() != null) {
+            this.delete(this.endpoint + TOKEN_PATH, "");
+        }
     }
 
     @VisibleForTesting
-    String getToken(String email, String password) throws IOException {
+    public TokenResponse requestToken(String email, String password) throws IOException {
         TokenRequest tokenRequest = new TokenRequest(email, password);
         Gson gson = new Gson();
         String tokenRequestJson = new Gson().toJson(tokenRequest);
 
-        String tokenResponseJson = this.post(this.endpoint + TOKEN_PATH, tokenRequestJson);
-        TokenResponse response = gson.fromJson(tokenResponseJson, TokenResponse.class);
+        HttpResponse httpResponse = this.post(this.endpoint + TOKEN_PATH, tokenRequestJson);
+        TokenResponse response = gson.fromJson(httpResponse.getBody(), TokenResponse.class);
+        response.setHttpResponse(httpResponse);
 
-        return response.getToken();
+        return response;
     }
 
     @VisibleForTesting
-    String post(String url, String body) throws IOException {
+    HttpResponse post(String url, String body) throws IOException {
         RequestBody requestBody = RequestBody.create(JSON, body);
         Request request = this.getAuthenticatedBuilder(url).post(requestBody).build();
 
-        return executeCall(request);
+        return this.executeCall(request);
     }
 
     @VisibleForTesting
-    String get(String url) throws IOException {
+    HttpResponse get(String url) throws IOException {
         Request request = this.getAuthenticatedBuilder(url).get().build();
         return this.executeCall(request);
     }
 
     @VisibleForTesting
-    String delete(String url, String body) throws IOException {
+    HttpResponse delete(String url, String body) throws IOException {
         RequestBody requestBody = RequestBody.create(JSON, body);
         Request request = this.getAuthenticatedBuilder(url).delete(requestBody).build();
-        return executeCall(request);
+        return this.executeCall(request);
     }
 
     private Builder getAuthenticatedBuilder(String url) throws IOException {
-        return new Request.Builder().addHeader("Authorization", "Bearer " + this.token).url(url);
+        return new Request.Builder().addHeader("Authorization", "Bearer " + this.getToken()).url(url);
     }
 
-    private String executeCall(Request request) throws IOException {
+    private HttpResponse executeCall(Request request) throws IOException {
         logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
 
         try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
+            return new HttpResponse(response.body().string(), response.code(), response.isSuccessful());
         }
     }
 }

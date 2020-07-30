@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
 import hudson.model.Computer;
@@ -15,6 +16,7 @@ import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.VMResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
+import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
 import java.io.IOException;
@@ -36,13 +38,20 @@ public class OrkaCloud extends Cloud {
 
     private String credentialsId;
     private String endpoint;
+    private OrkaClientProxy client;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
 
+    @VisibleForTesting
+    public OrkaCloud(String name, List<? extends AgentTemplate> templates) throws IOException {
+        super(name);
+        this.templates = templates == null ? Collections.emptyList() : templates;
+    }
+
     @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends AddressMapper> mappings,
-            List<? extends AgentTemplate> templates) {
+            List<? extends AgentTemplate> templates) throws IOException {
         super(name);
 
         this.credentialsId = credentialsId;
@@ -54,9 +63,12 @@ public class OrkaCloud extends Cloud {
         readResolve();
     }
 
-    protected Object readResolve() {
+    protected Object readResolve() throws IOException {
         this.templates.forEach(t -> t.setParent(this));
         this.mappings = this.mappings == null ? Collections.emptyList() : this.mappings;
+        if (this.client == null) {
+            this.client = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId);
+        }
 
         return this;
     }
@@ -87,22 +99,21 @@ public class OrkaCloud extends Cloud {
                 .findFirst().orElse(null);
     }
 
-    public List<VMResponse> getVMs() throws IOException {
-        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).getVMs();
+    public VMResponse getVMs() throws IOException {
+        return this.client.getVMs();
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
-        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId)
-            .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
+        return this.client.createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
-        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).deployVM(name);
+        return this.client.deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
-        new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).deleteVM(name);
+        this.client.deleteVM(name);
     }
 
     public String getRealHost(String host) {
@@ -116,8 +127,7 @@ public class OrkaCloud extends Cloud {
 
         try {
             String labelName = label != null ? label.getName() : "";
-            logger.info(
-                    provisionIdString + "Provisioning for label " + labelName + ". Workload: " + excessWorkload);
+            logger.info(provisionIdString + "Provisioning for label " + labelName + ". Workload: " + excessWorkload);
 
             AgentTemplate template = this.getTemplate(label);
 

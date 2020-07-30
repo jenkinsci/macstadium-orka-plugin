@@ -1,19 +1,8 @@
 package io.jenkins.plugins.orka.client;
 
-public class ConfigurationResponse {
-    private String message;
+public class ConfigurationResponse extends ResponseBase {
 
-    private OrkaError[] errors;
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public OrkaError[] getErrors() {
-        return this.errors.clone();
-    }
-
-    public boolean hasErrors() {
-        return this.errors != null && this.errors.length > 0;
+    public ConfigurationResponse(String message, OrkaError[] errors) {
+        super(message, errors);
     }
 }

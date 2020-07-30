@@ -23,10 +23,11 @@ public class OrkaInfoHelper {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                OrkaClientProxy clientProxy = this.clientProxyFactory
-                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
-                clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
-                        .forEach(n -> model.add(n.getHostname()));
+                try (OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                        orkaCredentialsId)) {
+                    clientProxy.getNodes().getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
+                            .forEach(n -> model.add(n.getHostname()));
+                }
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception in doFillNodeItems", e);
@@ -41,9 +42,10 @@ public class OrkaInfoHelper {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && !createNewVMConfig && orkaCredentialsId != null) {
-                OrkaClientProxy clientProxy = this.clientProxyFactory
-                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
-                clientProxy.getVMs().forEach(vm -> model.add(vm.getVMName()));
+                try (OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                        orkaCredentialsId)) {
+                    clientProxy.getVMs().getVMs().forEach(vm -> model.add(vm.getVMName()));
+                }
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception in doFillVmItems", e);
@@ -57,9 +59,10 @@ public class OrkaInfoHelper {
         ListBoxModel model = new ListBoxModel();
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && createNewVMConfig && orkaCredentialsId != null) {
-                OrkaClientProxy clientProxy = this.clientProxyFactory
-                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
-                clientProxy.getImages().forEach(image -> model.add(image));
+                try (OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                        orkaCredentialsId)) {
+                    clientProxy.getImages().getImages().forEach(image -> model.add(image));
+                }
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception in doFillBaseImageItems", e);

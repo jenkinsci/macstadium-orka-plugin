@@ -1,9 +1,7 @@
 package io.jenkins.plugins.orka.client;
 
-public class DeletionResponse {
-    private String message;
-
-    public String getMessage() {
-        return this.message;
+public class DeletionResponse extends ResponseBase {
+    public DeletionResponse(String message, OrkaError[] errors) {
+        super(message, errors);
     }
 }
