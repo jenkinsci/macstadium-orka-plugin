@@ -14,6 +14,7 @@ import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.VMResponse;
+import io.jenkins.plugins.orka.helpers.CapacityHandler;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class OrkaCloud extends Cloud {
@@ -36,17 +38,21 @@ public class OrkaCloud extends Cloud {
 
     private String credentialsId;
     private String endpoint;
+    private int instanceCap;
+    private String instanceCapSetting;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
+    private transient CapacityHandler capacityHandler;
 
     @DataBoundConstructor
-    public OrkaCloud(String name, String credentialsId, String endpoint, List<? extends AddressMapper> mappings,
-            List<? extends AgentTemplate> templates) {
+    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting,
+            List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
         this.endpoint = endpoint;
+        this.instanceCapSetting = instanceCapSetting;
 
         this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
@@ -58,6 +64,14 @@ public class OrkaCloud extends Cloud {
         this.templates.forEach(t -> t.setParent(this));
         this.mappings = this.mappings == null ? Collections.emptyList() : this.mappings;
 
+        if (StringUtils.isEmpty(this.instanceCapSetting)) {
+            this.instanceCap = Integer.MAX_VALUE;
+        } else {
+            this.instanceCap = Integer.parseInt(this.instanceCapSetting);
+        }
+
+        this.capacityHandler = new CapacityHandler(this.name, this.instanceCap);
+
         return this;
     }
 
@@ -67,6 +81,10 @@ public class OrkaCloud extends Cloud {
 
     public String getEndpoint() {
         return this.endpoint;
+    }
+
+    public String getInstanceCapSetting() {
+        return this.instanceCap == Integer.MAX_VALUE ? "" : String.valueOf(this.instanceCap);
     }
 
     public List<? extends AddressMapper> getMappings() {
@@ -94,7 +112,7 @@ public class OrkaCloud extends Cloud {
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
         return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId)
-            .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
+                .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
@@ -103,6 +121,7 @@ public class OrkaCloud extends Cloud {
 
     public void deleteVM(String name) throws IOException {
         new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).deleteVM(name);
+        this.capacityHandler.removeRunningInstance();
     }
 
     public String getRealHost(String host) {
@@ -116,8 +135,7 @@ public class OrkaCloud extends Cloud {
 
         try {
             String labelName = label != null ? label.getName() : "";
-            logger.info(
-                    provisionIdString + "Provisioning for label " + labelName + ". Workload: " + excessWorkload);
+            logger.info(provisionIdString + "Provisioning for label " + labelName + ". Workload: " + excessWorkload);
 
             AgentTemplate template = this.getTemplate(label);
 
@@ -128,11 +146,14 @@ public class OrkaCloud extends Cloud {
             }
 
             int vmsToProvision = Math.max(excessWorkload / template.getNumExecutors(), 1);
-            logger.fine(provisionIdString + "VMs to provision: " + vmsToProvision);
+            int possibleVMsToProvision = this.capacityHandler.reserveCapacity(vmsToProvision, provisionIdString);
+            logger.fine(String.format("%s. Asked for %s VMs and got %s", provisionIdString, vmsToProvision,
+                    possibleVMsToProvision));
 
-            return IntStream.range(0, vmsToProvision).mapToObj(i -> {
+            return IntStream.range(0, possibleVMsToProvision).mapToObj(i -> {
                 String nodeName = UUID.randomUUID().toString();
-                Callable<Node> provisionNodeCallable = this.provisionNode(template, provisionIdString);
+                Callable<Node> provisionNodeCallable = this.provisionNode(template, provisionIdString,
+                        this.capacityHandler);
                 Future<Node> provisionNodeTask = Computer.threadPoolForRemoting.submit(provisionNodeCallable);
 
                 return new PlannedNode(nodeName, provisionNodeTask, template.getNumExecutors());
@@ -144,18 +165,30 @@ public class OrkaCloud extends Cloud {
         return Collections.emptyList();
     }
 
-    private Callable<Node> provisionNode(AgentTemplate template, String provisionIdString) {
+    private Callable<Node> provisionNode(AgentTemplate template, String provisionIdString,
+            CapacityHandler capacityHandler) {
         return new Callable<Node>() {
             @Override
             public Node call() throws Exception {
 
                 logger.fine(provisionIdString + "Provisioning Node with template:");
                 logger.fine(template.toString());
+                OrkaProvisionedAgent agent = null;
 
-                OrkaProvisionedAgent agent = template.provision();
+                try {
+                    agent = template.provision();
+                } catch (Exception e) {
+                    capacityHandler.removeFailedPlannedInstance();
+                    logger.log(Level.WARNING, "Exception during provision", e);
+                    throw e;
+                }
+
                 if (agent != null) {
                     logger.fine(provisionIdString + "Adding Node to Jenkins:");
                     logger.fine(agent.toString());
+                    capacityHandler.addRunningInstance();
+                } else {
+                    capacityHandler.removeFailedPlannedInstance();
                 }
 
                 return agent;

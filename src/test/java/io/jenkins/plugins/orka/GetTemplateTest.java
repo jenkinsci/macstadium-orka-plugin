@@ -49,7 +49,7 @@ public class GetTemplateTest {
     @Test
     public void when_get_template_should_find_template_with_label() throws IOException, ANTLRException {
         AgentTemplate AgentTemplate = this.getAgentTemplate(this.mode, this.label);
-        OrkaCloud cloud = new OrkaCloud("cloud", "credentialsId", "endpoint", null, Arrays.asList(AgentTemplate));
+        OrkaCloud cloud = new OrkaCloud("cloud", "credentialsId", "endpoint", null, null, Arrays.asList(AgentTemplate));
 
         Label label = this.labelToLookFor != null ? Label.parseExpression(this.labelToLookFor) : null;
         AgentTemplate resultTemplate = cloud.getTemplate(label);
