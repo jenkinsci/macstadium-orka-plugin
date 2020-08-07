@@ -22,7 +22,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OrkaClient implements AutoCloseable {
-    private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(60, TimeUnit.SECONDS).build();
+    private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(300, TimeUnit.SECONDS).build();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
