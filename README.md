@@ -65,7 +65,8 @@ To configure:
     * Name of this Cloud - The name of the cloud
     * Orka Credentials - The credentials used to connect to the Orka environment. Created by running orka user create
     * Orka Endpoint - The endpoint used by the plugin to connect to the Orka environment
-    * Node Mappings (Optional) - Overwrite the default host address used to connect to an Orka VM. By default, the plugin uses the private node address. Provide a mapping to a public host address if you wish to change this behavior.  
+    * Max Jenkins Agents Limit - The maximum number of Orka VMs that can be created by that cloud instance. This allows you to better manage your Orka resources. This option is available by clicking `Advanced`
+    * Node Mappings (Optional) - Overwrite the default host address used to connect to an Orka VM. By default, the plugin uses the private node address. Provide a mapping to a public host address if you wish to change this behavior. This option is available by clicking `Advanced`
     **Note** The public node addresses are provided by MacStadium.
 * Click Add Orka Template. An Orka template is the agent template, Jenkins will use to create a new agent.
 * Fill the following values:
