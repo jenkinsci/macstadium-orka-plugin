@@ -22,7 +22,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OrkaClient implements AutoCloseable {
-    private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(300, TimeUnit.SECONDS).build();
+    private static final int defaultHttpClientTimeout = 300;
+    private static final OkHttpClient client = 
+        new OkHttpClient.Builder().readTimeout(defaultHttpClientTimeout, TimeUnit.SECONDS).build();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -38,12 +40,18 @@ public class OrkaClient implements AutoCloseable {
 
     private String endpoint;
     private String token;
+    private int httpClientTimeout;
 
     public OrkaClient(String endpoint, String email, String password) throws IOException {
-        this.endpoint = endpoint;
-        this.token = this.getToken(email, password);
+        this.setEndpointAndToken(endpoint, email, password);
+        this.httpClientTimeout = defaultHttpClientTimeout;
     }
-
+    
+    public OrkaClient(String endpoint, String email, String password, int httpClientTimeout) throws IOException {
+        this.setEndpointAndToken(endpoint, email, password);
+        this.httpClientTimeout = httpClientTimeout > 0 ? httpClientTimeout : defaultHttpClientTimeout;
+    }
+    
     public List<VMResponse> getVMs() throws IOException {
         String response = this.get(this.endpoint + VM_PATH + LIST_PATH);
 
@@ -160,6 +168,11 @@ public class OrkaClient implements AutoCloseable {
         Request request = this.getAuthenticatedBuilder(url).delete(requestBody).build();
         return executeCall(request);
     }
+    
+    private void setEndpointAndToken(String endpoint, String email, String password) {
+        this.endpoint = endpoint;
+        this.token = this.getToken(email, password);
+    }
 
     private Builder getAuthenticatedBuilder(String url) throws IOException {
         return new Request.Builder().addHeader("Authorization", "Bearer " + this.token).url(url);
@@ -168,7 +181,14 @@ public class OrkaClient implements AutoCloseable {
     private String executeCall(Request request) throws IOException {
         logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
 
-        try (Response response = client.newCall(request).execute()) {
+        OkHttpClient httpClient = client;
+        if (this.httpClientTimeout != defaultHttpClientTimeout) {
+            httpClient = client.newBuilder().readTimeout(this.httpClientTimeout, TimeUnit.SECONDS).build();;
+        } else {
+            httpClient = client;
+        }
+        
+        try (Response response = httpClient.newCall(request).execute()) {
             return response.body().string();
         }
     }

@@ -16,8 +16,11 @@
     </f:entry>
 
     <f:advanced>
-      <f:entry title="Max Jenkins Agents Limit" field="instanceCapSetting">
+      <f:entry title="${%Max Jenkins Agents Limit}" field="instanceCapSetting">
         <f:textbox />
+      </f:entry>
+      <f:entry title="${%Deployment Timeout in Sec}" field="timeout">
+        <f:number />
       </f:entry>
 
       <f:entry title="${%Node Mappings}" description="${%List of Orka node mappings}">
