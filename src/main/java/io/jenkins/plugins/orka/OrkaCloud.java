@@ -233,12 +233,12 @@ public class OrkaCloud extends Cloud {
                 int timeoutValue = Integer.parseInt(value);
                 if (0 < timeoutValue && timeoutValue < recommendedMinTimeout) {
                     return FormValidation.warning(
-                            String.format("Deployment timeout less than %d is not recommended.", recommendedMinTimeout)
+                            String.format("Deployment timeout less than %d seconds is not recommended.", recommendedMinTimeout)
                     );
                 }
                 
                 if (timeoutValue <= 0) {
-                    return FormValidation.warning("Deployment timeout must be a positive number.");
+                    return FormValidation.error("Deployment timeout must be a positive number.");
                 }
                 
                 return FormValidation.ok();
