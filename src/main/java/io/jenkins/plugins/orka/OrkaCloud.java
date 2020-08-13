@@ -240,6 +240,8 @@ public class OrkaCloud extends Cloud {
                 if (timeoutValue <= 0) {
                     return FormValidation.warning("Deployment timeout must be a positive number.");
                 }
+                
+                return FormValidation.ok();
             } catch (NumberFormatException e) {
                 return FormValidation.error("Deployment timeout must be a number.");
             }

@@ -169,7 +169,7 @@ public class OrkaClient implements AutoCloseable {
         return executeCall(request);
     }
     
-    private void setEndpointAndToken(String endpoint, String email, String password) {
+    private void setEndpointAndToken(String endpoint, String email, String password) throws IOException {
         this.endpoint = endpoint;
         this.token = this.getToken(email, password);
     }
