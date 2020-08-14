@@ -90,7 +90,8 @@ public class CapacityHandler {
         try {
             instanceLock.lock();
             this.ensureRunningInstancesInitialized();
-            this.runningInstances--;
+            this.runningInstances = this.runningInstances > 0 ? this.runningInstances - 1 : 0;
+
             logger.fine(String.format("New running instances: %s", this.runningInstances));
         } finally {
             instanceLock.unlock();
@@ -101,7 +102,9 @@ public class CapacityHandler {
         logger.fine("Removing planned instance...");
         try {
             instanceLock.lock();
-            this.plannedInstances--;
+            this.plannedInstances = this.plannedInstances > 0 ? this.plannedInstances - 1 : 0;
+
+
             logger.fine(String.format("New planned instances: %s", this.plannedInstances));
         } finally {
             instanceLock.unlock();
