@@ -45,7 +45,7 @@ public class OrkaCloud extends Cloud {
     private String endpoint;
     private int instanceCap;
     private String instanceCapSetting;
-    private final int timeout;
+    private int timeout;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
@@ -80,6 +80,8 @@ public class OrkaCloud extends Cloud {
 
         this.capacityHandler = new CapacityHandler(this.name, this.instanceCap);
 
+        this.timeout = this.timeout > 0 ? this.timeout : defaultTimeout;
+        
         return this;
     }
 
@@ -96,7 +98,7 @@ public class OrkaCloud extends Cloud {
     }
 
     public int getTimeout() {
-        return this.timeout > 0 ? this.timeout : defaultTimeout;
+        return this.timeout;
     }
 
     public List<? extends AddressMapper> getMappings() {
@@ -222,6 +224,10 @@ public class OrkaCloud extends Cloud {
         @Override
         public String getDisplayName() {
             return "Orka Cloud";
+        }
+        
+        public int getDefaultTimeout() {
+            return defaultTimeout;
         }
 
         public ListBoxModel doFillCredentialsIdItems() {
