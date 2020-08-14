@@ -43,16 +43,13 @@ public class OrkaClient implements AutoCloseable {
     private OkHttpClient client;
 
     public OrkaClient(String endpoint, String email, String password) throws IOException {
-        client = clientBase.newBuilder().readTimeout(defaultHttpClientTimeout, TimeUnit.SECONDS).build();
-        this.endpoint = endpoint;
-        this.token = this.getToken(email, password);
+        this(endpoint, email, password, defaultHttpClientTimeout);
     }
 
     public OrkaClient(String endpoint, String email, String password, int httpClientTimeout) throws IOException {
-        client = clientBase.newBuilder().readTimeout(httpClientTimeout, TimeUnit.SECONDS).build();
+        this.client = clientBase.newBuilder().readTimeout(httpClientTimeout, TimeUnit.SECONDS).build();
         this.endpoint = endpoint;
         this.token = this.getToken(email, password);
-
     }
 
     public List<VMResponse> getVMs() throws IOException {
