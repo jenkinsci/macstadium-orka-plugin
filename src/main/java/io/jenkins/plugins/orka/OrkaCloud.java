@@ -9,6 +9,7 @@ import hudson.model.Label;
 import hudson.model.Node;
 import hudson.slaves.Cloud;
 import hudson.slaves.NodeProvisioner.PlannedNode;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
@@ -29,30 +30,37 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
-
+    private static final int recommendedMinTimeout = 30;
+    private static final int defaultTimeout = 300;
+    
     private String credentialsId;
     private String endpoint;
     private int instanceCap;
     private String instanceCapSetting;
+    private int timeout;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
     private transient CapacityHandler capacityHandler;
 
     @DataBoundConstructor
-    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting,
-            List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
+    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, 
+                        int timeout, List<? extends AddressMapper> mappings, 
+                        List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
         this.endpoint = endpoint;
         this.instanceCapSetting = instanceCapSetting;
+        this.timeout = timeout;
 
         this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
@@ -72,6 +80,8 @@ public class OrkaCloud extends Cloud {
 
         this.capacityHandler = new CapacityHandler(this.name, this.instanceCap);
 
+        this.timeout = this.timeout > 0 ? this.timeout : defaultTimeout;
+        
         return this;
     }
 
@@ -85,6 +95,10 @@ public class OrkaCloud extends Cloud {
 
     public String getInstanceCapSetting() {
         return this.instanceCap == Integer.MAX_VALUE ? "" : String.valueOf(this.instanceCap);
+    }
+
+    public int getTimeout() {
+        return this.timeout;
     }
 
     public List<? extends AddressMapper> getMappings() {
@@ -116,7 +130,8 @@ public class OrkaCloud extends Cloud {
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
-        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).deployVM(name);
+        return new 
+            OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout).deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
@@ -210,9 +225,33 @@ public class OrkaCloud extends Cloud {
         public String getDisplayName() {
             return "Orka Cloud";
         }
+        
+        public int getDefaultTimeout() {
+            return defaultTimeout;
+        }
 
         public ListBoxModel doFillCredentialsIdItems() {
             return CredentialsHelper.getCredentials(StandardCredentials.class);
+        }
+        
+        public FormValidation doCheckTimeout(@QueryParameter String value) {
+            try {
+                int timeoutValue = Integer.parseInt(value);
+                if (0 < timeoutValue && timeoutValue < recommendedMinTimeout) {
+                    return FormValidation.warning(
+                        String.format("Deployment timeout less than %d seconds is not recommended.", 
+                                recommendedMinTimeout)
+                    );
+                }
+                
+                if (timeoutValue <= 0) {
+                    return FormValidation.error("Deployment timeout must be a positive number.");
+                }
+                
+                return FormValidation.ok();
+            } catch (NumberFormatException e) {
+                return FormValidation.error("Deployment timeout must be a number.");
+            }
         }
     }
 }

@@ -19,7 +19,9 @@
       <f:entry title="Max Jenkins Agents Limit" field="instanceCapSetting">
         <f:textbox />
       </f:entry>
-
+      <f:entry title="Deployment Timeout (sec)" field="timeout">
+          <f:number default="${descriptor.getDefaultTimeout()}"/>
+      </f:entry>
       <f:entry title="${%Node Mappings}" description="${%List of Orka node mappings}">
           <f:repeatable field="mappings" header="${%Mapping}" add="${%Add mapping}">
               <st:include page="config.jelly" class="${descriptor.clazz}"/>

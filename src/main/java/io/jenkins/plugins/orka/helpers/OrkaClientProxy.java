@@ -14,15 +14,21 @@ import java.io.IOException;
 import java.util.List;
 
 public class OrkaClientProxy {
-
     private StandardUsernamePasswordCredentials credentials;
     private String endpoint;
+    private int httpClientTimeout;
 
     public OrkaClientProxy() {
     }
-
+    
     public OrkaClientProxy(String endpoint, String credentialsId) {
         this.setData(endpoint, credentialsId);
+        this.httpClientTimeout = 0;
+    }
+    
+    public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout) {
+        this.setData(endpoint, credentialsId);
+        this.httpClientTimeout = httpClientTimeout;
     }
 
     public void setData(String endpoint, String credentialsId) {
@@ -82,6 +88,6 @@ public class OrkaClientProxy {
 
     private OrkaClient getOrkaClient() throws IOException {
         return new OrkaClient(this.endpoint, this.credentials.getUsername(),
-                Secret.toString(credentials.getPassword()));
+                Secret.toString(credentials.getPassword()), this.httpClientTimeout);
     }
 }
