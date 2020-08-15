@@ -160,6 +160,27 @@ public class CapacityHandlerTest {
     }
 
     @Test
+    public void when_reserve_eight_instances_and_no_running_should_return_eight() {
+        int capacity = 8;
+        CapacityHandler handler = new CapacityHandler("cloud", capacity);
+        handler.reserveCapacity(3, "provisionIdString");
+        handler.addRunningInstance();
+        handler.removeRunningInstance();
+        handler.addRunningInstance();
+        handler.removeRunningInstance();
+        handler.addRunningInstance();
+        handler.removeRunningInstance();
+        handler.removeRunningInstance();
+        handler.removeRunningInstance();
+        handler.removeRunningInstance();
+        int capacityToReserve = 8;
+
+        int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
+
+        assertEquals(8, actualReserved);
+    }
+
+    @Test
     public void when_reserve_three_instances_and_four_available_should_return_three() {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
