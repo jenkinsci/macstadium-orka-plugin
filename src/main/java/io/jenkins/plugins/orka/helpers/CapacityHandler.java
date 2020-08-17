@@ -86,7 +86,7 @@ public class CapacityHandler {
     }
 
     public void removeRunningInstance() {
-        logger.fine("Adding running instance...");
+        logger.fine("Remove running instance...");
         try {
             instanceLock.lock();
             this.ensureRunningInstancesInitialized();
