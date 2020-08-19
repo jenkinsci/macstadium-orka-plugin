@@ -65,7 +65,7 @@
               <f:textbox/>
           </f:entry>
 
-          <f:slave-mode name="mode" node="${it}"/>
+          <f:slave-mode name="mode" node="${instance}"/>
 
           <j:if test="${h.getRetentionStrategyDescriptors().size() gt 1}">
             <f:dropdownList name="slave.retentionStrategy" title="${%Availability}"
