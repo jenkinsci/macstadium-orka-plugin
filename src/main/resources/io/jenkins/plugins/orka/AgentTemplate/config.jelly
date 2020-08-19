@@ -56,7 +56,7 @@
         </j:forEach>
       </f:dropdownList>
 
-      <f:slave-mode name="mode" node="${it}"/>
+      <f:slave-mode name="mode" node="${instance}"/>
 
       </f:section>
 

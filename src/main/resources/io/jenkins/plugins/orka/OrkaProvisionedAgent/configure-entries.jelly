@@ -43,7 +43,7 @@
         <f:textbox />
     </f:entry>
 
-    <f:slave-mode name="mode" node="${it}"/>
+    <f:slave-mode name="mode" node="${instance}"/>
 
     <f:dropdownList name="retentionStrategy" title="${%Retention Strategy}" help="${descriptor.getHelpFile('retentionStrategy')}">
       <j:forEach var="d" items="${descriptor.getRetentionStrategyDescriptors()}">
