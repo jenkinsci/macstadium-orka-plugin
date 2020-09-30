@@ -13,7 +13,9 @@ import org.jvnet.hudson.test.JenkinsRule;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Node.Mode;
 import hudson.slaves.RetentionStrategy;
+import io.jenkins.plugins.orka.DefaultVerificationStrategy;
 import io.jenkins.plugins.orka.OrkaProvisionedAgent;
+import io.jenkins.plugins.orka.OrkaVerificationStrategy;
 
 public class CapacityHandlerTest {
     @ClassRule
@@ -242,8 +244,10 @@ public class CapacityHandlerTest {
     public void when_reserve_two_instances_with_one_initial_should_return_two() throws IOException, FormException {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
-        r.getInstance().addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5,
-                "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, Collections.emptyList()));
+        r.getInstance()
+                .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
+                        Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
+                        Collections.emptyList()));
         int capacityToReserve = 2;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -255,8 +259,10 @@ public class CapacityHandlerTest {
     public void when_reserve_five_instances_with_one_initial_should_return_four() throws IOException, FormException {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
-        r.getInstance().addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5,
-                "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, Collections.emptyList()));
+        r.getInstance()
+                .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
+                        Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
+                        Collections.emptyList()));
         int capacityToReserve = 5;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -268,8 +274,10 @@ public class CapacityHandlerTest {
     public void when_reserve_nine_instances_with_one_initial_should_return_four() throws IOException, FormException {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
-        r.getInstance().addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5,
-                "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, Collections.emptyList()));
+        r.getInstance()
+                .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
+                        Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
+                        Collections.emptyList()));
         int capacityToReserve = 9;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -281,8 +289,10 @@ public class CapacityHandlerTest {
             throws IOException, FormException {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
-        r.getInstance().addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
-                "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, Collections.emptyList()));
+        r.getInstance()
+                .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
+                        "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
+                        Collections.emptyList()));
         int capacityToReserve = 2;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -295,8 +305,10 @@ public class CapacityHandlerTest {
             throws IOException, FormException {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
-        r.getInstance().addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
-                "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, Collections.emptyList()));
+        r.getInstance()
+                .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
+                        "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
+                        Collections.emptyList()));
         int capacityToReserve = 5;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -309,8 +321,10 @@ public class CapacityHandlerTest {
             throws IOException, FormException {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
-        r.getInstance().addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
-                "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, Collections.emptyList()));
+        r.getInstance()
+                .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
+                        "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
+                        Collections.emptyList()));
         int capacityToReserve = 9;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
