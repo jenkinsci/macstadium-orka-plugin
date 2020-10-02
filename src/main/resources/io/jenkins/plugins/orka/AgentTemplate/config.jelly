@@ -58,15 +58,19 @@
 
       <f:slave-mode name="mode" node="${instance}"/>
 
-      </f:section>
+      <f:advanced>
+        <f:dropdownDescriptorSelector title="${%Verification Strategy}" field="verificationStrategy" descriptors="${descriptor.getVerificationStrategyDescriptors()}" default="${descriptor.getDefaultVerificationDescriptor()}" />
+      </f:advanced>
 
-      <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"
-                            field="nodeProperties"/>
+    </f:section>
 
-      <f:entry title="">
-        <div align="right">
-          <f:repeatableDeleteButton value="${%Delete Orka Template}"/>
-        </div>
-      </f:entry>
+    <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"
+                          field="nodeProperties"/>
+
+    <f:entry title="">
+      <div align="right">
+        <f:repeatableDeleteButton value="${%Delete Orka Template}"/>
+      </div>
+    </f:entry>
   </table>
 </j:jelly>

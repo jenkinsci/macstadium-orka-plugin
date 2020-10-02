@@ -59,7 +59,9 @@
         </f:dropdownListBlock>
       </j:forEach>
     </f:dropdownList>
-
+    <f:advanced>
+       <f:dropdownDescriptorSelector title="${%Verification Strategy}" field="verificationStrategy" descriptors="${descriptor.getVerificationStrategyDescriptors()}" />
+    </f:advanced>
   </f:section>
 
   <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"

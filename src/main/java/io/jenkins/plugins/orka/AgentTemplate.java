@@ -22,6 +22,7 @@ import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
+import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,6 +49,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String remoteFS;
     private String labelString;
     private RetentionStrategy<?> retentionStrategy;
+    private OrkaVerificationStrategy verificationStrategy;
     private List<? extends NodeProperty<?>> nodeProperties;
 
     @Deprecated
@@ -58,7 +60,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
-            RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties) {
+            RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
+            List<? extends NodeProperty<?>> nodeProperties) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
@@ -70,6 +73,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.mode = mode;
         this.labelString = labelString;
         this.retentionStrategy = retentionStrategy;
+        this.verificationStrategy = verificationStrategy;
         this.nodeProperties = nodeProperties;
     }
 
@@ -129,6 +133,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.retentionStrategy;
     }
 
+    public OrkaVerificationStrategy getVerificationStrategy() {
+        return this.verificationStrategy;
+    }
+
     public List<? extends NodeProperty<?>> getNodeProperties() {
         return this.nodeProperties;
     }
@@ -156,7 +164,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
                 response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
-                this.labelString, this.retentionStrategy, this.nodeProperties);
+                this.labelString, this.retentionStrategy, this.verificationStrategy, this.nodeProperties);
     }
 
     private void ensureConfigurationExist() throws IOException {
@@ -177,6 +185,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     protected Object readResolve() {
         if (this.retentionStrategy == null) {
             this.retentionStrategy = new IdleTimeCloudRetentionStrategy(this.idleTerminationMinutes);
+        }
+        if (this.verificationStrategy == null) {
+            this.verificationStrategy = new DefaultVerificationStrategy();
         }
         return this;
     }
@@ -232,6 +243,14 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {
             return OrkaRetentionStrategy.getRetentionStrategyDescriptors();
         }
+
+        public static List<Descriptor<OrkaVerificationStrategy>> getVerificationStrategyDescriptors() {
+            return OrkaVerificationStrategyProvider.getVerificationStrategyDescriptors();
+        }
+
+        public static Descriptor<OrkaVerificationStrategy> getDefaultVerificationDescriptor() {
+            return OrkaVerificationStrategyProvider.getDefaultVerificationDescriptor();
+        }
     }
 
     @Override
@@ -240,7 +259,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 + createNewVMConfig + ", idleTerminationMinutes=" + idleTerminationMinutes + ", labelString="
                 + labelString + ", mode=" + mode + ", nodeProperties=" + nodeProperties + ", numCPUs=" + numCPUs
                 + ", numExecutors=" + numExecutors + ", parent=" + parent + ", remoteFS=" + remoteFS
-                + ", retentionStrategy=" + retentionStrategy + ", vm=" + vm + ", vmCredentialsId=" + vmCredentialsId
-                + "]";
+                + ", retentionStrategy=" + retentionStrategy + ", verificationStrategy=" + verificationStrategy
+                + ", vm=" + vm + ", vmCredentialsId=" + vmCredentialsId + "]";
     }
 }
