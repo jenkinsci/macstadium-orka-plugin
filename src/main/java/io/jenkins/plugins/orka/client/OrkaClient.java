@@ -46,6 +46,8 @@ public class OrkaClient implements AutoCloseable {
         this.client = clientBase.newBuilder().readTimeout(httpClientTimeout, TimeUnit.SECONDS).build();
         this.endpoint = endpoint;
         this.tokenResponse = this.getToken(email, password);
+
+        this.verifyToken();
     }
 
     public VMResponse getVMs() throws IOException {
@@ -164,13 +166,27 @@ public class OrkaClient implements AutoCloseable {
     }
 
     private Builder getAuthenticatedBuilder(String url) throws IOException {
-        return new Request.Builder().addHeader("Authorization", "Bearer " + this.tokenResponse.getToken()).url(url);
+        Request.Builder builder = new Request.Builder().url(url);
+        if (this.tokenResponse != null) {
+            builder.addHeader("Authorization", "Bearer " + this.tokenResponse.getToken());
+        }
+
+        return builder;
     }
 
     private HttpResponse executeCall(Request request) throws IOException {
         logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
         try (Response response = client.newCall(request).execute()) {
             return new HttpResponse(response.body().string(), response.code(), response.isSuccessful());
+        }
+    }
+
+    private void verifyToken() throws IOException {
+        HttpResponse response = this.tokenResponse.getHttpResponse();
+        if (!response.getIsSuccessful() || this.tokenResponse.hasErrors()) {
+            String error = String.format("Authentication failed with: Code: %s, Errors: %s ", response.getCode(),
+                    Arrays.toString((this.tokenResponse.getErrors())));
+            throw new IOException(error);
         }
     }
 }

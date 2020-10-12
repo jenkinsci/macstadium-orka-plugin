@@ -17,8 +17,8 @@ import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.helpers.CapacityHandler;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
+import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
-import jenkins.model.Jenkins;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -32,10 +32,12 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jenkins.model.Jenkins;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.interceptor.RequirePOST;
+import org.kohsuke.stapler.verb.POST;
 
 public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
@@ -221,6 +223,9 @@ public class OrkaCloud extends Cloud {
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<Cloud> {
+        private OrkaClientProxyFactory clientProxyFactory = new OrkaClientProxyFactory();
+        private FormValidator formValidator = new FormValidator(this.clientProxyFactory);
+
         @Override
         public String getDisplayName() {
             return "Orka Cloud";
@@ -250,6 +255,13 @@ public class OrkaCloud extends Cloud {
             } catch (NumberFormatException e) {
                 return FormValidation.error("Deployment timeout must be a number.");
             }
+        }
+
+        @POST
+        public FormValidation doTestConnection(@QueryParameter String credentialsId, @QueryParameter String endpoint)
+                throws IOException {
+
+            return this.formValidator.doTestConnection(credentialsId, endpoint);
         }
     }
 }
