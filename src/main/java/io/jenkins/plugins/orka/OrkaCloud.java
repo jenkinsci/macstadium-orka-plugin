@@ -14,10 +14,11 @@ import hudson.util.ListBoxModel;
 
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.client.VMResponse;
+import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.helpers.CapacityHandler;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import jenkins.model.Jenkins;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -34,12 +35,13 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
     private static final int recommendedMinTimeout = 30;
     private static final int defaultTimeout = 300;
-    
+
     private String credentialsId;
     private String endpoint;
     private int instanceCap;
@@ -51,9 +53,8 @@ public class OrkaCloud extends Cloud {
     private transient CapacityHandler capacityHandler;
 
     @DataBoundConstructor
-    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, 
-                        int timeout, List<? extends AddressMapper> mappings, 
-                        List<? extends AgentTemplate> templates) {
+    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
+            List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
@@ -80,7 +81,7 @@ public class OrkaCloud extends Cloud {
         this.capacityHandler = new CapacityHandler(this.name, this.instanceCap);
 
         this.timeout = this.timeout > 0 ? this.timeout : defaultTimeout;
-        
+
         return this;
     }
 
@@ -118,7 +119,7 @@ public class OrkaCloud extends Cloud {
                 .findFirst().orElse(null);
     }
 
-    public List<VMResponse> getVMs() throws IOException {
+    public List<OrkaVM> getVMs() throws IOException {
         return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).getVMs();
     }
 
@@ -129,8 +130,8 @@ public class OrkaCloud extends Cloud {
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
-        return new 
-            OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout).deployVM(name);
+        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout)
+                .deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
@@ -224,7 +225,7 @@ public class OrkaCloud extends Cloud {
         public String getDisplayName() {
             return "Orka Cloud";
         }
-        
+
         public int getDefaultTimeout() {
             return defaultTimeout;
         }
@@ -232,21 +233,19 @@ public class OrkaCloud extends Cloud {
         public ListBoxModel doFillCredentialsIdItems() {
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
-        
+
         public FormValidation doCheckTimeout(@QueryParameter String value) {
             try {
                 int timeoutValue = Integer.parseInt(value);
                 if (0 < timeoutValue && timeoutValue < recommendedMinTimeout) {
-                    return FormValidation.warning(
-                        String.format("Deployment timeout less than %d seconds is not recommended.", 
-                                recommendedMinTimeout)
-                    );
+                    return FormValidation.warning(String.format(
+                            "Deployment timeout less than %d seconds is not recommended.", recommendedMinTimeout));
                 }
-                
+
                 if (timeoutValue <= 0) {
                     return FormValidation.error("Deployment timeout must be a positive number.");
                 }
-                
+
                 return FormValidation.ok();
             } catch (NumberFormatException e) {
                 return FormValidation.error("Deployment timeout must be a number.");

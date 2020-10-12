@@ -2,6 +2,8 @@ package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.NodeResponse;
+import io.jenkins.plugins.orka.client.OrkaNode;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
@@ -9,8 +11,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
-    private static final String NOT_ENOUGH_RESOURCES_FORMAT = 
-        "Not enough resources on node. Required %s CPU, available %s";
+    private static final String NOT_ENOUGH_RESOURCES_FORMAT = "Not enough resources on node. Required %s CPU, available %s";
 
     private OrkaClientProxyFactory clientProxyFactory;
 
@@ -29,8 +30,8 @@ public class FormValidator {
 
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                    OrkaClientProxy clientProxy = this.clientProxyFactory
-                        .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
+                    OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                            orkaCredentialsId);
                     boolean alreadyInUse = clientProxy.getVMs().stream()
                             .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
                     if (alreadyInUse) {
@@ -56,22 +57,19 @@ public class FormValidator {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                OrkaClientProxy clientProxy = this.clientProxyFactory
-                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
+                OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                        orkaCredentialsId);
                 hasAvailableNodes = clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .anyMatch(n -> true);
 
                 if (hasAvailableNodes) {
                     requiredCPU = numCPUs;
                     if (!createNewConfig) {
-                        requiredCPU = clientProxy.getVMs()
-                                .stream().filter(v -> v.getVMName().equals(vm))
-                                .findFirst()
-                                .get()
-                                .getCPUCount();
+                        requiredCPU = clientProxy.getVMs().stream().filter(v -> v.getVMName().equals(vm)).findFirst()
+                                .get().getCPUCount();
                     }
 
-                    NodeResponse nodeDetails = clientProxy.getNodes().stream().filter(n -> n.getHostname().equals(node))
+                    OrkaNode nodeDetails = clientProxy.getNodes().stream().filter(n -> n.getHostname().equals(node))
                             .findFirst().get();
                     canDeployVM = ProvisioningHelper.canDeployOnNode(nodeDetails, requiredCPU);
                     availableCPU = nodeDetails.getAvailableCPU();
