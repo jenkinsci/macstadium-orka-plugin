@@ -1,7 +1,9 @@
 package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.FormValidation;
-import io.jenkins.plugins.orka.client.NodeResponse;
+import io.jenkins.plugins.orka.client.OrkaNode;
+
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
@@ -29,8 +31,8 @@ public class FormValidator {
 
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                    OrkaClientProxy clientProxy = this.clientProxyFactory
-                        .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
+                    OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint, 
+                        orkaCredentialsId);
                     boolean alreadyInUse = clientProxy.getVMs().stream()
                             .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
                     if (alreadyInUse) {
@@ -56,22 +58,19 @@ public class FormValidator {
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                OrkaClientProxy clientProxy = this.clientProxyFactory
-                    .getOrkaClientProxy(orkaEndpoint, orkaCredentialsId);
+                OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                        orkaCredentialsId);
                 hasAvailableNodes = clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .anyMatch(n -> true);
 
                 if (hasAvailableNodes) {
                     requiredCPU = numCPUs;
                     if (!createNewConfig) {
-                        requiredCPU = clientProxy.getVMs()
-                                .stream().filter(v -> v.getVMName().equals(vm))
-                                .findFirst()
-                                .get()
-                                .getCPUCount();
+                        requiredCPU = clientProxy.getVMs().stream().filter(v -> v.getVMName().equals(vm)).findFirst()
+                                .get().getCPUCount();
                     }
 
-                    NodeResponse nodeDetails = clientProxy.getNodes().stream().filter(n -> n.getHostname().equals(node))
+                    OrkaNode nodeDetails = clientProxy.getNodes().stream().filter(n -> n.getHostname().equals(node))
                             .findFirst().get();
                     canDeployVM = ProvisioningHelper.canDeployOnNode(nodeDetails, requiredCPU);
                     availableCPU = nodeDetails.getAvailableCPU();
@@ -88,5 +87,22 @@ public class FormValidator {
         }
 
         return FormValidation.error("There are no available nodes");
+    }
+
+    public FormValidation doTestConnection(String credentialsId, String endpoint) throws IOException {
+
+        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            new OrkaClientProxyFactory().getOrkaClientProxy(endpoint, credentialsId).getNodes();
+        } catch (IOException e) {
+            return failedConnection(e.getMessage());
+        }
+
+        return FormValidation.ok("Connection Successful");
+    }
+
+    private static FormValidation failedConnection(String message) {
+        return FormValidation.error("Connection failed with: " + message);
     }
 }

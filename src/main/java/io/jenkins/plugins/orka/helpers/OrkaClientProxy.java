@@ -6,9 +6,9 @@ import hudson.util.Secret;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeletionResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
-import io.jenkins.plugins.orka.client.VMResponse;
+import io.jenkins.plugins.orka.client.OrkaNode;
+import io.jenkins.plugins.orka.client.OrkaVM;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,12 +20,12 @@ public class OrkaClientProxy {
 
     public OrkaClientProxy() {
     }
-    
+
     public OrkaClientProxy(String endpoint, String credentialsId) {
         this.setData(endpoint, credentialsId);
         this.httpClientTimeout = 0;
     }
-    
+
     public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout) {
         this.setData(endpoint, credentialsId);
         this.httpClientTimeout = httpClientTimeout;
@@ -36,21 +36,21 @@ public class OrkaClientProxy {
         this.endpoint = endpoint;
     }
 
-    public List<VMResponse> getVMs() throws IOException {
+    public List<OrkaVM> getVMs() throws IOException {
         try (OrkaClient client = getOrkaClient()) {
-            return client.getVMs();
+            return client.getVMs().getVMs();
         }
     }
 
-    public List<NodeResponse> getNodes() throws IOException {
+    public List<OrkaNode> getNodes() throws IOException {
         try (OrkaClient client = getOrkaClient()) {
-            return client.getNodes();
+            return client.getNodes().getNodes();
         }
     }
 
     public List<String> getImages() throws IOException {
         try (OrkaClient client = getOrkaClient()) {
-            return client.getImages();
+            return client.getImages().getImages();
         }
     }
 
@@ -87,7 +87,7 @@ public class OrkaClientProxy {
     }
 
     private OrkaClient getOrkaClient() throws IOException {
-        return new OrkaClient(this.endpoint, this.credentials.getUsername(),
-                Secret.toString(credentials.getPassword()), this.httpClientTimeout);
+        return new OrkaClient(this.endpoint, this.credentials.getUsername(), Secret.toString(credentials.getPassword()),
+                this.httpClientTimeout);
     }
 }

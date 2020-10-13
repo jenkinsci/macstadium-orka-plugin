@@ -15,6 +15,8 @@
       <f:textbox />
     </f:entry>
 
+    <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection" with="credentialsId,endpoint" />
+
     <f:advanced>
       <f:entry title="Max Jenkins Agents Limit" field="instanceCapSetting">
         <f:textbox />

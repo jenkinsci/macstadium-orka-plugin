@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Arrays;
 
-public class DeploymentResponse {
+public class DeploymentResponse extends ResponseBase {
     @SerializedName("ip")
     private String host;
 
@@ -14,16 +14,11 @@ public class DeploymentResponse {
     @SerializedName("vm_id")
     private String id;
 
-    private OrkaError[] errors;
-
-    private String message;
-
     public DeploymentResponse(String host, int sshPort, String id, OrkaError[] errors, String message) {
+        super(message, errors);
         this.host = host;
         this.sshPort = sshPort;
         this.id = id;
-        this.errors = errors != null ? errors.clone() : new OrkaError[] {};
-        this.message = message;
     }
 
     public String getHost() {
@@ -38,21 +33,9 @@ public class DeploymentResponse {
         return this.id;
     }
 
-    public OrkaError[] getErrors() {
-        return this.errors.clone();
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public boolean hasErrors() {
-        return this.errors != null && this.errors.length > 0;
-    }
-
     @Override
     public String toString() {
-        return "DeploymentResponse [errors=" + Arrays.toString(errors) + ", host=" + host + ", id=" + id + ", message="
-                + message + ", sshPort=" + sshPort + "]";
+        return "DeploymentResponse [errors=" + Arrays.toString(this.getErrors()) + ", host=" + host + ", id=" + id
+                + ", message=" + this.getMessage() + ", sshPort=" + sshPort + "]";
     }
 }

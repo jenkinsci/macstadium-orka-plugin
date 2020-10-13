@@ -17,7 +17,7 @@ import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.ListBoxModel;
-import io.jenkins.plugins.orka.client.VMResponse;
+import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
@@ -48,9 +48,9 @@ public class VMItemsFillTest {
 
     @Before
     public void initialize() throws IOException {
-        VMResponse firstVM = new VMResponse("first", "deployed", 12, "Mojave.img", "firstImage", "default");
-        VMResponse secondVM = new VMResponse("second", "not deployed", 24, "Mojave.img", "secondImage", "default");
-        List<VMResponse> response = Arrays.asList(firstVM, secondVM);
+        OrkaVM firstVM = new OrkaVM("first", "deployed", 12, "Mojave.img", "firstImage", "default");
+        OrkaVM secondVM = new OrkaVM("second", "not deployed", 24, "Mojave.img", "secondImage", "default");
+        List<OrkaVM> response = Arrays.asList(firstVM, secondVM);
 
         OrkaClientProxy client = mock(OrkaClientProxy.class);
 

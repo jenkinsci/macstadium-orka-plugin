@@ -177,5 +177,12 @@ public class OrkaAgent extends AbstractCloudSlave {
 
             return this.infoHelper.doFillBaseImageItems(orkaEndpoint, orkaCredentialsId, createNewVMConfig);
         }
+
+        @POST
+        public FormValidation doTestConnection(@QueryParameter String orkaCredentialsId,
+                @QueryParameter String orkaEndpoint) throws IOException {
+
+            return this.formValidator.doTestConnection(orkaCredentialsId, orkaEndpoint);
+        }
     }
 }
