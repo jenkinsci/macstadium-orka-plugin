@@ -126,9 +126,9 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
             ConfigurationResponse configResponse = clientProxy.createConfiguration(configName, image, baseImage,
                     template, numCPUs);
-            if (configResponse.hasErrors()) {
+            if (!configResponse.isSuccessful()) {
                 logger.println(String.format(configurationErrorFormat, Utils.getTimestamp(), configName, image,
-                        baseImage, template, numCPUs, Arrays.toString(configResponse.getErrors())));
+                        baseImage, template, numCPUs, Utils.getErrorMessage(configResponse)));
                 return false;
             }
             logger.println(
@@ -142,9 +142,9 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         String vmName = agent.getCreateNewVMConfig() ? agent.getConfigName() : agent.getVm();
 
         DeploymentResponse deploymentResponse = clientProxy.deployVM(vmName, agent.getNode());
-        if (deploymentResponse.hasErrors()) {
+        if (!deploymentResponse.isSuccessful()) {
             logger.println(String.format(deploymentErrorFormat, Utils.getTimestamp(), vmName, agent.getNode(),
-                    Arrays.toString(deploymentResponse.getErrors())));
+                    Utils.getErrorMessage(deploymentResponse)));
             return null;
         }
         logger.println(String.format(deploymentSuccessFormat, Utils.getTimestamp(), deploymentResponse.getMessage()));

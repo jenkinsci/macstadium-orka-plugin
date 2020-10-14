@@ -3,9 +3,10 @@ package io.jenkins.plugins.orka.client;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 
+import io.jenkins.plugins.orka.helpers.Utils;
+
 import java.io.IOException;
 import java.lang.AutoCloseable;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import java.util.logging.Logger;
@@ -182,10 +183,8 @@ public class OrkaClient implements AutoCloseable {
     }
 
     private void verifyToken() throws IOException {
-        HttpResponse response = this.tokenResponse.getHttpResponse();
-        if (!response.getIsSuccessful() || this.tokenResponse.hasErrors()) {
-            String error = String.format("Authentication failed with: Code: %s, Errors: %s ", response.getCode(),
-                    Arrays.toString((this.tokenResponse.getErrors())));
+        if (!this.tokenResponse.isSuccessful()) {
+            String error = String.format("Authentication failed with: %s", Utils.getErrorMessage(tokenResponse));
             throw new IOException(error);
         }
     }

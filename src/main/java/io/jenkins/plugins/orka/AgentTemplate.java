@@ -23,6 +23,7 @@ import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
+import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -155,8 +156,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         logger.fine("Result deploying VM " + vmName + ":");
         logger.fine(response.toString());
 
-        if (response.hasErrors()) {
-            logger.warning("Deploying VM failed with: " + Arrays.toString(response.getErrors()));
+        if (!response.isSuccessful()) {
+            logger.warning("Deploying VM failed with: " + Utils.getErrorMessage(response));
             return null;
         }
 
