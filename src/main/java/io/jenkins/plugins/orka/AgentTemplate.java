@@ -15,7 +15,7 @@ import hudson.slaves.NodeProperty;
 import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-
+import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
@@ -26,7 +26,6 @@ import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -147,7 +146,12 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     }
 
     public OrkaProvisionedAgent provision() throws IOException, FormException {
-        this.ensureConfigurationExist();
+        ConfigurationResponse configurationResponse = this.ensureConfigurationExist();
+        if (configurationResponse != null && !configurationResponse.isSuccessful()) {
+            logger.warning("Creating VM configuration failed with: " + Utils.getErrorMessage(configurationResponse));
+            return null;
+        }
+
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
 
         logger.fine("Deploying VM with name " + vmName);
@@ -168,15 +172,17 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 this.labelString, this.retentionStrategy, this.verificationStrategy, this.nodeProperties);
     }
 
-    private void ensureConfigurationExist() throws IOException {
+    private ConfigurationResponse ensureConfigurationExist() throws IOException {
         if (this.createNewVMConfig) {
             boolean configExist = parent.getVMs().stream().anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
 
             if (!configExist) {
-                parent.createConfiguration(this.configName, this.configName, this.baseImage,
+                logger.fine("Creating config with name " + this.configName);
+                return parent.createConfiguration(this.configName, this.configName, this.baseImage,
                         Constants.DEFAULT_CONFIG_NAME, this.numCPUs);
             }
         }
+        return null;
     }
 
     void setParent(OrkaCloud parent) {
