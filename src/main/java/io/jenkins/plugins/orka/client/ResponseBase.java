@@ -1,5 +1,7 @@
 package io.jenkins.plugins.orka.client;
 
+import java.util.Arrays;
+
 public class ResponseBase {
     private HttpResponse httpResponse;
 
@@ -28,7 +30,18 @@ public class ResponseBase {
         return this.errors.clone();
     }
 
-    public boolean hasErrors() {
+    public boolean isSuccessful() {
+        return this.httpResponse != null ? this.httpResponse.getIsSuccessful() : !this.hasErrors();
+    }
+
+    public String getErrorMessage() {
+        if (!this.isSuccessful()) {
+            return this.hasErrors() ? Arrays.toString(this.getErrors()) : httpResponse.getBody();
+        }
+        return null;
+    }
+
+    private boolean hasErrors() {
         return this.errors != null && this.errors.length > 0;
     }
 }
