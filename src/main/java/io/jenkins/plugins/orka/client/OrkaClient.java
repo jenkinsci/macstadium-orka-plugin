@@ -128,6 +128,14 @@ public class OrkaClient implements AutoCloseable {
         return response;
     }
 
+    public TokenStatusResponse getTokenStatus() throws IOException {
+        HttpResponse httpResponse = this.get(this.endpoint + TOKEN_PATH);
+        TokenStatusResponse response = new Gson().fromJson(httpResponse.getBody(), TokenStatusResponse.class);
+        response.setHttpResponse(httpResponse);
+
+        return response;
+    }
+
     public void close() throws IOException {
         this.delete(this.endpoint + TOKEN_PATH, "");
     }
