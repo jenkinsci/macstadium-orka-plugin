@@ -7,16 +7,19 @@ import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.lang.AutoCloseable;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import java.util.logging.Logger;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class OrkaClient implements AutoCloseable {
 
@@ -44,7 +47,8 @@ public class OrkaClient implements AutoCloseable {
     }
 
     public OrkaClient(String endpoint, String email, String password, int httpClientTimeout) throws IOException {
-        this.client = clientBase.newBuilder().readTimeout(httpClientTimeout, TimeUnit.SECONDS).build();
+        this.client = clientBase.newBuilder().readTimeout(httpClientTimeout, TimeUnit.SECONDS)
+                .protocols(Arrays.asList(Protocol.HTTP_1_1)).build();
         this.endpoint = endpoint;
         this.tokenResponse = this.getToken(email, password);
 
@@ -147,7 +151,7 @@ public class OrkaClient implements AutoCloseable {
 
     @VisibleForTesting
     HttpResponse post(String url, String body) throws IOException {
-        RequestBody requestBody = RequestBody.create(JSON, body);
+        RequestBody requestBody = RequestBody.create(body, JSON);
         Request request = this.getAuthenticatedBuilder(url).post(requestBody).build();
 
         return executeCall(request);
@@ -161,7 +165,7 @@ public class OrkaClient implements AutoCloseable {
 
     @VisibleForTesting
     HttpResponse delete(String url, String body) throws IOException {
-        RequestBody requestBody = RequestBody.create(JSON, body);
+        RequestBody requestBody = RequestBody.create(body, JSON);
         Request request = this.getAuthenticatedBuilder(url).delete(requestBody).build();
         return executeCall(request);
     }
@@ -178,7 +182,8 @@ public class OrkaClient implements AutoCloseable {
     private HttpResponse executeCall(Request request) throws IOException {
         logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
         try (Response response = client.newCall(request).execute()) {
-            return new HttpResponse(response.body().string(), response.code(), response.isSuccessful());
+            ResponseBody body = response.body();
+            return new HttpResponse(body != null ? body.string() : null, response.code(), response.isSuccessful());
         }
     }
 
