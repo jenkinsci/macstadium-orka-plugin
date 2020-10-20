@@ -9,6 +9,7 @@ import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.client.OrkaNode;
 import io.jenkins.plugins.orka.client.OrkaVM;
+import io.jenkins.plugins.orka.client.TokenStatusResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -83,6 +84,12 @@ public class OrkaClientProxy {
     public DeletionResponse deleteVM(String vmName, String node) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.deleteVM(vmName, node);
+        }
+    }
+
+    public TokenStatusResponse getTokenStatus() throws IOException {
+        try (OrkaClient client = getOrkaClient()) {
+            return client.getTokenStatus();
         }
     }
 

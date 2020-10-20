@@ -2,6 +2,7 @@ package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.OrkaNode;
+import io.jenkins.plugins.orka.client.TokenStatusResponse;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -31,8 +32,8 @@ public class FormValidator {
 
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                    OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint, 
-                        orkaCredentialsId);
+                    OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                            orkaCredentialsId);
                     boolean alreadyInUse = clientProxy.getVMs().stream()
                             .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
                     if (alreadyInUse) {
@@ -94,7 +95,11 @@ public class FormValidator {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            new OrkaClientProxyFactory().getOrkaClientProxy(endpoint, credentialsId).getNodes();
+            TokenStatusResponse response = new OrkaClientProxyFactory().getOrkaClientProxy(endpoint, credentialsId)
+                    .getTokenStatus();
+            if (!response.isSuccessful() || !response.getIsValid()) {
+                return failedConnection(Utils.getErrorMessage(response));
+            }
         } catch (IOException e) {
             return failedConnection(e.getMessage());
         }
