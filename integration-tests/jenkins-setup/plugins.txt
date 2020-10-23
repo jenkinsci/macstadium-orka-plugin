@@ -1,0 +1,2 @@
+ssh-slaves:latest
+macstadium-orka:latest
