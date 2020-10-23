@@ -1,0 +1,22 @@
+{
+  "name": "jenkins-tests",
+  "version": "1.0.0",
+  "description": "This package contains integration tests for the Orka Jenkins Plugin",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "cd jenkins-setup && ./start-jenkins.sh",
+    "test": "./node_modules/.bin/jest --verbose --runInBand",
+    "posttest": "cd jenkins-setup && ./stop-jenkins.sh"
+  },
+  "dependencies": {
+    "jest": "26.5.2",
+    "playwright": "1.4.2",
+    "playwright-cli": "0.5.2",
+    "axios": "0.20.0",
+    "envalid": "6.0.2",
+    "wait-for-expect": "3.0.2"
+  },
+  "devDependencies": {
+    "jest-circus": "26.6.1"
+  }
+}
