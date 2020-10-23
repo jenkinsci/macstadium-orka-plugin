@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -52,7 +53,7 @@ public class ConfigNameCheckTest {
         OrkaClientProxy client = mock(OrkaClientProxy.class);
 
         this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString())).thenReturn(client);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(client);
         when(client.getVMs()).thenReturn(response);
     }
 
@@ -61,7 +62,7 @@ public class ConfigNameCheckTest {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", true);
+        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false, true);
 
         assertEquals(this.validationKind, validation.kind);
     }
@@ -71,7 +72,7 @@ public class ConfigNameCheckTest {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", true);
+        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false, true);
 
         assertEquals(this.validationKind, validation.kind);
     }

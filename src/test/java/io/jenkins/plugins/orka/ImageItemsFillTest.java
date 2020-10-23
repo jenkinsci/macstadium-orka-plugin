@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,7 +52,7 @@ public class ImageItemsFillTest {
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
         this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString())).thenReturn(clientProxy);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(clientProxy);
         when(clientProxy.getImages()).thenReturn(Arrays.asList((response)));
     }
 
@@ -60,7 +61,7 @@ public class ImageItemsFillTest {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials,
+        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
                 this.createNewConfig);
 
         assertEquals(this.resultSize, baseImages.size());
@@ -71,7 +72,7 @@ public class ImageItemsFillTest {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials,
+        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
                 this.createNewConfig);
 
         assertEquals(this.resultSize, baseImages.size());

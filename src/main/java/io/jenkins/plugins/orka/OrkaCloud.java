@@ -47,6 +47,7 @@ public class OrkaCloud extends Cloud {
     private int instanceCap;
     private String instanceCapSetting;
     private int timeout;
+    private boolean useJenkinsProxySettings;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
@@ -54,13 +55,15 @@ public class OrkaCloud extends Cloud {
 
     @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
-            List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
+            boolean useJenkinsProxySettings, List<? extends AddressMapper> mappings,
+            List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
         this.endpoint = endpoint;
         this.instanceCapSetting = instanceCapSetting;
         this.timeout = timeout;
+        this.useJenkinsProxySettings = useJenkinsProxySettings;
 
         this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
@@ -93,6 +96,10 @@ public class OrkaCloud extends Cloud {
         return this.endpoint;
     }
 
+    public boolean getUseJenkinsProxySettings() {
+        return this.useJenkinsProxySettings;
+    }
+
     public String getInstanceCapSetting() {
         return this.instanceCap == Integer.MAX_VALUE ? "" : String.valueOf(this.instanceCap);
     }
@@ -120,22 +127,26 @@ public class OrkaCloud extends Cloud {
     }
 
     public List<OrkaVM> getVMs() throws IOException {
-        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).getVMs();
+        return new OrkaClientProxyFactory()
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings).getVMs();
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
-        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId)
+        return new OrkaClientProxyFactory()
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings)
                 .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
-        return new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout)
+        return new OrkaClientProxyFactory()
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings)
                 .deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
-        new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId).deleteVM(name);
+        new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings)
+                .deleteVM(name);
         this.capacityHandler.removeRunningInstance();
     }
 
@@ -256,10 +267,10 @@ public class OrkaCloud extends Cloud {
         }
 
         @POST
-        public FormValidation doTestConnection(@QueryParameter String credentialsId, @QueryParameter String endpoint)
-                throws IOException {
+        public FormValidation doTestConnection(@QueryParameter String credentialsId, @QueryParameter String endpoint,
+                @QueryParameter boolean useJenkinsProxySettings) throws IOException {
 
-            return this.formValidator.doTestConnection(credentialsId, endpoint);
+            return this.formValidator.doTestConnection(credentialsId, endpoint, useJenkinsProxySettings);
         }
     }
 }

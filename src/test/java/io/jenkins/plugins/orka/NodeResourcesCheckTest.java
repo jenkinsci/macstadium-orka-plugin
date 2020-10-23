@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -79,15 +80,15 @@ public class NodeResourcesCheckTest {
         OrkaClientProxyFactory factory = mock(OrkaClientProxyFactory.class);
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
-        when(factory.getOrkaClientProxy(anyString(), anyString())).thenReturn(clientProxy);
+        when(factory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(clientProxy);
         when(clientProxy.getNodes()).thenReturn(response);
         when(clientProxy.getVMs()).thenReturn(vmResponse);
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(factory);
 
-        FormValidation validation = descriptor.doCheckNode(this.selectedNode, "endpoint", "credentialsId", this.vm,
-                this.createNewVMConfig, this.requiredCPU);
+        FormValidation validation = descriptor.doCheckNode(this.selectedNode, "endpoint", "credentialsId", false,
+                this.vm, this.createNewVMConfig, this.requiredCPU);
 
         assertEquals(this.validationKind, validation.kind);
     }
