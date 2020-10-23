@@ -35,7 +35,7 @@ public class AddressMapper implements Describable<AddressMapper> {
 
     @Override
     public Descriptor<AddressMapper> getDescriptor() {
-        return Jenkins.getInstance().getDescriptor(getClass());
+        return Jenkins.get().getDescriptor(getClass());
     }
 
     @Extension

@@ -63,7 +63,7 @@ public class CapacityHandler {
 
     private void ensureRunningInstancesInitialized() {
         if (this.runningInstances == INITIAL_RUNNING_INSTANCES) {
-            this.runningInstances = (int) Jenkins.getInstance().getNodes().stream().filter(n -> this.belongsToCloud(n))
+            this.runningInstances = (int) Jenkins.get().getNodes().stream().filter(n -> this.belongsToCloud(n))
                     .count();
             logger.fine("Initial running instances count: " + this.runningInstances);
         }

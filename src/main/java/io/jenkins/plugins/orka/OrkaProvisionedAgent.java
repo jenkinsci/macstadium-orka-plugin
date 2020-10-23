@@ -40,9 +40,12 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
             RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
             List<? extends NodeProperty<?>> nodeProperties) throws Descriptor.FormException, IOException {
 
-        super(vmId, null, remoteFS, numExecutors, mode, labelString,
-                new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy), retentionStrategy,
-                nodeProperties);
+        super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy));
+
+        this.setNumExecutors(numExecutors);
+        this.setMode(mode);
+        this.setLabelString(labelString);
+        this.setNodeProperties(nodeProperties);
 
         this.cloudId = cloudId;
         this.vmId = vmId;
@@ -130,7 +133,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     }
 
     private OrkaCloud getCloud() {
-        return (OrkaCloud) Jenkins.getInstance().getCloud(cloudId);
+        return (OrkaCloud) Jenkins.get().getCloud(cloudId);
     }
 
     @Override
