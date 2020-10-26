@@ -4,9 +4,9 @@
   "description": "This package contains integration tests for the Orka Jenkins Plugin",
   "main": "index.js",
   "scripts": {
-    "pretest": "cd jenkins-image && ./start-jenkins.sh",
+    "pretest": "cd jenkins-setup && ./start-jenkins.sh",
     "test": "./node_modules/.bin/jest --verbose --runInBand",
-    "posttest": "cd jenkins-image && ./stop-jenkins.sh"
+    "posttest": "cd jenkins-setup && ./stop-jenkins.sh"
   },
   "dependencies": {
     "jest": "26.5.2",

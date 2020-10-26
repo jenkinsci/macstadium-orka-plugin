@@ -50,7 +50,7 @@ wait_for_jenkins_to_start
 echo "Building & installing macstadium-orka-plugin..."
 cd $JENKINS_PLUGIN_REPO_PATH
 rm -rf target && mvn package 
-cd ./integration-tests/jenkins-image
+cd ./integration-tests/jenkins-setup
 
 cp $JENKINS_PLUGIN_REPO_PATH/target/macstadium-orka.hpi $JENKINS_HOME_VOLUME/plugins
 docker exec -i $(docker ps -aqf name=$CONTAINER_NAME) curl $JENKINS_URL/jnlpJars/jenkins-cli.jar -o $JENKINS_HOME/jenkins-cli.jar
