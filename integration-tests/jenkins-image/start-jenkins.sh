@@ -8,7 +8,7 @@ JENKINS_HOME_VOLUME=~/docker/it/jenkins_home
 JENKINS_HOME=/var/jenkins_home
 JENKINS_DOCKER_IMAGE_NAME=orka/it-jenkins-setup:lts
 CONTAINER_NAME=it-jenkins
-JENKINS_PLUGIN_REPO_PATH=../../
+JENKINS_PLUGIN_REPO_PATH=../..
 WAIT_JENKINS_SEQ_MAX=24
 WAIT_JENKINS_SLEEP_SECONDS=10
 WAIT_JENKINS_MINUTES=$(($WAIT_JENKINS_SEQ_MAX/(60/$WAIT_JENKINS_SLEEP_SECONDS)))
@@ -50,7 +50,7 @@ wait_for_jenkins_to_start
 echo "Building & installing macstadium-orka-plugin..."
 cd $JENKINS_PLUGIN_REPO_PATH
 rm -rf target && mvn package 
-cd ./tests/jenkins-image
+cd ./integration-tests/jenkins-image
 
 cp $JENKINS_PLUGIN_REPO_PATH/target/macstadium-orka.hpi $JENKINS_HOME_VOLUME/plugins
 docker exec -i $(docker ps -aqf name=$CONTAINER_NAME) curl $JENKINS_URL/jnlpJars/jenkins-cli.jar -o $JENKINS_HOME/jenkins-cli.jar
