@@ -2,8 +2,7 @@
 
 ## Tools
 
-1. [Jest](https://jestjs.io/docs/en/getting-started)
-2. [Playwright](https://github.com/microsoft/playwright)
+The MacStadium Jenkins plugin tests use NodeJs, [Jest](https://jestjs.io/docs/en/getting-started) and [Playwright](https://github.com/microsoft/playwright).
 
 ## Prerequisites
 
