@@ -5,7 +5,11 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+
+import hudson.security.ACL;
 import hudson.util.ListBoxModel;
+
+import java.util.Collections;
 import jenkins.model.Jenkins;
 
 public final class CredentialsHelper {
@@ -14,14 +18,16 @@ public final class CredentialsHelper {
     }
 
     public static <C extends Credentials> C lookupSystemCredentials(final String credentialsId, final Class<C> type) {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-        return CredentialsMatchers.firstOrNull(CredentialsProvider.lookupCredentials(type, Jenkins.getInstance()),
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+        return CredentialsMatchers.firstOrNull(
+                CredentialsProvider.lookupCredentials(type, Jenkins.get(), ACL.SYSTEM, Collections.emptyList()),
                 CredentialsMatchers.withId(credentialsId));
     }
 
     public static ListBoxModel getCredentials(Class type) {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-        return new StandardListBoxModel().includeEmptyValue().withMatching(CredentialsMatchers.always(),
-                CredentialsProvider.lookupCredentials(type, Jenkins.getInstance()));
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, Jenkins.get(), type,
+                Collections.emptyList(), CredentialsMatchers.always());
     }
 }

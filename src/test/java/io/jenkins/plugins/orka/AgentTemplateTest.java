@@ -22,7 +22,7 @@ public class AgentTemplateTest {
 
     @Test
     public void when_provision_should_get_agents() throws IOException, FormException {
-        AgentTemplate AgentTemplate = this.getAgentTemplate();
+        AgentTemplate agentTemplate = this.getAgentTemplate();
         String ip = "127.0.0.1";
         int sshPort = 2101;
         String id = "vm-machine";
@@ -30,15 +30,15 @@ public class AgentTemplateTest {
         OrkaCloud cloud = mock(OrkaCloud.class);
         when(cloud.deployVM(anyString())).thenReturn(new DeploymentResponse(ip, sshPort, id, null, null));
         when(cloud.getRealHost(anyString())).thenReturn(ip);
-        AgentTemplate.setParent(cloud);
+        agentTemplate.setParent(cloud);
 
-        OrkaProvisionedAgent provisionedAgent = AgentTemplate.provision();
+        OrkaProvisionedAgent provisionedAgent = agentTemplate.provision();
 
-        assertEquals(AgentTemplate.getLabelString(), provisionedAgent.getLabelString());
-        assertEquals(AgentTemplate.getMode(), provisionedAgent.getMode());
-        assertEquals(AgentTemplate.getNumExecutors(), provisionedAgent.getNumExecutors());
-        assertEquals(AgentTemplate.getRemoteFS(), provisionedAgent.getRemoteFS());
-        assertEquals(AgentTemplate.getVmCredentialsId(), provisionedAgent.getVmCredentialsId());
+        assertEquals(agentTemplate.getLabelString(), provisionedAgent.getLabelString());
+        assertEquals(agentTemplate.getMode(), provisionedAgent.getMode());
+        assertEquals(agentTemplate.getNumExecutors(), provisionedAgent.getNumExecutors());
+        assertEquals(agentTemplate.getRemoteFS(), provisionedAgent.getRemoteFS());
+        assertEquals(agentTemplate.getVmCredentialsId(), provisionedAgent.getVmCredentialsId());
         assertEquals(ip, provisionedAgent.getHost());
         assertEquals(sshPort, provisionedAgent.getSshPort());
         assertEquals(id, provisionedAgent.getVmId());

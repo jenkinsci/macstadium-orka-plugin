@@ -8,8 +8,6 @@ import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
-import hudson.slaves.NodeProperty;
-import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
@@ -19,7 +17,6 @@ import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -41,12 +38,10 @@ public class OrkaAgent extends AbstractCloudSlave {
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
-            int numCPUs, int numExecutors, String host, int port, String remoteFS, Mode mode, String labelString,
-            RetentionStrategy retentionStrategy, List<? extends NodeProperty<?>> nodeProperties)
+            int numCPUs, int numExecutors, String host, int port, String remoteFS)
             throws Descriptor.FormException, IOException {
 
-        super(name, null, remoteFS, numExecutors, mode, labelString, new OrkaComputerLauncher(host, port, redirectHost),
-                retentionStrategy, nodeProperties);
+        super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost));
 
         this.orkaCredentialsId = orkaCredentialsId;
         this.orkaEndpoint = orkaEndpoint;

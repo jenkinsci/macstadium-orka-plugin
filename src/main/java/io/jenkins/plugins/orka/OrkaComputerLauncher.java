@@ -14,7 +14,6 @@ import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
@@ -84,7 +83,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         this.host = StringUtils.isNotBlank(this.redirectHost) ? redirectHost : deploymentResponse.getHost();
         this.port = deploymentResponse.getSSHPort();
         this.launcher = this.getLauncher(agent.getVmCredentialsId());
-        Jenkins.getInstance().updateNode(slaveComputer.getNode());
+        Jenkins.get().updateNode(slaveComputer.getNode());
 
         listener.getLogger().println("Waiting for VM to boot");
         this.waitForVM(this.host, this.port);

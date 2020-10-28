@@ -15,7 +15,6 @@ import hudson.model.Node.Mode;
 import hudson.slaves.RetentionStrategy;
 import io.jenkins.plugins.orka.DefaultVerificationStrategy;
 import io.jenkins.plugins.orka.OrkaProvisionedAgent;
-import io.jenkins.plugins.orka.OrkaVerificationStrategy;
 
 public class CapacityHandlerTest {
     @ClassRule

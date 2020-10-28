@@ -23,7 +23,7 @@ public class FormValidator {
 
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
             boolean createNewVMConfig) {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         if (createNewVMConfig) {
             if (configName.length() < 5) {
@@ -50,7 +50,7 @@ public class FormValidator {
 
     public FormValidation doCheckNode(String node, String orkaEndpoint, String orkaCredentialsId, String vm,
             boolean createNewConfig, int numCPUs) {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         boolean hasAvailableNodes = true;
         boolean canDeployVM = true;
@@ -92,7 +92,7 @@ public class FormValidator {
 
     public FormValidation doTestConnection(String credentialsId, String endpoint) throws IOException {
 
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
             TokenStatusResponse response = new OrkaClientProxyFactory().getOrkaClientProxy(endpoint, credentialsId)
