@@ -11,13 +11,18 @@ import org.kohsuke.stapler.QueryParameter;
 
 
 public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
-    private final int idleMinutes;
-    private static final int recommendedMinIdle = 30;
-
+    private int idleMinutes;
+    public static final int recommendedMinIdle = 30;
+    
     @DataBoundConstructor
     public IdleTimeCloudRetentionStrategy(int idleMinutes) {
-        super(idleMinutes);
-        this.idleMinutes = idleMinutes;
+        super(normalizeIdleTime(idleMinutes));
+        
+        this.idleMinutes = normalizeIdleTime(idleMinutes);
+    }
+    
+    static int normalizeIdleTime(int idleMinutes) { 
+        return idleMinutes > 0 ? idleMinutes : recommendedMinIdle;
     }
 
     public int getIdleMinutes() {
@@ -62,6 +67,8 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
     }
 
     private Object readResolve() {
+        this.idleMinutes = normalizeIdleTime(this.idleMinutes);
+
         return new IdleTimeCloudRetentionStrategy(idleMinutes);
     }
 }
