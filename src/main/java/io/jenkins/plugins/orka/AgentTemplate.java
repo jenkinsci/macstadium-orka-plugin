@@ -215,9 +215,12 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         @POST
         public FormValidation doCheckConfigName(@QueryParameter String configName,
                 @QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            return formValidator.doCheckConfigName(configName, endpoint, credentialsId, createNewVMConfig);
+            return formValidator.doCheckConfigName(configName, endpoint, credentialsId, useJenkinsProxySettings,
+                    createNewVMConfig);
         }
 
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
@@ -235,16 +238,21 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         @POST
         public ListBoxModel doFillVmItems(@QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
 
-            return this.infoHelper.doFillVmItems(endpoint, credentialsId, createNewVMConfig);
+            return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, createNewVMConfig);
         }
 
         @POST
         public ListBoxModel doFillBaseImageItems(@QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
 
-            return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, createNewVMConfig);
+            return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
+                    createNewVMConfig);
         }
 
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {

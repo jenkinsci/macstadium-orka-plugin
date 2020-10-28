@@ -11,7 +11,11 @@
       <f:textbox />
     </f:entry>
 
-    <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection" with="orkaCredentialsId,orkaEndpoint" />
+    <f:entry title="${%Use Jenkins HTTP Proxy Settings}" field="useJenkinsProxySettings">
+      <f:checkbox />
+    </f:entry>
+
+    <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection" with="orkaCredentialsId,orkaEndpoint,useJenkinsProxySettings" />
 
   </f:section>
 
