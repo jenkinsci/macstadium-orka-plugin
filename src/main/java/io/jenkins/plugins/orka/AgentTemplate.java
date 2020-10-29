@@ -5,14 +5,18 @@ import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
 import hudson.RelativePath;
+import hudson.Util;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Label;
 import hudson.model.Node.Mode;
+import hudson.model.Saveable;
 import hudson.model.labels.LabelAtom;
 import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
@@ -26,7 +30,9 @@ import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -50,7 +56,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String labelString;
     private RetentionStrategy<?> retentionStrategy;
     private OrkaVerificationStrategy verificationStrategy;
-    private List<? extends NodeProperty<?>> nodeProperties;
+    private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
 
     @Deprecated
     private transient int idleTerminationMinutes;
@@ -74,7 +80,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.labelString = labelString;
         this.retentionStrategy = retentionStrategy;
         this.verificationStrategy = verificationStrategy;
-        this.nodeProperties = nodeProperties;
+        this.nodeProperties = new DescribableList<>(Saveable.NOOP, Util.fixNull(nodeProperties));
     }
 
     public String getOrkaCredentialsId() {
@@ -137,8 +143,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.verificationStrategy;
     }
 
-    public List<? extends NodeProperty<?>> getNodeProperties() {
-        return this.nodeProperties;
+    public DescribableList<NodeProperty<?>, NodePropertyDescriptor> getNodeProperties() {
+        return Objects.requireNonNull(this.nodeProperties);
     }
 
     public Descriptor<AgentTemplate> getDescriptor() {
@@ -201,6 +207,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }
         if (this.verificationStrategy == null) {
             this.verificationStrategy = new DefaultVerificationStrategy();
+        }
+        if (this.nodeProperties == null) {
+            this.nodeProperties = new DescribableList<>(Saveable.NOOP, Collections.emptyList());
         }
         return this;
     }
@@ -271,6 +280,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         public static Descriptor<OrkaVerificationStrategy> getDefaultVerificationDescriptor() {
             return OrkaVerificationStrategyProvider.getDefaultVerificationDescriptor();
+        }
+
+        public List<NodePropertyDescriptor> getNodePropertyDescriptors() {
+            return NodePropertyDescriptor.for_(NodeProperty.all(), OrkaProvisionedAgent.class);
         }
     }
 

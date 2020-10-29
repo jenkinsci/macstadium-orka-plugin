@@ -10,9 +10,11 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import hudson.model.Saveable;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Node.Mode;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.DescribableList;
 import io.jenkins.plugins.orka.DefaultVerificationStrategy;
 import io.jenkins.plugins.orka.OrkaProvisionedAgent;
 
@@ -246,7 +248,7 @@ public class CapacityHandlerTest {
         r.getInstance()
                 .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
                         Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
-                        Collections.emptyList()));
+                        new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 2;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -261,7 +263,7 @@ public class CapacityHandlerTest {
         r.getInstance()
                 .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
                         Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
-                        Collections.emptyList()));
+                        new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 5;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -276,7 +278,7 @@ public class CapacityHandlerTest {
         r.getInstance()
                 .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
                         Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
-                        Collections.emptyList()));
+                        new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 9;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -291,7 +293,7 @@ public class CapacityHandlerTest {
         r.getInstance()
                 .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
                         "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
-                        Collections.emptyList()));
+                        new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 2;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -307,7 +309,7 @@ public class CapacityHandlerTest {
         r.getInstance()
                 .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
                         "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
-                        Collections.emptyList()));
+                        new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 5;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");
@@ -323,7 +325,7 @@ public class CapacityHandlerTest {
         r.getInstance()
                 .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
                         "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
-                        Collections.emptyList()));
+                        new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 9;
 
         int actualReserved = handler.reserveCapacity(capacityToReserve, "provisionIdString");

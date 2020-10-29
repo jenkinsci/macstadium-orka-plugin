@@ -8,7 +8,9 @@ import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.DescribableList;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
@@ -39,7 +41,8 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
             RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties) throws Descriptor.FormException, IOException {
+            DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties)
+            throws Descriptor.FormException, IOException {
 
         super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy));
 
@@ -50,8 +53,9 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         retentionStrategy = retentionStrategy != null ? retentionStrategy : new IdleTimeCloudRetentionStrategy(30);
         this.setRetentionStrategy(retentionStrategy);
 
-        nodeProperties = nodeProperties != null ? nodeProperties : Collections.<NodeProperty<?>>emptyList();
-        this.setNodeProperties(nodeProperties);
+        List<NodeProperty<?>> nodePropertiesToUse = nodeProperties != null ? nodeProperties.toList()
+                : Collections.<NodeProperty<?>>emptyList();
+        this.setNodeProperties(nodePropertiesToUse);
 
         this.cloudId = cloudId;
         this.vmId = vmId;
