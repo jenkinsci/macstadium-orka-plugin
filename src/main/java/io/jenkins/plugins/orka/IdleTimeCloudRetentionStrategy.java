@@ -61,7 +61,7 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
                 
                 return FormValidation.ok();
             } catch (NumberFormatException e) {
-                return FormValidation.error("Idle timeout must be a number.");
+                return FormValidation.error("Idle timeout must be a positive number.");
             }
         }
     }
