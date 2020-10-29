@@ -156,20 +156,26 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         logger.fine("Deploying VM with name " + vmName);
         DeploymentResponse response = this.parent.deployVM(vmName);
+        try {
+            logger.fine("Result deploying VM " + vmName + ":");
+            logger.fine(response.toString());
 
-        logger.fine("Result deploying VM " + vmName + ":");
-        logger.fine(response.toString());
+            if (!response.isSuccessful()) {
+                logger.warning("Deploying VM failed with: " + Utils.getErrorMessage(response));
+                return null;
+            }
 
-        if (!response.isSuccessful()) {
-            logger.warning("Deploying VM failed with: " + Utils.getErrorMessage(response));
-            return null;
+            String host = this.parent.getRealHost(response.getHost());
+
+            return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
+                    response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
+                    this.labelString, this.retentionStrategy, this.verificationStrategy, this.nodeProperties);
+        } catch (Exception e) {
+            logger.warning("Exception while creating provisioned agent. Deleting VM.");
+            this.parent.deleteVM(response.getId());
+            
+            throw e;
         }
-
-        String host = this.parent.getRealHost(response.getHost());
-
-        return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
-                response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
-                this.labelString, this.retentionStrategy, this.verificationStrategy, this.nodeProperties);
     }
 
     private ConfigurationResponse ensureConfigurationExist() throws IOException {

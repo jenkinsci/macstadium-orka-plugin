@@ -15,6 +15,7 @@ import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -45,6 +46,11 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         this.setNumExecutors(numExecutors);
         this.setMode(mode);
         this.setLabelString(labelString);
+
+        retentionStrategy = retentionStrategy != null ? retentionStrategy : new IdleTimeCloudRetentionStrategy(30);
+        this.setRetentionStrategy(retentionStrategy);
+
+        nodeProperties = nodeProperties != null ? nodeProperties : Collections.<NodeProperty<?>>emptyList();
         this.setNodeProperties(nodeProperties);
 
         this.cloudId = cloudId;
