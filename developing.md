@@ -45,7 +45,7 @@ This boots a Jenkins master, package the plugin and install it. To run the Jenki
 
 ## Running integration tests locally
 
-Please, refer to the [integration tests README](https://github.com/jenkinsci/macstadium-orka-plugin/tree/master/integration-tests).
+Please, refer to the [integration tests README](integration-tests/README.md).
 
 [maven]: http://maven.apache.org/
 [checkstyle]: http://checkstyle.sourceforge.net/
