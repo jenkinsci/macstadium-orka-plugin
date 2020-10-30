@@ -64,7 +64,7 @@
 
     </f:section>
 
-    <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"
+    <f:descriptorList title="${%Node Properties}" descriptors="${descriptor.getNodePropertyDescriptors()}"
                           field="nodeProperties"/>
 
     <f:entry title="">
