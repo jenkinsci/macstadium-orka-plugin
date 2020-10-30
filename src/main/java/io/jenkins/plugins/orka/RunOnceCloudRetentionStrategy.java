@@ -1,5 +1,6 @@
 package io.jenkins.plugins.orka;
 
+import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Executor;
 import hudson.model.ExecutorListener;
@@ -13,8 +14,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implements ExecutorListener {
@@ -75,7 +74,7 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
         return DESCRIPTOR;
     }
 
-    @Restricted(NoExternalUse.class)
+    @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     public static final class DescriptorImpl extends Descriptor<RetentionStrategy<?>> {
