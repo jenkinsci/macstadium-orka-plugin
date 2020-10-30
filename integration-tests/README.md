@@ -1,4 +1,4 @@
-# Macstadium Jenkins Plugin Integration Tests
+# MacStadium Jenkins Plugin Integration Tests
 
 ## Tools
 
