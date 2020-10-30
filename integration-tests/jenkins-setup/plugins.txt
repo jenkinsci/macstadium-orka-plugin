@@ -1,3 +1,2 @@
 ssh-slaves:latest
-greenballs:latest
 macstadium-orka:latest
