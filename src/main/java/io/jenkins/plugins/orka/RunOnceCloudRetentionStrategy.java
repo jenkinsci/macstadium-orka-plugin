@@ -9,12 +9,14 @@ import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.CloudRetentionStrategy;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.FormValidation;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implements ExecutorListener {
     private static final Logger LOGGER = Logger.getLogger(RunOnceCloudRetentionStrategy.class.getName());
@@ -81,6 +83,22 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
         @Override
         public String getDisplayName() {
             return "Terminate immediately after use";
+        }
+
+        public FormValidation doCheckIdleMinutes(@QueryParameter String value) {
+            try {
+                int idleMinutesValue = Integer.parseInt(value);
+
+                if (0 < idleMinutesValue && idleMinutesValue < 30) {
+                    return FormValidation.warning(
+                        String.format("Idle timeout less than %d seconds is not recommended", 30)
+                    );
+                }
+
+                return FormValidation.ok();
+            } catch (NumberFormatException e) {
+                return FormValidation.error("Idle timeout value must be a positive number.");
+            }
         }
     }
 
