@@ -21,12 +21,18 @@ import org.kohsuke.stapler.QueryParameter;
 public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implements ExecutorListener {
     private static final Logger LOGGER = Logger.getLogger(RunOnceCloudRetentionStrategy.class.getName());
 
-    private final int idleMinutes;
+    private int idleMinutes;
+    public static final int recommendedMinIdle = 30;
 
     @DataBoundConstructor
     public RunOnceCloudRetentionStrategy(int idleMinutes) {
-        super(idleMinutes);
-        this.idleMinutes = idleMinutes;
+        super(normalizeIdleTime(idleMinutes));
+        
+        this.idleMinutes = normalizeIdleTime(idleMinutes);
+    }
+        
+    static int normalizeIdleTime(int idleMinutes) { 
+        return idleMinutes > 0 ? idleMinutes : recommendedMinIdle;
     }
 
     public int getIdleMinutes() {
@@ -89,9 +95,13 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
             try {
                 int idleMinutesValue = Integer.parseInt(value);
 
-                if (0 < idleMinutesValue && idleMinutesValue < 30) {
+                if (idleMinutesValue <= 0) {
+                    return FormValidation.error("Idle timeout must be a positive number.");
+                }
+
+                if (idleMinutesValue < recommendedMinIdle) {
                     return FormValidation.warning(
-                        String.format("Idle timeout less than %d seconds is not recommended", 30)
+                        String.format("Idle timeout less than %d seconds is not recommended.", recommendedMinIdle)
                     );
                 }
 
@@ -103,6 +113,8 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
     }
 
     private Object readResolve() {
+        this.idleMinutes = normalizeIdleTime(this.idleMinutes);
+
         return new RunOnceCloudRetentionStrategy(idleMinutes);
     }
 }
