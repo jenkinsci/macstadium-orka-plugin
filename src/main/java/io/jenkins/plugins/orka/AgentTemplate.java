@@ -5,14 +5,18 @@ import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
 import hudson.RelativePath;
+import hudson.Util;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Label;
 import hudson.model.Node.Mode;
+import hudson.model.Saveable;
 import hudson.model.labels.LabelAtom;
 import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
@@ -26,7 +30,9 @@ import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -50,7 +56,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String labelString;
     private RetentionStrategy<?> retentionStrategy;
     private OrkaVerificationStrategy verificationStrategy;
-    private List<? extends NodeProperty<?>> nodeProperties;
+    private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
 
     @Deprecated
     private transient int idleTerminationMinutes;
@@ -74,7 +80,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.labelString = labelString;
         this.retentionStrategy = retentionStrategy;
         this.verificationStrategy = verificationStrategy;
-        this.nodeProperties = nodeProperties;
+        this.nodeProperties = new DescribableList<>(Saveable.NOOP, Util.fixNull(nodeProperties));
     }
 
     public String getOrkaCredentialsId() {
@@ -137,12 +143,12 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.verificationStrategy;
     }
 
-    public List<? extends NodeProperty<?>> getNodeProperties() {
-        return this.nodeProperties;
+    public DescribableList<NodeProperty<?>, NodePropertyDescriptor> getNodeProperties() {
+        return Objects.requireNonNull(this.nodeProperties);
     }
 
     public Descriptor<AgentTemplate> getDescriptor() {
-        return Jenkins.getInstance().getDescriptor(getClass());
+        return Jenkins.get().getDescriptor(getClass());
     }
 
     public OrkaProvisionedAgent provision() throws IOException, FormException {
@@ -156,20 +162,26 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         logger.fine("Deploying VM with name " + vmName);
         DeploymentResponse response = this.parent.deployVM(vmName);
+        try {
+            logger.fine("Result deploying VM " + vmName + ":");
+            logger.fine(response.toString());
 
-        logger.fine("Result deploying VM " + vmName + ":");
-        logger.fine(response.toString());
+            if (!response.isSuccessful()) {
+                logger.warning("Deploying VM failed with: " + Utils.getErrorMessage(response));
+                return null;
+            }
 
-        if (!response.isSuccessful()) {
-            logger.warning("Deploying VM failed with: " + Utils.getErrorMessage(response));
-            return null;
+            String host = this.parent.getRealHost(response.getHost());
+
+            return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
+                    response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
+                    this.labelString, this.retentionStrategy, this.verificationStrategy, this.nodeProperties);
+        } catch (Exception e) {
+            logger.warning("Exception while creating provisioned agent. Deleting VM.");
+            this.parent.deleteVM(response.getId());
+            
+            throw e;
         }
-
-        String host = this.parent.getRealHost(response.getHost());
-
-        return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
-                response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
-                this.labelString, this.retentionStrategy, this.verificationStrategy, this.nodeProperties);
     }
 
     private ConfigurationResponse ensureConfigurationExist() throws IOException {
@@ -196,6 +208,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         if (this.verificationStrategy == null) {
             this.verificationStrategy = new DefaultVerificationStrategy();
         }
+        if (this.nodeProperties == null) {
+            this.nodeProperties = new DescribableList<>(Saveable.NOOP, Collections.emptyList());
+        }
         return this;
     }
 
@@ -215,9 +230,12 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         @POST
         public FormValidation doCheckConfigName(@QueryParameter String configName,
                 @QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
-            Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-            return formValidator.doCheckConfigName(configName, endpoint, credentialsId, createNewVMConfig);
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            return formValidator.doCheckConfigName(configName, endpoint, credentialsId, useJenkinsProxySettings,
+                    createNewVMConfig);
         }
 
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
@@ -225,7 +243,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }
 
         public ListBoxModel doFillVmCredentialsIdItems() {
-            Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
@@ -235,16 +253,21 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         @POST
         public ListBoxModel doFillVmItems(@QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
 
-            return this.infoHelper.doFillVmItems(endpoint, credentialsId, createNewVMConfig);
+            return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, createNewVMConfig);
         }
 
         @POST
         public ListBoxModel doFillBaseImageItems(@QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
 
-            return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, createNewVMConfig);
+            return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
+                    createNewVMConfig);
         }
 
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {
@@ -257,6 +280,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         public static Descriptor<OrkaVerificationStrategy> getDefaultVerificationDescriptor() {
             return OrkaVerificationStrategyProvider.getDefaultVerificationDescriptor();
+        }
+
+        public List<NodePropertyDescriptor> getNodePropertyDescriptors() {
+            return NodePropertyDescriptor.for_(NodeProperty.all(), OrkaProvisionedAgent.class);
         }
     }
 

@@ -8,8 +8,6 @@ import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
-import hudson.slaves.NodeProperty;
-import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
@@ -19,7 +17,6 @@ import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -31,6 +28,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     public String orkaCredentialsId;
     public String orkaEndpoint;
     public String vmCredentialsId;
+    private boolean useJenkinsProxySettings;
     private boolean createNewVMConfig;
     private String vm;
     private String node;
@@ -41,12 +39,10 @@ public class OrkaAgent extends AbstractCloudSlave {
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
-            int numCPUs, int numExecutors, String host, int port, String remoteFS, Mode mode, String labelString,
-            RetentionStrategy retentionStrategy, List<? extends NodeProperty<?>> nodeProperties)
+            int numCPUs, int numExecutors, String host, int port, String remoteFS)
             throws Descriptor.FormException, IOException {
 
-        super(name, null, remoteFS, numExecutors, mode, labelString, new OrkaComputerLauncher(host, port, redirectHost),
-                retentionStrategy, nodeProperties);
+        super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost));
 
         this.orkaCredentialsId = orkaCredentialsId;
         this.orkaEndpoint = orkaEndpoint;
@@ -69,6 +65,10 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     public String getVmCredentialsId() {
         return this.vmCredentialsId;
+    }
+
+    public boolean getUseJenkinsProxySettings() {
+        return this.useJenkinsProxySettings;
     }
 
     public boolean getCreateNewVMConfig() {
@@ -132,18 +132,20 @@ public class OrkaAgent extends AbstractCloudSlave {
 
         @POST
         public FormValidation doCheckConfigName(@QueryParameter String configName, @QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
 
-            return this.formValidator.doCheckConfigName(configName, orkaEndpoint, orkaCredentialsId, createNewVMConfig);
+            return this.formValidator.doCheckConfigName(configName, orkaEndpoint, orkaCredentialsId,
+                    useJenkinsProxySettings, createNewVMConfig);
         }
 
         @POST
         public FormValidation doCheckNode(@QueryParameter String value, @QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter String vm,
-                @QueryParameter boolean createNewVMConfig, @QueryParameter int numCPUs) {
+                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
+                @QueryParameter String vm, @QueryParameter boolean createNewVMConfig, @QueryParameter int numCPUs) {
 
-            return this.formValidator.doCheckNode(value, orkaEndpoint, orkaCredentialsId, vm, createNewVMConfig,
-                    numCPUs);
+            return this.formValidator.doCheckNode(value, orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings, vm,
+                    createNewVMConfig, numCPUs);
         }
 
         public ListBoxModel doFillOrkaCredentialsIdItems() {
@@ -155,9 +157,9 @@ public class OrkaAgent extends AbstractCloudSlave {
         }
 
         public ListBoxModel doFillNodeItems(@QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId) {
+                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings) {
 
-            return this.infoHelper.doFillNodeItems(orkaEndpoint, orkaCredentialsId);
+            return this.infoHelper.doFillNodeItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings);
         }
 
         public ListBoxModel doFillNumCPUsItems() {
@@ -166,23 +168,27 @@ public class OrkaAgent extends AbstractCloudSlave {
 
         @POST
         public ListBoxModel doFillVmItems(@QueryParameter String orkaEndpoint, @QueryParameter String orkaCredentialsId,
-                @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter boolean useJenkinsProxySettings, @QueryParameter boolean createNewVMConfig) {
 
-            return this.infoHelper.doFillVmItems(orkaEndpoint, orkaCredentialsId, createNewVMConfig);
+            return this.infoHelper.doFillVmItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
+                    createNewVMConfig);
         }
 
         @POST
         public ListBoxModel doFillBaseImageItems(@QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
+                @QueryParameter boolean createNewVMConfig) {
 
-            return this.infoHelper.doFillBaseImageItems(orkaEndpoint, orkaCredentialsId, createNewVMConfig);
+            return this.infoHelper.doFillBaseImageItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
+                    createNewVMConfig);
         }
 
         @POST
         public FormValidation doTestConnection(@QueryParameter String orkaCredentialsId,
-                @QueryParameter String orkaEndpoint) throws IOException {
+                @QueryParameter String orkaEndpoint, @QueryParameter boolean useJenkinsProxySettings)
+                throws IOException {
 
-            return this.formValidator.doTestConnection(orkaCredentialsId, orkaEndpoint);
+            return this.formValidator.doTestConnection(orkaCredentialsId, orkaEndpoint, useJenkinsProxySettings);
         }
     }
 }

@@ -15,8 +15,6 @@
       <f:textbox />
     </f:entry>
 
-    <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection" with="credentialsId,endpoint" />
-
     <f:advanced>
       <f:entry title="Max Jenkins Agents Limit" field="instanceCapSetting">
         <f:textbox />
@@ -29,7 +27,12 @@
               <st:include page="config.jelly" class="${descriptor.clazz}"/>
           </f:repeatable>
       </f:entry>
+      <f:entry title="${%Use Jenkins HTTP Proxy Settings}" field="useJenkinsProxySettings">
+        <f:checkbox />
+      </f:entry>
     </f:advanced>
+
+    <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection" with="credentialsId,endpoint,useJenkinsProxySettings" />
 
   </f:section>
 

@@ -8,13 +8,16 @@ import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.DescribableList;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -38,11 +41,21 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
             RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties) throws Descriptor.FormException, IOException {
+            DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties)
+            throws Descriptor.FormException, IOException {
 
-        super(vmId, null, remoteFS, numExecutors, mode, labelString,
-                new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy), retentionStrategy,
-                nodeProperties);
+        super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy));
+
+        this.setNumExecutors(numExecutors);
+        this.setMode(mode);
+        this.setLabelString(labelString);
+
+        retentionStrategy = retentionStrategy != null ? retentionStrategy : new IdleTimeCloudRetentionStrategy(30);
+        this.setRetentionStrategy(retentionStrategy);
+
+        List<NodeProperty<?>> nodePropertiesToUse = nodeProperties != null ? nodeProperties.toList()
+                : Collections.<NodeProperty<?>>emptyList();
+        this.setNodeProperties(nodePropertiesToUse);
 
         this.cloudId = cloudId;
         this.vmId = vmId;
@@ -130,7 +143,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     }
 
     private OrkaCloud getCloud() {
-        return (OrkaCloud) Jenkins.getInstance().getCloud(cloudId);
+        return (OrkaCloud) Jenkins.get().getCloud(cloudId);
     }
 
     @Override

@@ -6,8 +6,6 @@ import hudson.slaves.CloudRetentionStrategy;
 import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
 
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -31,7 +29,7 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
         return DESCRIPTOR;
     }
 
-    @Restricted(NoExternalUse.class)
+    @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     @Extension

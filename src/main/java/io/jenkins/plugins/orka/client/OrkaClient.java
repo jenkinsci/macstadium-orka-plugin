@@ -7,6 +7,7 @@ import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.lang.AutoCloseable;
+import java.net.Proxy;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -43,12 +44,13 @@ public class OrkaClient implements AutoCloseable {
     private OkHttpClient client;
 
     public OrkaClient(String endpoint, String email, String password) throws IOException {
-        this(endpoint, email, password, defaultHttpClientTimeout);
+        this(endpoint, email, password, defaultHttpClientTimeout, Proxy.NO_PROXY);
     }
 
-    public OrkaClient(String endpoint, String email, String password, int httpClientTimeout) throws IOException {
+    public OrkaClient(String endpoint, String email, String password, int httpClientTimeout, Proxy proxy)
+            throws IOException {
         this.client = clientBase.newBuilder().readTimeout(httpClientTimeout, TimeUnit.SECONDS)
-                .protocols(Arrays.asList(Protocol.HTTP_1_1)).build();
+                .protocols(Arrays.asList(Protocol.HTTP_1_1)).proxy(proxy).build();
         this.endpoint = endpoint;
         this.tokenResponse = this.getToken(email, password);
 

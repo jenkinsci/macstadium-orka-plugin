@@ -8,7 +8,7 @@ import jenkins.model.Jenkins;
 
 public class OrkaVerificationStrategyProvider {
     public static List<Descriptor<OrkaVerificationStrategy>> getVerificationStrategyDescriptors() {
-        return Jenkins.getInstance().getDescriptorList(OrkaVerificationStrategy.class);
+        return Jenkins.get().getDescriptorList(OrkaVerificationStrategy.class);
     }
 
     public static Descriptor<OrkaVerificationStrategy> getDefaultVerificationDescriptor() {
