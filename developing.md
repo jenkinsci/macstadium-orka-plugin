@@ -2,19 +2,19 @@
 
 This article provides information about how to build, package, or run the plugin locally. For usage information, see the Jenkins plugin [tutorial][tutorial].
 
-The plugin provides two functionalities:  
+The plugin provides two functionalities:
 
-* Provision permanent agents in MacStadium - Via `Manage Jenkins` -> `Manage Nodes`
-* Provision ephemeral agents in MacStadium - Via `Manage Jenkins` -> `Configure System` -> `Add a new cloud`
+- Provision permanent agents in MacStadium - Via `Manage Jenkins` -> `Manage Nodes`
+- Provision ephemeral agents in MacStadium - Via `Manage Jenkins` -> `Configure System` -> `Add a new cloud`
 
 ## Build requirements
 
-* [Maven 3][maven]
-* JDK 8
+- [Maven 3][maven]
+- JDK 8
 
 ## Building, packaging and testing the plugin
 
-To build the plugin, run:  
+To build the plugin, run:
 
     mvn install
 
@@ -42,6 +42,10 @@ To use the plugin locally, run:
     mvn hpi:run
 
 This boots a Jenkins master, package the plugin and install it. To run the Jenkins master open http://localhost:8080.
+
+## Running integration tests locally
+
+Please, refer to the [integration tests README](integration-tests/README.md).
 
 [maven]: http://maven.apache.org/
 [checkstyle]: http://checkstyle.sourceforge.net/
