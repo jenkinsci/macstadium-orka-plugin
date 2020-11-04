@@ -21,8 +21,8 @@ public class RunOnceCloudRetentionStrategyTest {
     @Parameterized.Parameters(name = "{index}: Test with inputValue={0}, expected={1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] { { 5, 5 },
-                { -5, RunOnceCloudRetentionStrategy.recommendedMinIdle },
-                { 0, RunOnceCloudRetentionStrategy.recommendedMinIdle }
+                { -5, RunOnceCloudRetentionStrategy.RECOMMENDED_MIN_IDLE },
+                { 0, RunOnceCloudRetentionStrategy.RECOMMENDED_MIN_IDLE }
         });
     }
 

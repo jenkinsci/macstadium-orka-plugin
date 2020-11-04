@@ -12,7 +12,7 @@ import org.kohsuke.stapler.QueryParameter;
 
 public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
     private int idleMinutes;
-    public static final int recommendedMinIdle = 30;
+    public static final int RECOMMENDED_MIN_IDLE = 30;
     
     @DataBoundConstructor
     public IdleTimeCloudRetentionStrategy(int idleMinutes) {
@@ -22,7 +22,7 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
     }
     
     static int normalizeIdleTime(int idleMinutes) { 
-        return idleMinutes > 0 ? idleMinutes : recommendedMinIdle;
+        return idleMinutes > 0 ? idleMinutes : RECOMMENDED_MIN_IDLE;
     }
 
     public int getIdleMinutes() {
@@ -48,10 +48,10 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
             try {
                 int idleMinutesValue = Integer.parseInt(value);
                 
-                if (0 < idleMinutesValue && idleMinutesValue < recommendedMinIdle) {
+                if (0 < idleMinutesValue && idleMinutesValue < RECOMMENDED_MIN_IDLE) {
                     return FormValidation.warning(
                         String.format("Idle timeout less than %d seconds is not recommended.", 
-                                recommendedMinIdle)
+                                RECOMMENDED_MIN_IDLE)
                     );
                 }
                 

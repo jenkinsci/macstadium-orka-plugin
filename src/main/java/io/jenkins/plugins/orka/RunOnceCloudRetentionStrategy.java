@@ -22,7 +22,7 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
     private static final Logger LOGGER = Logger.getLogger(RunOnceCloudRetentionStrategy.class.getName());
 
     private int idleMinutes;
-    public static final int recommendedMinIdle = 30;
+    public static final int RECOMMENDED_MIN_IDLE = 30;
 
     @DataBoundConstructor
     public RunOnceCloudRetentionStrategy(int idleMinutes) {
@@ -32,7 +32,7 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
     }
         
     static int normalizeIdleTime(int idleMinutes) { 
-        return idleMinutes > 0 ? idleMinutes : recommendedMinIdle;
+        return idleMinutes > 0 ? idleMinutes : RECOMMENDED_MIN_IDLE;
     }
 
     public int getIdleMinutes() {
@@ -99,9 +99,9 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
                     return FormValidation.error("Idle timeout must be a positive number.");
                 }
 
-                if (idleMinutesValue < recommendedMinIdle) {
+                if (idleMinutesValue < RECOMMENDED_MIN_IDLE) {
                     return FormValidation.warning(
-                        String.format("Idle timeout less than %d seconds is not recommended.", recommendedMinIdle)
+                        String.format("Idle timeout less than %d seconds is not recommended.", RECOMMENDED_MIN_IDLE)
                     );
                 }
 
