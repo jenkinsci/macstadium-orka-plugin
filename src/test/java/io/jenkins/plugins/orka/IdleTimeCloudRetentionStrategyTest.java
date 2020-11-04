@@ -21,8 +21,8 @@ public class IdleTimeCloudRetentionStrategyTest {
     @Parameterized.Parameters(name = "{index}: Test with inputValue={0}, expected={1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] { { 5, 5 },
-                { -5, IdleTimeCloudRetentionStrategy.recommendedMinIdle },
-                { 0, IdleTimeCloudRetentionStrategy.recommendedMinIdle }
+                { -5, IdleTimeCloudRetentionStrategy.RECOMMENDED_MIN_IDLE },
+                { 0, IdleTimeCloudRetentionStrategy.RECOMMENDED_MIN_IDLE }
         });
     }
 
