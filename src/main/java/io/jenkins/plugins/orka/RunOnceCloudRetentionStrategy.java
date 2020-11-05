@@ -31,7 +31,7 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
         this.idleMinutes = normalizeIdleTime(idleMinutes);
     }
         
-    static int normalizeIdleTime(int idleMinutes) { 
+    private static final int normalizeIdleTime(int idleMinutes) { 
         return idleMinutes > 0 ? idleMinutes : RECOMMENDED_MIN_IDLE;
     }
 
