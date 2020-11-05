@@ -21,7 +21,7 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
         this.idleMinutes = normalizeIdleTime(idleMinutes);
     }
     
-    static int normalizeIdleTime(int idleMinutes) { 
+    private static final int normalizeIdleTime(int idleMinutes) { 
         return idleMinutes > 0 ? idleMinutes : RECOMMENDED_MIN_IDLE;
     }
 
@@ -37,7 +37,6 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
     @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
-    @Extension
     public static final class DescriptorImpl extends Descriptor<RetentionStrategy<?>> {
         @Override
         public String getDisplayName() {

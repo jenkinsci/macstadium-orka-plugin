@@ -13,4 +13,6 @@ public class Utils {
         return String.format("HTTP Code: %s, Error: %s", response.getHttpResponse().getCode(),
                 response.getErrorMessage());
     }
+
+    public static int normalizeIdleTime(int idleMinutes)
 }
