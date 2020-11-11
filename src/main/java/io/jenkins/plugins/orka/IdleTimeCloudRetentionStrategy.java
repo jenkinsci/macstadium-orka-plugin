@@ -5,6 +5,7 @@ import hudson.model.Descriptor;
 import hudson.slaves.CloudRetentionStrategy;
 import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
+import io.jenkins.plugins.orka.helpers.Utils;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -16,15 +17,11 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
     
     @DataBoundConstructor
     public IdleTimeCloudRetentionStrategy(int idleMinutes) {
-        super(normalizeIdleTime(idleMinutes));
+        super(Utils.normalizeIdleTime(idleMinutes, RECOMMENDED_MIN_IDLE));
         
-        this.idleMinutes = normalizeIdleTime(idleMinutes);
+        this.idleMinutes = Utils.normalizeIdleTime(idleMinutes, RECOMMENDED_MIN_IDLE);
     }
     
-    private static final int normalizeIdleTime(int idleMinutes) { 
-        return idleMinutes > 0 ? idleMinutes : RECOMMENDED_MIN_IDLE;
-    }
-
     public int getIdleMinutes() {
         return idleMinutes;
     }
@@ -66,7 +63,7 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
     }
 
     private Object readResolve() {
-        this.idleMinutes = normalizeIdleTime(this.idleMinutes);
+        this.idleMinutes = Utils.normalizeIdleTime(this.idleMinutes, RECOMMENDED_MIN_IDLE);
 
         return new IdleTimeCloudRetentionStrategy(idleMinutes);
     }

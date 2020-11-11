@@ -14,5 +14,7 @@ public class Utils {
                 response.getErrorMessage());
     }
 
-    public static int normalizeIdleTime(int idleMinutes)
+    public static int normalizeIdleTime(int userValue, int recommended) {
+        return userValue > 0 ? userValue : recommended;
+    }
 }
