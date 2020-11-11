@@ -10,6 +10,7 @@ import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.CloudRetentionStrategy;
 import hudson.slaves.RetentionStrategy;
 import hudson.util.FormValidation;
+import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -22,19 +23,15 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
     private static final Logger LOGGER = Logger.getLogger(RunOnceCloudRetentionStrategy.class.getName());
 
     private int idleMinutes;
-    public static final int RECOMMENDED_MIN_IDLE = 30;
+    public static final int RECOMMENDED_MIN_IDLE = 1;
 
     @DataBoundConstructor
     public RunOnceCloudRetentionStrategy(int idleMinutes) {
-        super(normalizeIdleTime(idleMinutes));
+        super(Utils.normalizeIdleTime(idleMinutes, RECOMMENDED_MIN_IDLE));
         
-        this.idleMinutes = normalizeIdleTime(idleMinutes);
+        this.idleMinutes = Utils.normalizeIdleTime(idleMinutes, RECOMMENDED_MIN_IDLE);
     }
         
-    private static final int normalizeIdleTime(int idleMinutes) { 
-        return idleMinutes > 0 ? idleMinutes : RECOMMENDED_MIN_IDLE;
-    }
-
     public int getIdleMinutes() {
         return idleMinutes;
     }
@@ -101,7 +98,7 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
 
                 if (idleMinutesValue < RECOMMENDED_MIN_IDLE) {
                     return FormValidation.warning(
-                        String.format("Idle timeout less than %d seconds is not recommended.", RECOMMENDED_MIN_IDLE)
+                        String.format("Idle timeout less than %d minutes is not recommended.", RECOMMENDED_MIN_IDLE)
                     );
                 }
 
@@ -113,7 +110,7 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
     }
 
     private Object readResolve() {
-        this.idleMinutes = normalizeIdleTime(this.idleMinutes);
+        this.idleMinutes = Utils.normalizeIdleTime(this.idleMinutes, RECOMMENDED_MIN_IDLE);
 
         return new RunOnceCloudRetentionStrategy(idleMinutes);
     }
