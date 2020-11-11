@@ -1,8 +1,11 @@
 package io.jenkins.plugins.orka.helpers;
 
+import hudson.util.FormValidation;
+
 import io.jenkins.plugins.orka.client.ResponseBase;
 
 import java.util.Date;
+
 
 public class Utils {
     public static String getTimestamp() {
@@ -16,5 +19,25 @@ public class Utils {
 
     public static int normalizeIdleTime(int userValue, int recommended) {
         return userValue > 0 ? userValue : recommended;
+    }
+
+    public static FormValidation checkInputValue(String userInput, int recommended) {
+        try {
+            int idleMinutesValue = Integer.parseInt(userInput);
+
+            if (idleMinutesValue <= 0) {
+                return FormValidation.error("Idle timeout must be a positive number.");
+            }
+            
+            if (idleMinutesValue < recommended) {
+                return FormValidation.warning(
+                    String.format("Idle timeout less than %d minutes is not recommended.", recommended)
+                );
+            }
+            
+            return FormValidation.ok();
+        } catch (NumberFormatException e) {
+            return FormValidation.error("Idle timeout must be a positive number.");
+        }
     }
 }
