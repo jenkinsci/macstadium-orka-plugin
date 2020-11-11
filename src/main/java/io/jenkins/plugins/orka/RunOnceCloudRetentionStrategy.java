@@ -89,23 +89,7 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
         }
 
         public FormValidation doCheckIdleMinutes(@QueryParameter String value) {
-            try {
-                int idleMinutesValue = Integer.parseInt(value);
-
-                if (idleMinutesValue <= 0) {
-                    return FormValidation.error("Idle timeout must be a positive number.");
-                }
-
-                if (idleMinutesValue < RECOMMENDED_MIN_IDLE) {
-                    return FormValidation.warning(
-                        String.format("Idle timeout less than %d minutes is not recommended.", RECOMMENDED_MIN_IDLE)
-                    );
-                }
-
-                return FormValidation.ok();
-            } catch (NumberFormatException e) {
-                return FormValidation.error("Idle timeout value must be a positive number.");
-            }
+            return Utils.checkInputValue(value, RECOMMENDED_MIN_IDLE);
         }
     }
 

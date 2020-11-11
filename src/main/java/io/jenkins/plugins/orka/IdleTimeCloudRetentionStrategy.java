@@ -38,27 +38,10 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
         @Override
         public String getDisplayName() {
             return "Keep until idle time expires";
-        } 
+        }
         
         public FormValidation doCheckIdleMinutes(@QueryParameter String value) {
-            try {
-                int idleMinutesValue = Integer.parseInt(value);
-                
-                if (0 < idleMinutesValue && idleMinutesValue < RECOMMENDED_MIN_IDLE) {
-                    return FormValidation.warning(
-                        String.format("Idle timeout less than %d seconds is not recommended.", 
-                                RECOMMENDED_MIN_IDLE)
-                    );
-                }
-                
-                if (idleMinutesValue <= 0) {
-                    return FormValidation.error("Idle timeout must be a positive number.");
-                }
-                
-                return FormValidation.ok();
-            } catch (NumberFormatException e) {
-                return FormValidation.error("Idle timeout must be a positive number.");
-            }
+            return Utils.checkInputValue(value, RECOMMENDED_MIN_IDLE);
         }
     }
 
