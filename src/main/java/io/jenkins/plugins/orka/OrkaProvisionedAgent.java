@@ -41,7 +41,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
             RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties)
+            List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
 
         super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy));
@@ -53,7 +53,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         retentionStrategy = retentionStrategy != null ? retentionStrategy : new IdleTimeCloudRetentionStrategy(30);
         this.setRetentionStrategy(retentionStrategy);
 
-        List<NodeProperty<?>> nodePropertiesToUse = nodeProperties != null ? nodeProperties.toList()
+        List<? extends NodeProperty<?>> nodePropertiesToUse = nodeProperties != null ? nodeProperties
                 : Collections.<NodeProperty<?>>emptyList();
         this.setNodeProperties(nodePropertiesToUse);
 
