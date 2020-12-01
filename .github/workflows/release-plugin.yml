@@ -1,0 +1,24 @@
+name: Release Jenkins Plugin
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-plugin:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - uses: oleksiyrudenko/gha-git-credentials@v2-latest
+      with:
+        name: github-actions[bot]
+        token: '${{ secrets.GITHUB_TOKEN }}'
+    - uses: s4u/maven-settings-action@v2.2.0
+      with:
+        servers: '[{"id": "maven.jenkins-ci.org", "username": "${{ secrets.MAVEN_SERVER_USER }}", "password": "${{ secrets.MAVEN_SERVER_PASS }}"}]'
+    - name: Prepare and release plugin
+      run: mvn -B release:prepare release:perform
