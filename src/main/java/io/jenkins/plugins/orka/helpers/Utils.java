@@ -21,18 +21,12 @@ public class Utils {
         return userValue > 0 ? userValue : recommended;
     }
 
-    public static FormValidation checkInputValue(String userInput, int recommended) {
+    public static FormValidation checkInputValue(String userInput) {
         try {
             int idleMinutesValue = Integer.parseInt(userInput);
 
             if (idleMinutesValue <= 0) {
                 return FormValidation.error("Idle timeout must be a positive number.");
-            }
-            
-            if (idleMinutesValue < recommended) {
-                return FormValidation.warning(
-                    String.format("Idle timeout less than %d minutes is not recommended.", recommended)
-                );
             }
             
             return FormValidation.ok();

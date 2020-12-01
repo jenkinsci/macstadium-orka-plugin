@@ -21,7 +21,7 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
         
         this.idleMinutes = Utils.normalizeIdleTime(idleMinutes, RECOMMENDED_MIN_IDLE);
     }
-    
+
     public int getIdleMinutes() {
         return idleMinutes;
     }
@@ -41,7 +41,7 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
         }
         
         public FormValidation doCheckIdleMinutes(@QueryParameter String value) {
-            return Utils.checkInputValue(value, RECOMMENDED_MIN_IDLE);
+            return Utils.checkInputValue(value);
         }
     }
 
