@@ -9,22 +9,27 @@ import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.CloudRetentionStrategy;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.FormValidation;
+import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implements ExecutorListener {
     private static final Logger LOGGER = Logger.getLogger(RunOnceCloudRetentionStrategy.class.getName());
 
-    private final int idleMinutes;
+    private int idleMinutes;
+    public static final int RECOMMENDED_MIN_IDLE = 1;
 
     @DataBoundConstructor
     public RunOnceCloudRetentionStrategy(int idleMinutes) {
-        super(idleMinutes);
-        this.idleMinutes = idleMinutes;
+        super(Utils.normalizeIdleTime(idleMinutes, RECOMMENDED_MIN_IDLE));
+        
+        this.idleMinutes = Utils.normalizeIdleTime(idleMinutes, RECOMMENDED_MIN_IDLE);
     }
 
     public int getIdleMinutes() {
@@ -82,9 +87,15 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
         public String getDisplayName() {
             return "Terminate immediately after use";
         }
+
+        public FormValidation doCheckIdleMinutes(@QueryParameter String value) {
+            return Utils.checkInputValue(value);
+        }
     }
 
     private Object readResolve() {
+        this.idleMinutes = Utils.normalizeIdleTime(this.idleMinutes, RECOMMENDED_MIN_IDLE);
+
         return new RunOnceCloudRetentionStrategy(idleMinutes);
     }
 }
