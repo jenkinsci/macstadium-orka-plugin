@@ -53,6 +53,8 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.configName = configName;
         this.baseImage = baseImage;
         this.numCPUs = numCPUs;
+
+        this.setNumExecutors(numExecutors);
     }
 
     public String getOrkaCredentialsId() {
