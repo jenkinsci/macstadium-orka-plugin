@@ -54,6 +54,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private Mode mode;
     private String remoteFS;
     private String labelString;
+    private String namePrefix;
     private RetentionStrategy<?> retentionStrategy;
     private OrkaVerificationStrategy verificationStrategy;
     private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
@@ -66,7 +67,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
-            RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
+            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
             List<? extends NodeProperty<?>> nodeProperties) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
@@ -78,6 +79,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.remoteFS = remoteFS;
         this.mode = mode;
         this.labelString = labelString;
+        this.namePrefix = namePrefix;
         this.retentionStrategy = retentionStrategy;
         this.verificationStrategy = verificationStrategy;
         this.nodeProperties = new DescribableList<>(Saveable.NOOP, Util.fixNull(nodeProperties));
@@ -121,6 +123,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public Set<LabelAtom> getLabelSet() {
         return Label.parse(this.getLabelString());
+    }
+
+    public String getNamePrefix() {
+        return this.namePrefix;
     }
 
     public int getNumExecutors() {
@@ -172,10 +178,12 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             }
 
             String host = this.parent.getRealHost(response.getHost());
+            String vmId = response.getId();
 
-            return new OrkaProvisionedAgent(this.parent.getDisplayName(), response.getId(), response.getHost(), host,
-                    response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
-                    this.labelString, this.retentionStrategy, this.verificationStrategy, this.nodeProperties);
+            return new OrkaProvisionedAgent(this.parent.getDisplayName(), this.namePrefix, vmId, response.getHost(), 
+                    host, response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
+                    this.labelString, this.retentionStrategy, this.verificationStrategy, 
+                    this.nodeProperties);
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
             this.parent.deleteVM(response.getId());
@@ -291,9 +299,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     public String toString() {
         return "AgentTemplate [baseImage=" + baseImage + ", configName=" + configName + ", createNewVMConfig="
                 + createNewVMConfig + ", idleTerminationMinutes=" + idleTerminationMinutes + ", labelString="
-                + labelString + ", mode=" + mode + ", nodeProperties=" + nodeProperties + ", numCPUs=" + numCPUs
-                + ", numExecutors=" + numExecutors + ", parent=" + parent + ", remoteFS=" + remoteFS
-                + ", retentionStrategy=" + retentionStrategy + ", verificationStrategy=" + verificationStrategy
-                + ", vm=" + vm + ", vmCredentialsId=" + vmCredentialsId + "]";
+                + labelString + ", namePrefix=" + namePrefix + ", mode=" + mode + ", nodeProperties=" 
+                + nodeProperties + ", numCPUs=" + numCPUs + ", numExecutors=" + numExecutors + ", parent=" + parent 
+                + ", remoteFS=" + remoteFS + ", retentionStrategy=" + retentionStrategy + ", verificationStrategy=" 
+                + verificationStrategy + ", vm=" + vm + ", vmCredentialsId=" + vmCredentialsId + "]";
     }
 }

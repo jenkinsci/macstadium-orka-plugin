@@ -246,7 +246,7 @@ public class CapacityHandlerTest {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
         r.getInstance()
-                .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
+                .addNode(new OrkaProvisionedAgent("cloud", "pre", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
                         Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
                         new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 2;
@@ -261,7 +261,7 @@ public class CapacityHandlerTest {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
         r.getInstance()
-                .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
+                .addNode(new OrkaProvisionedAgent("cloud", "pre", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
                         Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
                         new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 5;
@@ -276,7 +276,7 @@ public class CapacityHandlerTest {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
         r.getInstance()
-                .addNode(new OrkaProvisionedAgent("cloud", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
+                .addNode(new OrkaProvisionedAgent("cloud", "pre", "vmId", "node", "host", 2, "vmCredentialsId", 5, "remoteFS",
                         Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
                         new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 9;
@@ -291,7 +291,7 @@ public class CapacityHandlerTest {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
         r.getInstance()
-                .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
+                .addNode(new OrkaProvisionedAgent("another", "pre", "vmId", "node", "host", 2, "vmCredentialsId", 5,
                         "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
                         new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 2;
@@ -307,7 +307,7 @@ public class CapacityHandlerTest {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
         r.getInstance()
-                .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
+                .addNode(new OrkaProvisionedAgent("another", "pre", "vmId", "node", "host", 2, "vmCredentialsId", 5,
                         "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
                         new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 5;
@@ -323,7 +323,7 @@ public class CapacityHandlerTest {
         int capacity = 5;
         CapacityHandler handler = new CapacityHandler("cloud", capacity);
         r.getInstance()
-                .addNode(new OrkaProvisionedAgent("another", "vmId", "node", "host", 2, "vmCredentialsId", 5,
+                .addNode(new OrkaProvisionedAgent("another", "pre", "vmId", "node", "host", 2, "vmCredentialsId", 5,
                         "remoteFS", Mode.NORMAL, "labelString", RetentionStrategy.NOOP, new DefaultVerificationStrategy(),
                         new DescribableList<>(Saveable.NOOP, Collections.emptyList())));
         int capacityToReserve = 9;

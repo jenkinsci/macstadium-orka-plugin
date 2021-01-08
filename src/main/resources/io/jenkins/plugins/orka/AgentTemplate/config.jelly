@@ -40,6 +40,10 @@
       <f:entry title="${%Labels}" field="labelString">
         <f:textbox/>
       </f:entry>
+      
+      <f:entry title="${%Name Prefix}" field="namePrefix" help="${descriptor.getHelpFile('namePrefix')}">
+        <f:textbox/>
+      </f:entry>
 
       <f:dropdownList name="retentionStrategy" title="${%Retention Strategy}" help="${descriptor.getHelpFile('retentionStrategy')}">
         <j:forEach var="d" items="${descriptor.getRetentionStrategyDescriptors()}">
