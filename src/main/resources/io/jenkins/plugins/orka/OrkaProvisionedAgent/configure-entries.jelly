@@ -1,6 +1,10 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly">
 
+  <f:invisibleEntry>
+    <f:readOnlyTextbox name="namePrefix" value="${instance.namePrefix}" />
+  </f:invisibleEntry>
+      
   <f:entry title="${%Cloud}" field="cloudId">
     <f:readOnlyTextbox />
   </f:entry>

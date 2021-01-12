@@ -29,6 +29,7 @@ String sshPassword =  System.getenv()['SSH_PASSWORD'] ?: "admin";
 
 String vmConfigName = System.getenv()['VM_CONFIG_NAME'] ?: "it-orka-jenkins";
 String agentLabel = System.getenv()['AGENT_LABEL'] ?: "it-orka-agent";
+String agentPrefix = System.getenv()['AGENT_PREFIX'] ?: "it";
 
 String remoteFs = System.getenv()['REMOTE_FS_ROOT'] ?: "/Users/admin";
 
@@ -43,7 +44,7 @@ SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(
 
 AgentTemplate template = new AgentTemplate(sshUserCredentialsId, vmConfigName, false, null, 
     null, 1, 1, remoteFs, 
-    Mode.NORMAL, agentLabel, new IdleTimeCloudRetentionStrategy(30), new DefaultVerificationStrategy(), Collections.emptyList());
+    Mode.NORMAL, agentLabel, agentPrefix, new IdleTimeCloudRetentionStrategy(30), new DefaultVerificationStrategy(), Collections.emptyList());
 
 ArrayList<AgentTemplate> templates = new ArrayList<AgentTemplate>()
 templates.add(template)
