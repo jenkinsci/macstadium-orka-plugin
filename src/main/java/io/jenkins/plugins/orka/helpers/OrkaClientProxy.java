@@ -11,6 +11,7 @@ import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.client.OrkaNode;
 import io.jenkins.plugins.orka.client.OrkaVM;
+import io.jenkins.plugins.orka.client.OrkaVMConfig;
 import io.jenkins.plugins.orka.client.TokenStatusResponse;
 
 import java.io.IOException;
@@ -36,6 +37,12 @@ public class OrkaClientProxy {
     public List<OrkaVM> getVMs() throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.getVMs().getVMs();
+        }
+    }
+    
+    public List<OrkaVMConfig> getVMConfigs() throws IOException {
+        try (OrkaClient client = getOrkaClient()) {
+            return client.getVMConfigs().getConfigs();
         }
     }
 
