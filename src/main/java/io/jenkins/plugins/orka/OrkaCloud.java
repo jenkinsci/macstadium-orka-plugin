@@ -15,6 +15,7 @@ import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaVM;
+import io.jenkins.plugins.orka.client.OrkaVMConfig;
 import io.jenkins.plugins.orka.helpers.CapacityHandler;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
@@ -129,6 +130,11 @@ public class OrkaCloud extends Cloud {
     public List<OrkaVM> getVMs() throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings).getVMs();
+    }
+    
+    public List<OrkaVMConfig> getVMConfigs() throws IOException {
+        return new OrkaClientProxyFactory()
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings).getVMConfigs();
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,

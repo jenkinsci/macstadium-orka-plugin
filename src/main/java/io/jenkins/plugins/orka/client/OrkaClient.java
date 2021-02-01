@@ -38,6 +38,7 @@ public class OrkaClient implements AutoCloseable {
     private static final String CREATE_PATH = "/create";
     private static final String DEPLOY_PATH = "/deploy";
     private static final String DELETE_PATH = "/delete";
+    private static final String CONFIG_PATH = "/configs";
 
     private String endpoint;
     private TokenResponse tokenResponse;
@@ -62,6 +63,15 @@ public class OrkaClient implements AutoCloseable {
 
         Gson gson = new Gson();
         VMResponse response = gson.fromJson(httpResponse.getBody(), VMResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
+    }
+    
+    public VMConfigResponse getVMConfigs() throws IOException {
+        HttpResponse httpResponse = this.get(this.endpoint + VM_PATH + CONFIG_PATH);
+
+        Gson gson = new Gson();
+        VMConfigResponse response = gson.fromJson(httpResponse.getBody(), VMConfigResponse.class);
         response.setHttpResponse(httpResponse);
         return response;
     }

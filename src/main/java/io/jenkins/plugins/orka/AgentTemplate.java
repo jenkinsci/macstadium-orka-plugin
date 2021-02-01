@@ -194,7 +194,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     private ConfigurationResponse ensureConfigurationExist() throws IOException {
         if (this.createNewVMConfig) {
-            boolean configExist = parent.getVMs().stream().anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
+            boolean configExist = parent.getVMConfigs().stream()
+                    .anyMatch(vm -> vm.getName().equalsIgnoreCase(configName));
 
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
