@@ -15,9 +15,13 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class SSHUtil {
+    private static final Logger logger = Logger.getLogger(SSHUtil.class.getName());
+
     public static boolean waitForSSH(String host, int sshPort, int retries, int secondsBetweenRetries)
             throws IOException, InterruptedException {
         int attempts = 0;
@@ -43,19 +47,37 @@ public class SSHUtil {
 
         Connection connection = new Connection(host, sshPort);
         try {
+            int connectionRetries = 10;
+            int secondsBetweenRetries = 5;
+            
             long launchTimeoutMilliseconds = TimeUnit.SECONDS.toMillis(launchTimeoutSeconds);
-            connection.connect(new ServerHostKeyVerifier() {
-                public boolean verifyServerHostKey(String hostname, int port, String serverHostKeyAlgorithm,
-                        byte[] serverHostKey) throws Exception {
-                    return true;
+            int attempts = 0;
+            while (attempts < connectionRetries) {
+                attempts++;
+                try {
+                    connection.connect(new ServerHostKeyVerifier() {
+                        public boolean verifyServerHostKey(String hostname, int port, String serverHostKeyAlgorithm,
+                                byte[] serverHostKey) throws Exception {
+                            return true;
+                        }
+                    }, (int) launchTimeoutMilliseconds, 0, 
+                            (int) (launchTimeoutMilliseconds + TimeUnit.SECONDS.toMillis(5)));
+                    break;
+                } catch (Exception e) {
+                    logger.log(Level.WARNING,
+                            "Exception when connecting via SSH for host " + host + " on port " + sshPort, e);
+                    if (attempts == connectionRetries) {
+                        throw e;
+                    }
                 }
-            }, (int) launchTimeoutMilliseconds, 0, (int) (launchTimeoutMilliseconds + TimeUnit.SECONDS.toMillis(5)));
-
+                Thread.sleep(TimeUnit.SECONDS.toMillis(secondsBetweenRetries));
+            }
+            logger.log(Level.FINE, "Connected via SSH for host " + host + " on port " + sshPort);
             if (SSHAuthenticator.newInstance(connection, credentials).authenticate(TaskListener.NULL)) {
-
                 SCPClient scp = connection.createSCPClient();
                 String scriptName = "orka_handshake.sh";
                 scp.put(script.getBytes("UTF-8"), scriptName, remoteLocation, "0700");
+                logger.log(Level.FINE, "File copied for host " + host + " on port " + sshPort);
 
                 Session session = connection.openSession();
                 session.requestDumbPTY();
@@ -67,6 +89,8 @@ public class SSHUtil {
                         new InputStreamReader(session.getStdout(), StandardCharsets.UTF_8))) {
                     return reader.lines().collect(Collectors.joining("\n"));
                 }
+            } else {
+                logger.log(Level.SEVERE, "Could not authenticate to SSH for host " + host + " on port " + sshPort);
             }
         } finally {
             connection.close();
