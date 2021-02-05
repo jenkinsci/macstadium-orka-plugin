@@ -18,14 +18,14 @@ public class OrkaInfoHelper {
     }
 
     public ListBoxModel doFillNodeItems(String orkaEndpoint, String orkaCredentialsId,
-            boolean useJenkinsProxySettings) {
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
 
         ListBoxModel model = new ListBoxModel();
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                 OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
-                        orkaCredentialsId, useJenkinsProxySettings);
+                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .forEach(n -> model.add(n.getHostname()));
             }
@@ -37,14 +37,14 @@ public class OrkaInfoHelper {
     }
 
     public ListBoxModel doFillVmItems(String orkaEndpoint, String orkaCredentialsId, boolean useJenkinsProxySettings,
-            boolean createNewVMConfig) {
+            boolean ignoreSSLErrors, boolean createNewVMConfig) {
 
         ListBoxModel model = new ListBoxModel();
 
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && !createNewVMConfig && orkaCredentialsId != null) {
                 OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
-                        orkaCredentialsId, useJenkinsProxySettings);
+                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 clientProxy.getVMs().forEach(vm -> model.add(vm.getVMName()));
             }
         } catch (Exception e) {
@@ -55,13 +55,13 @@ public class OrkaInfoHelper {
     }
 
     public ListBoxModel doFillBaseImageItems(String orkaEndpoint, String orkaCredentialsId,
-            boolean useJenkinsProxySettings, boolean createNewVMConfig) {
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, boolean createNewVMConfig) {
 
         ListBoxModel model = new ListBoxModel();
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && createNewVMConfig && orkaCredentialsId != null) {
                 OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
-                        orkaCredentialsId, useJenkinsProxySettings);
+                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 clientProxy.getImages().forEach(image -> model.add(image));
             }
         } catch (Exception e) {

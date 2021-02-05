@@ -80,14 +80,14 @@ public class NodeResourcesCheckTest {
         OrkaClientProxyFactory factory = mock(OrkaClientProxyFactory.class);
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
-        when(factory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(clientProxy);
+        when(factory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean())).thenReturn(clientProxy);
         when(clientProxy.getNodes()).thenReturn(response);
         when(clientProxy.getVMs()).thenReturn(vmResponse);
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(factory);
 
-        FormValidation validation = descriptor.doCheckNode(this.selectedNode, "endpoint", "credentialsId", false,
+        FormValidation validation = descriptor.doCheckNode(this.selectedNode, "endpoint", "credentialsId", false, false,
                 this.vm, this.createNewVMConfig, this.requiredCPU);
 
         assertEquals(this.validationKind, validation.kind);

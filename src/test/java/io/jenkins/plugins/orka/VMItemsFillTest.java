@@ -56,7 +56,8 @@ public class VMItemsFillTest {
         OrkaClientProxy client = mock(OrkaClientProxy.class);
 
         this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(client);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
+                .thenReturn(client);
         when(client.getVMs()).thenReturn(response);
     }
 
@@ -65,7 +66,8 @@ public class VMItemsFillTest {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, this.createNewConfig);
+        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
+                this.createNewConfig);
 
         assertEquals(this.resultSize, vms.size());
     }
@@ -75,7 +77,8 @@ public class VMItemsFillTest {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, this.createNewConfig);
+        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
+                this.createNewConfig);
 
         assertEquals(this.resultSize, vms.size());
     }

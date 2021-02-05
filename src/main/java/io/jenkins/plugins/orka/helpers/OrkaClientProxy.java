@@ -24,14 +24,21 @@ public class OrkaClientProxy {
     private StandardUsernamePasswordCredentials credentials;
     private String endpoint;
     private int httpClientTimeout;
+    private boolean ignoreSSLErrors;
     private Proxy proxy;
+    
+    public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
+        boolean useJenkinsProxySettings) {
+        this(endpoint, credentialsId, httpClientTimeout, useJenkinsProxySettings, false);
+    }
 
     public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
-            boolean useJenkinsProxySettings) {
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
         this.credentials = CredentialsHelper.lookupSystemCredentials(credentialsId);
         this.endpoint = endpoint;
         this.httpClientTimeout = httpClientTimeout;
         this.proxy = this.getProxy(useJenkinsProxySettings);
+        this.ignoreSSLErrors = ignoreSSLErrors;
     }
 
     public List<OrkaVM> getVMs() throws IOException {
@@ -98,7 +105,7 @@ public class OrkaClientProxy {
 
     private OrkaClient getOrkaClient() throws IOException {
         return new OrkaClient(this.endpoint, this.credentials.getUsername(), Secret.toString(credentials.getPassword()),
-                this.httpClientTimeout, this.proxy);
+                this.httpClientTimeout, this.proxy, this.ignoreSSLErrors);
     }
 
     private Proxy getProxy(boolean useJenkinsProxySettings) {

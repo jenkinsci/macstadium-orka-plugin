@@ -53,7 +53,8 @@ public class ConfigNameCheckTest {
         OrkaClientProxy client = mock(OrkaClientProxy.class);
 
         this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(client);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
+                .thenReturn(client);
         when(client.getVMs()).thenReturn(response);
     }
 
@@ -62,7 +63,8 @@ public class ConfigNameCheckTest {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false, true);
+        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false,
+                false, true);
 
         assertEquals(this.validationKind, validation.kind);
     }
@@ -72,7 +74,8 @@ public class ConfigNameCheckTest {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false, true);
+        FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false,
+                false, true);
 
         assertEquals(this.validationKind, validation.kind);
     }

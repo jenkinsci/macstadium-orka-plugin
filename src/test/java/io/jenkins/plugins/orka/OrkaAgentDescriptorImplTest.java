@@ -29,7 +29,8 @@ public class OrkaAgentDescriptorImplTest {
     public void when_not_creating_new_config_should_return_ok() throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         
-        FormValidation validation = descriptor.doCheckConfigName("a", "127.0.0.1", "credentialsId", false, false);
+        FormValidation validation = descriptor.doCheckConfigName("a", "127.0.0.1", "credentialsId", false, false,
+                false);
 
         assertEquals(FormValidation.ok(), validation);
     }

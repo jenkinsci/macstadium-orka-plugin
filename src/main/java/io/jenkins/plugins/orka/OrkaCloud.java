@@ -49,14 +49,22 @@ public class OrkaCloud extends Cloud {
     private String instanceCapSetting;
     private int timeout;
     private boolean useJenkinsProxySettings;
+    private boolean ignoreSSLErrors;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
     private transient CapacityHandler capacityHandler;
+    
+    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
+            boolean useJenkinsProxySettings, List<? extends AddressMapper> mappings,
+            List<? extends AgentTemplate> templates) {
+        this(name, credentialsId, endpoint, instanceCapSetting, timeout, useJenkinsProxySettings, false, mappings,
+                templates);
+    }
 
     @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
-            boolean useJenkinsProxySettings, List<? extends AddressMapper> mappings,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, List<? extends AddressMapper> mappings,
             List<? extends AgentTemplate> templates) {
         super(name);
 
@@ -65,6 +73,7 @@ public class OrkaCloud extends Cloud {
         this.instanceCapSetting = instanceCapSetting;
         this.timeout = timeout;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
+        this.ignoreSSLErrors = ignoreSSLErrors;
 
         this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
@@ -100,6 +109,10 @@ public class OrkaCloud extends Cloud {
     public boolean getUseJenkinsProxySettings() {
         return this.useJenkinsProxySettings;
     }
+    
+    public boolean getIgnoreSSLErrors() {
+        return this.ignoreSSLErrors;
+    }
 
     public String getInstanceCapSetting() {
         return this.instanceCap == Integer.MAX_VALUE ? "" : String.valueOf(this.instanceCap);
@@ -129,29 +142,36 @@ public class OrkaCloud extends Cloud {
 
     public List<OrkaVM> getVMs() throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings).getVMs();
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings, 
+                        this.ignoreSSLErrors)
+                .getVMs();
     }
     
     public List<OrkaVMConfig> getVMConfigs() throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings).getVMConfigs();
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings, 
+                        this.ignoreSSLErrors)
+                .getVMConfigs();
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings)
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings, 
+                        this.ignoreSSLErrors)
                 .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings)
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings, 
+                        this.ignoreSSLErrors)
                 .deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
-        new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings)
+        new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings,
+                this.ignoreSSLErrors)
                 .deleteVM(name);
         this.capacityHandler.removeRunningInstance();
     }
@@ -274,9 +294,11 @@ public class OrkaCloud extends Cloud {
 
         @POST
         public FormValidation doTestConnection(@QueryParameter String credentialsId, @QueryParameter String endpoint,
-                @QueryParameter boolean useJenkinsProxySettings) throws IOException {
+                @QueryParameter boolean useJenkinsProxySettings, 
+                @QueryParameter boolean ignoreSSLErrors) throws IOException {
 
-            return this.formValidator.doTestConnection(credentialsId, endpoint, useJenkinsProxySettings);
+            return this.formValidator.doTestConnection(credentialsId, endpoint, useJenkinsProxySettings,
+                    ignoreSSLErrors);
         }
     }
 }
