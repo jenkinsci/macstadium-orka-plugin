@@ -61,13 +61,14 @@ public class NodeNameCheckTest {
         OrkaClientProxyFactory factory = mock(OrkaClientProxyFactory.class);
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
-        when(factory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(clientProxy);
+        when(factory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean())).thenReturn(clientProxy);
         when(clientProxy.getNodes()).thenReturn(response);
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(factory);
 
-        FormValidation validation = descriptor.doCheckNode(null, "endpoint", "credentialsId", false, null, false, 12);
+        FormValidation validation = descriptor.doCheckNode(null, "endpoint", "credentialsId", false, false, null, false,
+                        12);
 
         assertEquals(this.validationKind, validation.kind);
     }

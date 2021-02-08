@@ -50,8 +50,13 @@ public class OrkaClient implements AutoCloseable {
 
     public OrkaClient(String endpoint, String email, String password, int httpClientTimeout, Proxy proxy)
             throws IOException {
-        this.client = clientBase.newBuilder().readTimeout(httpClientTimeout, TimeUnit.SECONDS)
-                .protocols(Arrays.asList(Protocol.HTTP_1_1)).proxy(proxy).build();
+        this(endpoint, email, password, httpClientTimeout, proxy, false);
+    }
+    
+    public OrkaClient(String endpoint, String email, String password, int httpClientTimeout, Proxy proxy,
+            boolean ignoreSSLErrors)
+            throws IOException {
+        this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
         this.endpoint = endpoint;
         this.tokenResponse = this.getToken(email, password);
 
@@ -212,5 +217,12 @@ public class OrkaClient implements AutoCloseable {
             String error = String.format("Authentication failed with: %s", Utils.getErrorMessage(tokenResponse));
             throw new IOException(error);
         }
+    }
+    
+    private OkHttpClient createClient(Proxy proxy, int httpClientTimeout, boolean ignoreSSLErrors) {
+        OkHttpClient.Builder builder = ignoreSSLErrors ? SSLHelper.ignoreSSLErrors(clientBase.newBuilder())
+                : clientBase.newBuilder();
+        return builder.readTimeout(httpClientTimeout, TimeUnit.SECONDS).protocols(Arrays.asList(Protocol.HTTP_1_1))
+                .proxy(proxy).build();
     }
 }

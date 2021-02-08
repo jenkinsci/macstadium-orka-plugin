@@ -67,13 +67,14 @@ public class NodeItemsFillTest {
         OrkaClientProxyFactory clientProxyFactory = mock(OrkaClientProxyFactory.class);
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(clientProxy);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
+                        .thenReturn(clientProxy);
         when(clientProxy.getNodes()).thenReturn(response);
 
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setClientProxyFactory(clientProxyFactory);
 
-        ListBoxModel nodes = descriptor.doFillNodeItems(this.endpoint, this.credentials, false);
+        ListBoxModel nodes = descriptor.doFillNodeItems(this.endpoint, this.credentials, false, false);
 
         assertEquals(this.resultSize, nodes.size());
     }

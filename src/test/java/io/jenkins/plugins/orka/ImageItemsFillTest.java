@@ -52,7 +52,8 @@ public class ImageItemsFillTest {
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
         this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean())).thenReturn(clientProxy);
+        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
+                .thenReturn(clientProxy);
         when(clientProxy.getImages()).thenReturn(Arrays.asList((response)));
     }
 
@@ -62,7 +63,7 @@ public class ImageItemsFillTest {
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
         ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                this.createNewConfig);
+                false, this.createNewConfig);
 
         assertEquals(this.resultSize, baseImages.size());
     }
@@ -73,7 +74,7 @@ public class ImageItemsFillTest {
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
         ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                this.createNewConfig);
+                false, this.createNewConfig);
 
         assertEquals(this.resultSize, baseImages.size());
     }

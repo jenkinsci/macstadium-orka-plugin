@@ -22,7 +22,7 @@ public class FormValidator {
     }
 
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
-            boolean useJenkinsProxySettings, boolean createNewVMConfig) {
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, boolean createNewVMConfig) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         
         if (createNewVMConfig) {
@@ -33,7 +33,7 @@ public class FormValidator {
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                     OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
-                            orkaCredentialsId, useJenkinsProxySettings);
+                            orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                     boolean alreadyInUse = clientProxy.getVMs().stream()
                             .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
                     if (alreadyInUse) {
@@ -49,7 +49,7 @@ public class FormValidator {
     }
 
     public FormValidation doCheckNode(String node, String orkaEndpoint, String orkaCredentialsId,
-            boolean useJenkinsProxySettings, String vm, boolean createNewConfig, int numCPUs) {
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String vm, boolean createNewConfig, int numCPUs) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         boolean hasAvailableNodes = true;
@@ -60,7 +60,7 @@ public class FormValidator {
         try {
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                 OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
-                        orkaCredentialsId, useJenkinsProxySettings);
+                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 hasAvailableNodes = clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
                         .anyMatch(n -> true);
 
@@ -90,14 +90,17 @@ public class FormValidator {
         return FormValidation.error("There are no available nodes");
     }
 
-    public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings)
+    public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings, 
+            boolean ignoreSSLErrors)
             throws IOException {
 
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
             TokenStatusResponse response = new OrkaClientProxyFactory()
-                    .getOrkaClientProxy(endpoint, credentialsId, useJenkinsProxySettings).getTokenStatus();
+                    .getOrkaClientProxy(endpoint, credentialsId, useJenkinsProxySettings, 
+                            ignoreSSLErrors)
+                    .getTokenStatus();
             if (!response.isSuccessful() || !response.getIsValid()) {
                 return failedConnection(Utils.getErrorMessage(response));
             }

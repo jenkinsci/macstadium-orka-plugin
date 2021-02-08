@@ -241,10 +241,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 @QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId,
                 @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
                 @QueryParameter boolean createNewVMConfig) {
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return formValidator.doCheckConfigName(configName, endpoint, credentialsId, useJenkinsProxySettings,
-                    createNewVMConfig);
+            ignoreSSLErrors, createNewVMConfig);
         }
 
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
@@ -264,19 +265,22 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         public ListBoxModel doFillVmItems(@QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId,
                 @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
                 @QueryParameter boolean createNewVMConfig) {
 
-            return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, createNewVMConfig);
+            return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, ignoreSSLErrors,
+                    createNewVMConfig);
         }
 
         @POST
         public ListBoxModel doFillBaseImageItems(@QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId,
                 @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
                 @QueryParameter boolean createNewVMConfig) {
 
             return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
-                    createNewVMConfig);
+                    ignoreSSLErrors, createNewVMConfig);
         }
 
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {

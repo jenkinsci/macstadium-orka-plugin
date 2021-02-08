@@ -67,7 +67,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         }
 
         OrkaClientProxy client = new OrkaClientProxyFactory().getOrkaClientProxy(agent.getOrkaEndpoint(),
-                agent.getOrkaCredentialsId(), agent.getUseJenkinsProxySettings());
+                agent.getOrkaCredentialsId(), agent.getUseJenkinsProxySettings(), agent.getIgnoreSSLErrors());
 
         PrintStream logger = listener.getLogger();
 
