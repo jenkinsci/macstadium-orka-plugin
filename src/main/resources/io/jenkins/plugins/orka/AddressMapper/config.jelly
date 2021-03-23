@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly">
-  <table width="100%">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly" xmlns:orka="/lib/orka">
+  <orka:blockWrapper>
     <f:entry title="Private Host" field="defaultHost">
       <f:textbox />
     </f:entry>
@@ -13,5 +13,5 @@
         <f:repeatableDeleteButton value="${%Delete Mapping}"/>
       </div>
     </f:entry>
-  </table>
+  </orka:blockWrapper>
 </j:jelly>

@@ -1,0 +1,15 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:d="jelly:define">
+  <j:choose>
+    <j:when test="${divBasedFormLayout}">
+      <div>
+        <d:invokeBody/>
+      </div>
+    </j:when>
+    <j:otherwise>
+      <table style="width:100%">
+        <d:invokeBody/>
+      </table>
+    </j:otherwise>
+  </j:choose>
+</j:jelly>
