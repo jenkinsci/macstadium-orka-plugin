@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly">
-  <table width="100%">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly" xmlns:orka="/lib/orka">
+  <orka:blockWrapper>
     <f:section title="${%ORKA VM Details}">
       <f:entry title="${%VM}" field="vm">
         <f:select checkMethod="post"/>
@@ -76,5 +76,5 @@
         <f:repeatableDeleteButton value="${%Delete Orka Template}"/>
       </div>
     </f:entry>
-  </table>
+  </orka:blockWrapper>
 </j:jelly>
