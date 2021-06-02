@@ -18,8 +18,7 @@ public final class WaitSSHLauncher extends ComputerLauncher {
     private OrkaVerificationStrategy verificationStrategy;
 
     public WaitSSHLauncher(String host, int sshPort, String vmCredentialsId,
-            OrkaVerificationStrategy verificationStrategy) {
-        String jvmOptions = null;
+            OrkaVerificationStrategy verificationStrategy, String jvmOptions) {
         String javaPath = null;
         String prefixStartSlaveCmd = null;
         String suffixStartSlaveCmd = null;

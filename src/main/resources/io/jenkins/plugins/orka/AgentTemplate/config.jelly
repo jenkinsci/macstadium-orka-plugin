@@ -62,6 +62,10 @@
 
       <f:slave-mode name="mode" node="${instance}"/>
 
+       <f:entry title="${%JVM options for the Orka agent process}" field="jvmOptions">
+        <f:textbox/>
+      </f:entry>
+
       <f:advanced>
         <f:dropdownDescriptorSelector title="${%Verification Strategy}" field="verificationStrategy" descriptors="${descriptor.getVerificationStrategyDescriptors()}" default="${descriptor.getDefaultVerificationDescriptor()}" />
       </f:advanced>

@@ -37,11 +37,13 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     private transient String redirectHost;
     private String host;
     private int port;
+    private String jvmOptions;
 
-    public OrkaComputerLauncher(String host, int port, String redirectHost) {
+    public OrkaComputerLauncher(String host, int port, String redirectHost, String jvmOptions) {
         this.host = host;
         this.port = port;
         this.redirectHost = redirectHost;
+        this.jvmOptions = jvmOptions;
     }
 
     public String getHost() {
@@ -50,6 +52,10 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
     public int getPort() {
         return this.port;
+    }
+
+    public String getJvmOptions() {
+        return this.jvmOptions;
     }
 
     @Override
@@ -151,12 +157,11 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     }
 
     private SSHLauncher getLauncher(String vmCredentialsId) {
-        String jvmOptions = null;
         String javaPath = null;
         String prefixStartSlaveCmd = null;
         String suffixStartSlaveCmd = null;
 
-        return new SSHLauncher(this.host, this.port, vmCredentialsId, jvmOptions, javaPath, prefixStartSlaveCmd,
+        return new SSHLauncher(this.host, this.port, vmCredentialsId, this.jvmOptions, javaPath, prefixStartSlaveCmd,
                 suffixStartSlaveCmd, this.launchTimeoutSeconds, this.maxRetries, this.retryWaitTime,
                 new NonVerifyingKeyVerificationStrategy());
     }

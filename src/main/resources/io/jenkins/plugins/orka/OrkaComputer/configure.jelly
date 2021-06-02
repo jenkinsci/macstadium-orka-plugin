@@ -67,6 +67,10 @@
 
           <f:slave-mode name="mode" node="${instance}"/>
 
+          <f:entry title="${%JVM options for the Orka agent process}" field="jvmOptions">
+            <f:textbox/>
+          </f:entry>
+
           <j:if test="${h.getRetentionStrategyDescriptors().size() gt 1}">
             <f:dropdownList name="slave.retentionStrategy" title="${%Availability}"
                             help="/help/system-config/master-slave/availability.html">
