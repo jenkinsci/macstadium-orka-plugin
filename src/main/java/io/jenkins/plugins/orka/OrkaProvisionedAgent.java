@@ -41,6 +41,15 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private OrkaVerificationStrategy verificationStrategy;
     private String jvmOptions;
 
+    public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
+            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString, 
+            RetentionStrategy<?> retentionStrategy, 
+            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties)
+            throws Descriptor.FormException, IOException {
+        this(cloudId, namePrefix, vmId, node, host, sshPort, vmCredentialsId, numExecutors,
+                remoteFS, mode, labelString, retentionStrategy, verificationStrategy, nodeProperties, null);
+    }
+
     @DataBoundConstructor
     public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString, 

@@ -62,7 +62,7 @@
 
       <f:slave-mode name="mode" node="${instance}"/>
 
-       <f:entry title="${%JVM options for the Orka agent process}" field="jvmOptions">
+      <f:entry title="${%JVM options for the Orka agent process}" field="jvmOptions">
         <f:textbox/>
       </f:entry>
 

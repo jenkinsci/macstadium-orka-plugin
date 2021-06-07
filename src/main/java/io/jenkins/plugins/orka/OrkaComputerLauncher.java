@@ -39,6 +39,10 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     private int port;
     private String jvmOptions;
 
+    public OrkaComputerLauncher(String host, int port, String redirectHost) {
+        this(host, port, redirectHost, null);
+    }
+
     public OrkaComputerLauncher(String host, int port, String redirectHost, String jvmOptions) {
         this.host = host;
         this.port = port;

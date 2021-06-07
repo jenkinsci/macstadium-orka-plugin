@@ -65,6 +65,14 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     private transient OrkaCloud parent;
 
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
+            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
+            List<? extends NodeProperty<?>> nodeProperties) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
+            mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, null);
+    }
+
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,

@@ -46,6 +46,17 @@ public class OrkaAgent extends AbstractCloudSlave {
         this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
                 configName, baseImage, numCPUs, numExecutors, host, port, remoteFS, false, false, null);
     }
+
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
+            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
+            int numCPUs, int numExecutors, String host, int port, String remoteFS,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors)
+            throws Descriptor.FormException, IOException {
+
+        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
+                configName, baseImage, numCPUs, numExecutors, host, port, remoteFS, 
+                useJenkinsProxySettings, ignoreSSLErrors, null);
+    }
     
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
