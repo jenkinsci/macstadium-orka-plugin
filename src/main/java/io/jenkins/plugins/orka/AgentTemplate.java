@@ -58,17 +58,26 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private RetentionStrategy<?> retentionStrategy;
     private OrkaVerificationStrategy verificationStrategy;
     private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
+    private String jvmOptions;
 
     @Deprecated
     private transient int idleTerminationMinutes;
 
     private transient OrkaCloud parent;
 
-    @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
             List<? extends NodeProperty<?>> nodeProperties) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
+            mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, null);
+    }
+
+    @DataBoundConstructor
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
+            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
@@ -83,6 +92,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.retentionStrategy = retentionStrategy;
         this.verificationStrategy = verificationStrategy;
         this.nodeProperties = new DescribableList<>(Saveable.NOOP, Util.fixNull(nodeProperties));
+        this.jvmOptions = jvmOptions;
     }
 
     public String getOrkaCredentialsId() {
@@ -141,6 +151,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.remoteFS;
     }
 
+    public String getJvmOptions() {
+        return this.jvmOptions;
+    }
+
     public RetentionStrategy<?> getRetentionStrategy() {
         return this.retentionStrategy;
     }
@@ -183,7 +197,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return new OrkaProvisionedAgent(this.parent.getDisplayName(), this.namePrefix, vmId, response.getHost(), 
                     host, response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
                     this.labelString, this.retentionStrategy, this.verificationStrategy, 
-                    this.nodeProperties);
+                    this.nodeProperties, this.jvmOptions);
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
             this.parent.deleteVM(response.getId());

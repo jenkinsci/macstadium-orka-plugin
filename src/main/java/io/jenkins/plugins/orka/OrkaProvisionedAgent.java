@@ -39,16 +39,27 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private String vmCredentialsId;
     private String namePrefix;
     private OrkaVerificationStrategy verificationStrategy;
+    private String jvmOptions;
 
-    @DataBoundConstructor
     public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString, 
             RetentionStrategy<?> retentionStrategy, 
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
+        this(cloudId, namePrefix, vmId, node, host, sshPort, vmCredentialsId, numExecutors,
+                remoteFS, mode, labelString, retentionStrategy, verificationStrategy, nodeProperties, null);
+    }
+
+    @DataBoundConstructor
+    public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
+            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString, 
+            RetentionStrategy<?> retentionStrategy, 
+            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions)
+            throws Descriptor.FormException, IOException {
 
         super(StringUtils.isNotBlank(namePrefix) ? namePrefix + '_' + vmId : vmId, remoteFS, 
-                new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy));
+                new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy, jvmOptions));
 
         this.setNumExecutors(numExecutors);
         this.setMode(mode);
@@ -69,6 +80,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         this.vmCredentialsId = vmCredentialsId;
         this.namePrefix = namePrefix;
         this.verificationStrategy = verificationStrategy;
+        this.jvmOptions = jvmOptions;
     }
 
     protected Object readResolve() {
@@ -104,6 +116,10 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     public String getNamePrefix() {
         return this.namePrefix;
+    }
+    
+    public String getJvmOptions() {
+        return this.jvmOptions;
     }
 
     public OrkaVerificationStrategy getVerificationStrategy() {
