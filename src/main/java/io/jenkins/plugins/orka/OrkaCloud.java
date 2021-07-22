@@ -181,7 +181,7 @@ public class OrkaCloud extends Cloud {
                 logger.info("VM with name" + name + " is successfully deleted.");
                 this.capacityHandler.removeRunningInstance();
             } else {
-                logger.warning("Deleting VM failed with: " + Utils.getErrorMessage(deletionResponse));
+                logger.warning("Deleting VM " + name + " failed with: " + Utils.getErrorMessage(deletionResponse));
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Failed to delete a VM with name" + name, ex);
