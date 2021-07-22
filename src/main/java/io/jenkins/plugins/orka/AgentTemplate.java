@@ -200,12 +200,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                     this.nodeProperties, this.jvmOptions);
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
-            DeletionResponse deletionResponse = this.parent.deleteVM(response.getId());
+            this.parent.deleteVM(response.getId());
         
-            if (!deletionResponse.isSuccessful()) {
-                logger.warning("Deleting VM failed with: " + Utils.getErrorMessage(deletionResponse));
-            }
-            
             throw e;
         }
     }
