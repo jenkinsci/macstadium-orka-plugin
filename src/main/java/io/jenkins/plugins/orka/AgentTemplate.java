@@ -201,7 +201,6 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
             this.parent.deleteVM(response.getId());
-
             throw e;
         }
     }
