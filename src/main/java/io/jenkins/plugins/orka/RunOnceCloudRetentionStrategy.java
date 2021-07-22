@@ -56,7 +56,6 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
     private void taskCompleted(final AbstractCloudComputer<?> computer) {
         computer.setAcceptingTasks(false);
 
-        LOGGER.log(Level.FINE, "Terminating " + computer.getName());
         final AbstractCloudSlave computerNode = computer.getNode();
         if (computerNode != null) {
             try {

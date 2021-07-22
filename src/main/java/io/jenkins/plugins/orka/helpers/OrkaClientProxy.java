@@ -17,13 +17,10 @@ import io.jenkins.plugins.orka.client.TokenStatusResponse;
 import java.io.IOException;
 import java.net.Proxy;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
 public class OrkaClientProxy {
-    private static final Logger logger = Logger.getLogger(OrkaClientProxy.class.getName());
     private StandardUsernamePasswordCredentials credentials;
     private String endpoint;
     private int httpClientTimeout;
@@ -91,21 +88,13 @@ public class OrkaClientProxy {
     public DeletionResponse deleteVM(String vmName) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.deleteVM(vmName);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Failed to delete a VM with name" + vmName, ex);
         }
-
-        return null;
     }
 
     public DeletionResponse deleteVM(String vmName, String node) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.deleteVM(vmName, node);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Failed to delete a VM with name" + vmName + " on node " + node, ex);
         }
-
-        return null;
     }
 
     public TokenStatusResponse getTokenStatus() throws IOException {

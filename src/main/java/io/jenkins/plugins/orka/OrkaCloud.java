@@ -172,14 +172,18 @@ public class OrkaCloud extends Cloud {
     }
 
     public void deleteVM(String name) throws IOException {
-        DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, 
+        try {
+            DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, 
                 this.credentialsId, this.useJenkinsProxySettings,this.ignoreSSLErrors)
                 .deleteVM(name);
-        
-        if (deletionResponse.isSuccessful()) {
-            this.capacityHandler.removeRunningInstance();
-        } else {
-            logger.warning("Deleting VM failed with: " + Utils.getErrorMessage(deletionResponse));
+    
+            if (deletionResponse.isSuccessful()) {
+                this.capacityHandler.removeRunningInstance();
+            } else {
+                logger.warning("Deleting VM failed with: " + Utils.getErrorMessage(deletionResponse));
+            }
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Failed to delete a VM with name" + name, ex);
         }
     }
 
