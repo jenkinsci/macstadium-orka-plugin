@@ -93,6 +93,11 @@ public class RunOnceCloudRetentionStrategy extends CloudRetentionStrategy implem
         }
     }
 
+    @Override
+    public String toString() {
+        return "RunOnceCloudRetentionStrategy [idleMinutes=" + idleMinutes + "]";
+    }
+
     private Object readResolve() {
         this.idleMinutes = Utils.normalizeIdleTime(this.idleMinutes, RECOMMENDED_MIN_IDLE);
 
