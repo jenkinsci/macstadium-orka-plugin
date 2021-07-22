@@ -88,12 +88,16 @@ public class OrkaClientProxy {
     public DeletionResponse deleteVM(String vmName) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.deleteVM(vmName);
+        } catch (Exception ex) {
+            logger.log(Level.ERROR, "Failed to delete a VM with name" + vmName, ex);
         }
     }
 
     public DeletionResponse deleteVM(String vmName, String node) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.deleteVM(vmName, node);
+        } catch (Exception ex) {
+            logger.log(Level.ERROR, "Failed to delete a VM with name" + vmName + " on node " + node, ex);
         }
     }
 
