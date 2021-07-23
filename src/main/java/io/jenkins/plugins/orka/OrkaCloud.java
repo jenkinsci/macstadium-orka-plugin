@@ -13,6 +13,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
+import io.jenkins.plugins.orka.client.DeletionResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.client.OrkaVMConfig;
@@ -20,6 +21,7 @@ import io.jenkins.plugins.orka.helpers.CapacityHandler;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -170,10 +172,20 @@ public class OrkaCloud extends Cloud {
     }
 
     public void deleteVM(String name) throws IOException {
-        new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings,
-                this.ignoreSSLErrors)
+        try {
+            DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, 
+                this.credentialsId, this.useJenkinsProxySettings,this.ignoreSSLErrors)
                 .deleteVM(name);
-        this.capacityHandler.removeRunningInstance();
+    
+            if (deletionResponse.isSuccessful()) {
+                logger.info("VM " + name + " is successfully deleted.");
+                this.capacityHandler.removeRunningInstance();
+            } else {
+                logger.warning("Deleting VM " + name + " failed with: " + Utils.getErrorMessage(deletionResponse));
+            }
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Failed to delete a VM with name" + name, ex);
+        }
     }
 
     public String getRealHost(String host) {

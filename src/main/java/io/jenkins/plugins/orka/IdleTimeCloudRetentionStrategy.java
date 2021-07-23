@@ -45,6 +45,11 @@ public class IdleTimeCloudRetentionStrategy extends CloudRetentionStrategy {
         }
     }
 
+    @Override
+    public String toString() {
+        return "IdleTimeCloudRetentionStrategy [idleMinutes=" + idleMinutes + "]";
+    }
+
     private Object readResolve() {
         this.idleMinutes = Utils.normalizeIdleTime(this.idleMinutes, RECOMMENDED_MIN_IDLE);
 
