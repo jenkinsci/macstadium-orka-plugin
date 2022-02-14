@@ -18,15 +18,12 @@ public final class CredentialsHelper {
     }
 
     public static <C extends Credentials> C lookupSystemCredentials(final String credentialsId, final Class<C> type) {
-        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         return CredentialsMatchers.firstOrNull(
                 CredentialsProvider.lookupCredentials(type, Jenkins.get(), ACL.SYSTEM, Collections.emptyList()),
                 CredentialsMatchers.withId(credentialsId));
     }
 
     public static ListBoxModel getCredentials(Class type) {
-        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-
         return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, Jenkins.get(), type,
                 Collections.emptyList(), CredentialsMatchers.always());
     }
