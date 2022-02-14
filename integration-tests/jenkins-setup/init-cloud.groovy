@@ -49,7 +49,7 @@ AgentTemplate template = new AgentTemplate(sshUserCredentialsId, vmConfigName, f
 ArrayList<AgentTemplate> templates = new ArrayList<AgentTemplate>()
 templates.add(template)
 
-OrkaCloud cloud = new OrkaCloud(cloudConfigName, orkaUserCredentialsId, orkaEndpoint, "1", 300, false, null, templates)
+OrkaCloud cloud = new OrkaCloud(cloudConfigName, orkaUserCredentialsId, orkaEndpoint, "1", 600, false, null, templates)
 
 Jenkins.instance.clouds.add(cloud)
 
