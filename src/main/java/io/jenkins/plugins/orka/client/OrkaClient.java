@@ -24,7 +24,7 @@ import okhttp3.ResponseBody;
 
 public class OrkaClient implements AutoCloseable {
 
-    private static final int defaultHttpClientTimeout = 300;
+    private static final int defaultHttpClientTimeout = 600;
     private static final OkHttpClient clientBase = new OkHttpClient();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 

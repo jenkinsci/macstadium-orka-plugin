@@ -43,7 +43,7 @@ import org.kohsuke.stapler.verb.POST;
 public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
     private static final int recommendedMinTimeout = 30;
-    private static final int defaultTimeout = 300;
+    private static final int defaultTimeout = 600;
 
     private String credentialsId;
     private String endpoint;
