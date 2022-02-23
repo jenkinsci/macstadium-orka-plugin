@@ -51,6 +51,7 @@
       <f:entry title="${%# of CPUs}" field="numCPUs">
         <c:select />
       </f:entry>
+
     </f:optionalBlock>
 
     <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">

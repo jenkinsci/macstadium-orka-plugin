@@ -52,7 +52,7 @@ public class OrkaClient implements AutoCloseable {
             throws IOException {
         this(endpoint, email, password, httpClientTimeout, proxy, false);
     }
-    
+
     public OrkaClient(String endpoint, String email, String password, int httpClientTimeout, Proxy proxy,
             boolean ignoreSSLErrors)
             throws IOException {
@@ -71,7 +71,7 @@ public class OrkaClient implements AutoCloseable {
         response.setHttpResponse(httpResponse);
         return response;
     }
-    
+
     public VMConfigResponse getVMConfigs() throws IOException {
         HttpResponse httpResponse = this.get(this.endpoint + VM_PATH + CONFIG_PATH);
 
@@ -101,10 +101,15 @@ public class OrkaClient implements AutoCloseable {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount) throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, null);
+    }
+
+    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
+            String configTemplate, int cpuCount, String scheduler) throws IOException {
         Gson gson = new Gson();
 
         ConfigurationRequest configRequest = new ConfigurationRequest(vmName, image, baseImage, configTemplate,
-                cpuCount);
+                cpuCount, scheduler);
 
         String configRequestJson = gson.toJson(configRequest);
 
@@ -120,9 +125,13 @@ public class OrkaClient implements AutoCloseable {
     }
 
     public DeploymentResponse deployVM(String vmName, String node) throws IOException {
+        return this.deployVM(vmName, node, null);
+    }
+
+    public DeploymentResponse deployVM(String vmName, String node, String scheduler) throws IOException {
         Gson gson = new Gson();
 
-        DeploymentRequest deploymentRequest = new DeploymentRequest(vmName, node);
+        DeploymentRequest deploymentRequest = new DeploymentRequest(vmName, node, scheduler);
         String deploymentRequestJson = gson.toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(this.endpoint + VM_PATH + DEPLOY_PATH, deploymentRequestJson);
@@ -218,7 +227,7 @@ public class OrkaClient implements AutoCloseable {
             throw new IOException(error);
         }
     }
-    
+
     private OkHttpClient createClient(Proxy proxy, int httpClientTimeout, boolean ignoreSSLErrors) {
         OkHttpClient.Builder builder = ignoreSSLErrors ? SSLHelper.ignoreSSLErrors(clientBase.newBuilder())
                 : clientBase.newBuilder();

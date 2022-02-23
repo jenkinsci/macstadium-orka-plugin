@@ -20,8 +20,9 @@ import org.apache.commons.lang.StringUtils;
 
 public final class OrkaComputerLauncher extends ComputerLauncher {
     private static String configurationErrorFormat = "%s: Creating configuration with configName: %s, image: %s, "
-            + "baseImage: %s, template: %s and numCPUs: %s failed with an error: %s. Stopping creation.";
-    private static String deploymentErrorFormat = "%s: Deploying vm with name: %s and node: %s "
+            + "baseImage: %s, template: %s, and numCPUs: %s"
+            + "failed with an error: %s. Stopping creation.";
+    private static String deploymentErrorFormat = "%s: Deploying vm with name: %s, and node: %s"
             + "failed with an error: %s. Stopping creation.";
 
     private static String configurationSuccessFormat = "%s: Creating configuration returned result: %s";
@@ -152,8 +153,9 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
         DeploymentResponse deploymentResponse = clientProxy.deployVM(vmName, agent.getNode());
         if (!deploymentResponse.isSuccessful()) {
-            logger.println(String.format(deploymentErrorFormat, Utils.getTimestamp(), vmName, agent.getNode(),
-                    Utils.getErrorMessage(deploymentResponse)));
+            logger.println(
+                    String.format(deploymentErrorFormat, Utils.getTimestamp(), vmName, agent.getNode(),
+                            Utils.getErrorMessage(deploymentResponse)));
             return null;
         }
         logger.println(String.format(deploymentSuccessFormat, Utils.getTimestamp(), deploymentResponse.getMessage()));

@@ -26,9 +26,9 @@ public class OrkaClientProxy {
     private int httpClientTimeout;
     private boolean ignoreSSLErrors;
     private Proxy proxy;
-    
+
     public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
-        boolean useJenkinsProxySettings) {
+            boolean useJenkinsProxySettings) {
         this(endpoint, credentialsId, httpClientTimeout, useJenkinsProxySettings, false);
     }
 
@@ -46,7 +46,7 @@ public class OrkaClientProxy {
             return client.getVMs().getVMs();
         }
     }
-    
+
     public List<OrkaVMConfig> getVMConfigs() throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.getVMConfigs().getConfigs();
@@ -67,21 +67,28 @@ public class OrkaClientProxy {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount) throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, null);
+    }
+
+    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
+            String configTemplate, int cpuCount, String scheduler) throws IOException {
 
         try (OrkaClient client = getOrkaClient()) {
-            return client.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount);
+            return client.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler);
         }
     }
 
     public DeploymentResponse deployVM(String vmName) throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.deployVM(vmName);
-        }
+        return this.deployVM(vmName, null);
     }
 
     public DeploymentResponse deployVM(String vmName, String node) throws IOException {
+        return this.deployVM(vmName, node, null);
+    }
+
+    public DeploymentResponse deployVM(String vmName, String node, String scheduler) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
-            return client.deployVM(vmName, node);
+            return client.deployVM(vmName, node, scheduler);
         }
     }
 

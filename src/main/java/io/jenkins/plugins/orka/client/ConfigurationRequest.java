@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import org.apache.commons.lang.StringUtils;
+
 public class ConfigurationRequest {
 
     @SerializedName("orka_vm_name")
@@ -26,11 +28,20 @@ public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private int cpuCount;
 
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private String scheduler;
+
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount) {
+        this(vmName, image, baseImage, configTemplate, cpuCount, null);
+    }
+
+    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
+            String scheduler) {
         this.vmName = vmName;
         this.image = image;
         this.baseImage = baseImage;
         this.configTemplate = configTemplate;
         this.cpuCount = cpuCount;
+        this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
     }
 }
