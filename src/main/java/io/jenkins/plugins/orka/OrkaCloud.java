@@ -174,7 +174,7 @@ public class OrkaCloud extends Cloud {
     public void deleteVM(String name) throws IOException {
         try {
             DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, 
-                this.credentialsId, this.useJenkinsProxySettings,this.ignoreSSLErrors)
+                this.credentialsId, this.timeout, this.useJenkinsProxySettings,this.ignoreSSLErrors)
                 .deleteVM(name);
     
             if (deletionResponse.isSuccessful()) {
