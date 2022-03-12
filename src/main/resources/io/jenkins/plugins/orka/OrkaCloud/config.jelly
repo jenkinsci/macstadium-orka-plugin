@@ -22,8 +22,8 @@
       <f:entry title="Deployment Timeout (sec)" field="timeout">
           <f:number default="${descriptor.getDefaultTimeout()}"/>
       </f:entry>
-      <f:entry title="Deletion Timeout (sec)" field="deletion">
-          <f:number default="${descriptor.getDefaultDeletionTimeout()}"/>
+      <f:entry title="HTTP Timeout (sec)" field="httpTimeout">
+          <f:number default="${descriptor.getDefaultHttpTimeout()}"/>
       </f:entry>
       <f:entry title="${%Node Mappings}" description="${%List of Orka node mappings}">
           <f:repeatable field="mappings" header="${%Mapping}" add="${%Add mapping}">
