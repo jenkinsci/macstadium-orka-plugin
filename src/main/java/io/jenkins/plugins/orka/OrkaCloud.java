@@ -106,7 +106,7 @@ public class OrkaCloud extends Cloud {
         this.capacityHandler = new CapacityHandler(this.name, this.instanceCap);
 
         this.timeout = this.timeout > 0 ? this.timeout : defaultTimeout;
-        this.httpTimeout = this.httpTimeout > 0 ? this.timeout : defaultHttpTimeout;
+        this.httpTimeout = this.httpTimeout > 0 ? this.httpTimeout : defaultHttpTimeout;
 
         return this;
     }
