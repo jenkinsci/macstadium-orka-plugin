@@ -44,7 +44,7 @@ public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
     private static final int recommendedMinTimeout = 30;
     private static final int defaultTimeout = 600;
-    private static final int defaultHttpTimeout = 600;
+    private static final int defaultHttpTimeout = 300;
 
     private String credentialsId;
     private String endpoint;
@@ -328,16 +328,16 @@ public class OrkaCloud extends Cloud {
                 int timeoutValue = Integer.parseInt(value);
                 if (0 < timeoutValue && timeoutValue < recommendedMinTimeout) {
                     return FormValidation.warning(String.format(
-                                "Deletion timeout less than %d seconds is not recommended.", recommendedMinTimeout));
+                                "HTTP timeout less than %d seconds is not recommended.", recommendedMinTimeout));
                 }
 
                 if (timeoutValue <= 0) {
-                    return FormValidation.error("Deletion timeout must be a positive number.");
+                    return FormValidation.error("HTTP timeout must be a positive number.");
                 }
 
                 return FormValidation.ok();
             } catch (NumberFormatException e) {
-                return FormValidation.error("Deletion timeout must be a number.");
+                return FormValidation.error("HTTP timeout must be a number.");
             }
         }
 
