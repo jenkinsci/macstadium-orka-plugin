@@ -44,19 +44,21 @@ public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
     private static final int recommendedMinTimeout = 30;
     private static final int defaultTimeout = 600;
+    private static final int defaultHttpTimeout = 300;
 
     private String credentialsId;
     private String endpoint;
     private int instanceCap;
     private String instanceCapSetting;
     private int timeout;
+    private int httpTimeout;
     private boolean useJenkinsProxySettings;
     private boolean ignoreSSLErrors;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
     private transient CapacityHandler capacityHandler;
-    
+
     public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
             boolean useJenkinsProxySettings, List<? extends AddressMapper> mappings,
             List<? extends AgentTemplate> templates) {
@@ -64,16 +66,24 @@ public class OrkaCloud extends Cloud {
                 templates);
     }
 
+    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
+        boolean useJenkinsProxySettings, boolean ignoreSSLErrors, List<? extends AddressMapper> mappings,
+        List<? extends AgentTemplate> templates) {
+        this(name, credentialsId, endpoint, instanceCapSetting, timeout, defaultHttpTimeout,
+            useJenkinsProxySettings, ignoreSSLErrors, mappings, templates);
+    }
+
     @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
-            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, List<? extends AddressMapper> mappings,
-            List<? extends AgentTemplate> templates) {
+        int httpTimeout, boolean useJenkinsProxySettings, boolean ignoreSSLErrors,
+        List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
         this.endpoint = endpoint;
         this.instanceCapSetting = instanceCapSetting;
         this.timeout = timeout;
+        this.httpTimeout = httpTimeout;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
         this.ignoreSSLErrors = ignoreSSLErrors;
 
@@ -96,6 +106,7 @@ public class OrkaCloud extends Cloud {
         this.capacityHandler = new CapacityHandler(this.name, this.instanceCap);
 
         this.timeout = this.timeout > 0 ? this.timeout : defaultTimeout;
+        this.httpTimeout = this.httpTimeout > 0 ? this.httpTimeout : defaultHttpTimeout;
 
         return this;
     }
@@ -111,7 +122,7 @@ public class OrkaCloud extends Cloud {
     public boolean getUseJenkinsProxySettings() {
         return this.useJenkinsProxySettings;
     }
-    
+
     public boolean getIgnoreSSLErrors() {
         return this.ignoreSSLErrors;
     }
@@ -122,6 +133,10 @@ public class OrkaCloud extends Cloud {
 
     public int getTimeout() {
         return this.timeout;
+    }
+
+    public int getHttpTimeout() {
+        return this.httpTimeout;
     }
 
     public List<? extends AddressMapper> getMappings() {
@@ -144,14 +159,14 @@ public class OrkaCloud extends Cloud {
 
     public List<OrkaVM> getVMs() throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings, 
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
                 .getVMs();
     }
-    
+
     public List<OrkaVMConfig> getVMConfigs() throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings, 
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
                 .getVMConfigs();
     }
@@ -159,24 +174,24 @@ public class OrkaCloud extends Cloud {
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.useJenkinsProxySettings, 
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
                 .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
         return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings, 
+                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
                 .deployVM(name);
     }
 
     public void deleteVM(String name) throws IOException {
         try {
-            DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint, 
-                this.credentialsId, this.useJenkinsProxySettings,this.ignoreSSLErrors)
+            DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint,
+                this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,this.ignoreSSLErrors)
                 .deleteVM(name);
-    
+
             if (deletionResponse.isSuccessful()) {
                 logger.info("VM " + name + " is successfully deleted.");
                 this.capacityHandler.removeRunningInstance();
@@ -282,6 +297,10 @@ public class OrkaCloud extends Cloud {
             return defaultTimeout;
         }
 
+        public int getDefaultHttpTimeout() {
+            return defaultHttpTimeout;
+        }
+
         public ListBoxModel doFillCredentialsIdItems() {
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
@@ -304,9 +323,27 @@ public class OrkaCloud extends Cloud {
             }
         }
 
+        public FormValidation doCheckHttpTimeout(@QueryParameter String value) {
+            try {
+                int timeoutValue = Integer.parseInt(value);
+                if (0 < timeoutValue && timeoutValue < recommendedMinTimeout) {
+                    return FormValidation.warning(String.format(
+                                "HTTP timeout less than %d seconds is not recommended.", recommendedMinTimeout));
+                }
+
+                if (timeoutValue <= 0) {
+                    return FormValidation.error("HTTP timeout must be a positive number.");
+                }
+
+                return FormValidation.ok();
+            } catch (NumberFormatException e) {
+                return FormValidation.error("HTTP timeout must be a number.");
+            }
+        }
+
         @POST
         public FormValidation doTestConnection(@QueryParameter String credentialsId, @QueryParameter String endpoint,
-                @QueryParameter boolean useJenkinsProxySettings, 
+                @QueryParameter boolean useJenkinsProxySettings,
                 @QueryParameter boolean ignoreSSLErrors) throws IOException {
 
             return this.formValidator.doTestConnection(credentialsId, endpoint, useJenkinsProxySettings,
