@@ -59,6 +59,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private OrkaVerificationStrategy verificationStrategy;
     private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
     private String jvmOptions;
+    private String scheduler;
 
     @Deprecated
     private transient int idleTerminationMinutes;
@@ -70,14 +71,24 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
             List<? extends NodeProperty<?>> nodeProperties) {
         this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
-            mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, null);
+                mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, null);
+    }
+
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
+            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
+                mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, jvmOptions,
+                null);
+
     }
 
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
@@ -93,6 +104,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.verificationStrategy = verificationStrategy;
         this.nodeProperties = new DescribableList<>(Saveable.NOOP, Util.fixNull(nodeProperties));
         this.jvmOptions = jvmOptions;
+        this.scheduler = scheduler;
     }
 
     public String getOrkaCredentialsId() {
@@ -155,6 +167,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.jvmOptions;
     }
 
+    public String getScheduler() {
+        return this.scheduler;
+    }
+
     public RetentionStrategy<?> getRetentionStrategy() {
         return this.retentionStrategy;
     }
@@ -181,7 +197,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
 
         logger.fine("Deploying VM with name " + vmName);
-        DeploymentResponse response = this.parent.deployVM(vmName);
+        DeploymentResponse response = this.parent.deployVM(vmName, this.getScheduler());
         try {
             logger.fine("Result deploying VM " + vmName + ":");
             logger.fine(response.toString());
@@ -194,14 +210,14 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             String host = this.parent.getRealHost(response.getHost());
             String vmId = response.getId();
 
-            return new OrkaProvisionedAgent(this.parent.getDisplayName(), this.namePrefix, vmId, response.getHost(), 
+            return new OrkaProvisionedAgent(this.parent.getDisplayName(), this.namePrefix, vmId, response.getHost(),
                     host, response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
-                    this.labelString, this.retentionStrategy, this.verificationStrategy, 
+                    this.labelString, this.retentionStrategy, this.verificationStrategy,
                     this.nodeProperties, this.jvmOptions);
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
             this.parent.deleteVM(response.getId());
-            
+
             throw e;
         }
     }
@@ -214,7 +230,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
                 return parent.createConfiguration(this.configName, this.configName, this.baseImage,
-                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs);
+                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.scheduler);
             }
         }
         return null;
@@ -259,7 +275,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 @QueryParameter boolean createNewVMConfig) {
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return formValidator.doCheckConfigName(configName, endpoint, credentialsId, useJenkinsProxySettings,
-            ignoreSSLErrors, createNewVMConfig);
+                    ignoreSSLErrors, createNewVMConfig);
         }
 
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
@@ -273,6 +289,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         public ListBoxModel doFillNumCPUsItems() {
             return this.infoHelper.doFillNumCPUsItems();
+        }
+
+        public ListBoxModel doFillSchedulerItems() {
+            return this.infoHelper.doFillSchedulerItems();
         }
 
         @POST
@@ -318,9 +338,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     public String toString() {
         return "AgentTemplate [baseImage=" + baseImage + ", configName=" + configName + ", createNewVMConfig="
                 + createNewVMConfig + ", idleTerminationMinutes=" + idleTerminationMinutes + ", labelString="
-                + labelString + ", namePrefix=" + namePrefix + ", mode=" + mode + ", nodeProperties=" 
-                + nodeProperties + ", numCPUs=" + numCPUs + ", numExecutors=" + numExecutors + ", parent=" + parent 
-                + ", remoteFS=" + remoteFS + ", retentionStrategy=" + retentionStrategy + ", verificationStrategy=" 
-                + verificationStrategy + ", vm=" + vm + ", vmCredentialsId=" + vmCredentialsId + "]";
+                + labelString + ", namePrefix=" + namePrefix + ", mode=" + mode + ", nodeProperties="
+                + nodeProperties + ", numCPUs=" + numCPUs + ", numExecutors=" + numExecutors + ", parent=" + parent
+                + ", remoteFS=" + remoteFS + ", retentionStrategy=" + retentionStrategy + ", verificationStrategy="
+                + verificationStrategy + ", vm=" + vm + ", vmCredentialsId=" + vmCredentialsId + " scheduler="
+                + scheduler + "]";
     }
 }

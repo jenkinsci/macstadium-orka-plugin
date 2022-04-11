@@ -18,8 +18,11 @@
         <f:entry title="${%# of CPUs}" field="numCPUs">
           <c:select />
         </f:entry>
+      </f:optionalBlock>
 
-        </f:optionalBlock>
+      <f:entry title="${%Scheduler}" field="scheduler">
+        <c:select />
+      </f:entry>
 
         <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
           <c:select />

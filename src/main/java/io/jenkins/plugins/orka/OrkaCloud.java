@@ -67,16 +67,16 @@ public class OrkaCloud extends Cloud {
     }
 
     public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
-        boolean useJenkinsProxySettings, boolean ignoreSSLErrors, List<? extends AddressMapper> mappings,
-        List<? extends AgentTemplate> templates) {
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, List<? extends AddressMapper> mappings,
+            List<? extends AgentTemplate> templates) {
         this(name, credentialsId, endpoint, instanceCapSetting, timeout, defaultHttpTimeout,
-            useJenkinsProxySettings, ignoreSSLErrors, mappings, templates);
+                useJenkinsProxySettings, ignoreSSLErrors, mappings, templates);
     }
 
     @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
-        int httpTimeout, boolean useJenkinsProxySettings, boolean ignoreSSLErrors,
-        List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
+            int httpTimeout, boolean useJenkinsProxySettings, boolean ignoreSSLErrors,
+            List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
         super(name);
 
         this.credentialsId = credentialsId;
@@ -173,24 +173,33 @@ public class OrkaCloud extends Cloud {
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount) throws IOException {
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, null);
+    }
+
+    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
+            int cpuCount, String scheduler) throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .createConfiguration(name, image, baseImage, configTemplate, cpuCount);
+                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, scheduler);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
+        return this.deployVM(name, null);
+    }
+
+    public DeploymentResponse deployVM(String name, String scheduler) throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .deployVM(name);
+                .deployVM(name, null, scheduler);
     }
 
     public void deleteVM(String name) throws IOException {
         try {
             DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint,
-                this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,this.ignoreSSLErrors)
-                .deleteVM(name);
+                    this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings, this.ignoreSSLErrors)
+                    .deleteVM(name);
 
             if (deletionResponse.isSuccessful()) {
                 logger.info("VM " + name + " is successfully deleted.");
@@ -328,7 +337,7 @@ public class OrkaCloud extends Cloud {
                 int timeoutValue = Integer.parseInt(value);
                 if (0 < timeoutValue && timeoutValue < recommendedMinTimeout) {
                     return FormValidation.warning(String.format(
-                                "HTTP timeout less than %d seconds is not recommended.", recommendedMinTimeout));
+                            "HTTP timeout less than %d seconds is not recommended.", recommendedMinTimeout));
                 }
 
                 if (timeoutValue <= 0) {

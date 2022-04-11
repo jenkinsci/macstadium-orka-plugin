@@ -1,5 +1,6 @@
 package io.jenkins.plugins.orka.client;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.endsWith;
@@ -95,10 +96,11 @@ public class OrkaClientTest {
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
-        when(client.createConfiguration(anyString(), anyString(), anyString(), anyString(), anyInt()))
+        when(client.createConfiguration(anyString(), anyString(), anyString(), anyString(), anyInt(), anyString()))
                 .thenCallRealMethod();
 
-        ConfigurationResponse actualResponse = client.createConfiguration("newVm", "image", "baseImage", "default", 24);
+        ConfigurationResponse actualResponse = client.createConfiguration("newVm", "image", "baseImage", "default", 24,
+                "most-allocated");
 
         assertEquals(message, actualResponse.getMessage());
     }
@@ -112,9 +114,9 @@ public class OrkaClientTest {
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
-        when(client.deployVM(anyString(), anyString())).thenCallRealMethod();
+        when(client.deployVM(anyString(), anyString(), any())).thenCallRealMethod();
 
-        DeploymentResponse actualResponse = client.deployVM("newVm", "macpro-2");
+        DeploymentResponse actualResponse = client.deployVM("newVm", "macpro-2", null);
 
         assertEquals(ip, actualResponse.getHost());
         assertEquals(sshPort, actualResponse.getSSHPort());

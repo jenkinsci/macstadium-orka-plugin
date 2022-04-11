@@ -12,6 +12,7 @@ public class OrkaInfoHelper {
     private OrkaClientProxyFactory clientProxyFactory;
 
     private static final String[] supportedCPUs = new String[] { "3", "4", "6", "8", "12", "24" };
+    private static final String[] supportedSchedulers = new String[] { "default", "most-allocated" };
 
     public OrkaInfoHelper(OrkaClientProxyFactory clientProxyFactory) {
         this.clientProxyFactory = clientProxyFactory;
@@ -74,6 +75,13 @@ public class OrkaInfoHelper {
     public ListBoxModel doFillNumCPUsItems() {
         ListBoxModel model = new ListBoxModel();
         Arrays.stream(supportedCPUs).forEach(cpu -> model.add(cpu));
+        return model;
+    }
+
+    public ListBoxModel doFillSchedulerItems() {
+        ListBoxModel model = new ListBoxModel();
+        model.add("config-default", "");
+        Arrays.stream(supportedSchedulers).forEach(scheduler -> model.add(scheduler));
         return model;
     }
 }

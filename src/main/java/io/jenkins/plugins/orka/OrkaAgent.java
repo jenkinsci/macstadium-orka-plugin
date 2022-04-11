@@ -54,17 +54,16 @@ public class OrkaAgent extends AbstractCloudSlave {
             throws Descriptor.FormException, IOException {
 
         this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
-                configName, baseImage, numCPUs, numExecutors, host, port, remoteFS, 
+                configName, baseImage, numCPUs, numExecutors, host, port, remoteFS,
                 useJenkinsProxySettings, ignoreSSLErrors, null);
     }
-    
+
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
-            int numCPUs, int numExecutors, String host, int port, String remoteFS, 
+            int numCPUs, int numExecutors, String host, int port, String remoteFS,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions)
             throws Descriptor.FormException, IOException {
-
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
         this.orkaCredentialsId = orkaCredentialsId;
@@ -98,7 +97,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     public boolean getUseJenkinsProxySettings() {
         return this.useJenkinsProxySettings;
     }
-    
+
     public boolean getIgnoreSSLErrors() {
         return this.ignoreSSLErrors;
     }
@@ -181,7 +180,7 @@ public class OrkaAgent extends AbstractCloudSlave {
                 @QueryParameter boolean ignoreSSLErrors, @QueryParameter String vm,
                 @QueryParameter boolean createNewVMConfig, @QueryParameter int numCPUs) {
 
-            return this.formValidator.doCheckNode(value, orkaEndpoint, orkaCredentialsId, 
+            return this.formValidator.doCheckNode(value, orkaEndpoint, orkaCredentialsId,
                     useJenkinsProxySettings, ignoreSSLErrors, vm, createNewVMConfig, numCPUs);
         }
 
@@ -194,10 +193,10 @@ public class OrkaAgent extends AbstractCloudSlave {
         }
 
         public ListBoxModel doFillNodeItems(@QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings, 
+                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
                 @QueryParameter boolean ignoreSSLErrors) {
 
-            return this.infoHelper.doFillNodeItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings, 
+            return this.infoHelper.doFillNodeItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
                     ignoreSSLErrors);
         }
 
@@ -207,7 +206,7 @@ public class OrkaAgent extends AbstractCloudSlave {
 
         @POST
         public ListBoxModel doFillVmItems(@QueryParameter String orkaEndpoint, @QueryParameter String orkaCredentialsId,
-                @QueryParameter boolean useJenkinsProxySettings, @QueryParameter boolean ignoreSSLErrors, 
+                @QueryParameter boolean useJenkinsProxySettings, @QueryParameter boolean ignoreSSLErrors,
                 @QueryParameter boolean createNewVMConfig) {
 
             return this.infoHelper.doFillVmItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
@@ -225,7 +224,7 @@ public class OrkaAgent extends AbstractCloudSlave {
 
         @POST
         public FormValidation doTestConnection(@QueryParameter String orkaCredentialsId,
-                @QueryParameter String orkaEndpoint, @QueryParameter boolean useJenkinsProxySettings, 
+                @QueryParameter String orkaEndpoint, @QueryParameter boolean useJenkinsProxySettings,
                 @QueryParameter boolean ignoreSSLErrors)
                 throws IOException {
 
