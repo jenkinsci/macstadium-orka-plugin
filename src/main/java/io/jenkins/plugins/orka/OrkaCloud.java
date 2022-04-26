@@ -178,7 +178,7 @@ public class OrkaCloud extends Cloud {
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount, String scheduler) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, scheduler);
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, scheduler, 0);
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
