@@ -18,6 +18,10 @@
         <f:entry title="${%# of CPUs}" field="numCPUs">
           <c:select />
         </f:entry>
+
+        <f:entry title="${%Memory in GiB}" field="memory">
+          <f:number />
+        </f:entry>
       </f:optionalBlock>
 
       <f:entry title="${%Scheduler}" field="scheduler">

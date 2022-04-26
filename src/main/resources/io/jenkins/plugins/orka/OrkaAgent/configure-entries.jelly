@@ -52,6 +52,10 @@
         <c:select />
       </f:entry>
 
+      <f:entry title="${%Memory in GiB}" field="memory">
+        <f:number />
+      </f:entry>
+
     </f:optionalBlock>
 
     <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">

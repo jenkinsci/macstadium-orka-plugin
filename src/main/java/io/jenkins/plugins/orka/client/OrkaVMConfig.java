@@ -13,10 +13,19 @@ public class OrkaVMConfig {
     @SerializedName("orka_base_image")
     private String baseImage;
 
+    private int memory;
+
     public OrkaVMConfig(String name, int cpuCount, String baseImage) {
+        this(name, cpuCount, baseImage, 0);
+    }
+
+    public OrkaVMConfig(String name, int cpuCount, String baseImage, int memory) {
         this.name = name;
         this.cpuCount = cpuCount;
         this.baseImage = baseImage;
+        if (memory > 0) {
+            this.memory = memory;
+        }
     }
 
     public String getName() {
@@ -29,6 +38,10 @@ public class OrkaVMConfig {
 
     public String getBaseImage() {
         return this.baseImage;
+    }
+
+    public int getMemory() {
+        return this.memory;
     }
 
     @Override

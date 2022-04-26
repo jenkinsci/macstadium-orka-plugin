@@ -106,10 +106,15 @@ public class OrkaClient implements AutoCloseable {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler) throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler, 0);
+    }
+
+    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
+            String configTemplate, int cpuCount, String scheduler, int memory) throws IOException {
         Gson gson = new Gson();
 
         ConfigurationRequest configRequest = new ConfigurationRequest(vmName, image, baseImage, configTemplate,
-                cpuCount, scheduler);
+                cpuCount, scheduler, memory);
 
         String configRequestJson = gson.toJson(configRequest);
 

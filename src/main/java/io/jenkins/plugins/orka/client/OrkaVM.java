@@ -22,14 +22,24 @@ public class OrkaVM {
     @SerializedName("configuration_template")
     private String configurationTemplate;
 
+    private int memory;
+
     public OrkaVM(String vmName, String deploymentStatus, int cpuCount, String baseImage, String image,
             String configurationTemplate) {
+        this(vmName, deploymentStatus, cpuCount, baseImage, image, configurationTemplate, 0);
+    }
+
+    public OrkaVM(String vmName, String deploymentStatus, int cpuCount, String baseImage, String image,
+            String configurationTemplate, int memory) {
         this.vmName = vmName;
         this.deploymentStatus = deploymentStatus;
         this.cpuCount = cpuCount;
         this.baseImage = baseImage;
         this.image = image;
         this.configurationTemplate = configurationTemplate;
+        if (memory > 0) {
+            this.memory = memory;
+        }
     }
 
     public String getVMName() {
@@ -54,6 +64,10 @@ public class OrkaVM {
 
     public String getConfigurationTemplate() {
         return this.configurationTemplate;
+    }
+
+    public int getMemory() {
+        return this.memory;
     }
 
     @Override

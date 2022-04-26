@@ -36,6 +36,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String configName;
     private String baseImage;
     private int numCPUs;
+    private int memory;
     private String jvmOptions;
 
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
@@ -58,11 +59,22 @@ public class OrkaAgent extends AbstractCloudSlave {
                 useJenkinsProxySettings, ignoreSSLErrors, null);
     }
 
-    @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
             int numCPUs, int numExecutors, String host, int port, String remoteFS,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions)
+            throws Descriptor.FormException, IOException {
+
+        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
+                configName, baseImage, numCPUs, numExecutors, host, port, remoteFS,
+                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, 0);
+    }
+
+    @DataBoundConstructor
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
+            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
+            int numCPUs, int numExecutors, String host, int port, String remoteFS,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, int memory)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
@@ -78,6 +90,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.useJenkinsProxySettings = useJenkinsProxySettings;
         this.ignoreSSLErrors = ignoreSSLErrors;
         this.jvmOptions = jvmOptions;
+        this.memory = memory;
 
         this.setNumExecutors(numExecutors);
     }
@@ -124,6 +137,10 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     public int getNumCPUs() {
         return this.numCPUs;
+    }
+
+    public int getMemory() {
+        return this.memory;
     }
 
     public String getJvmOptions() {
