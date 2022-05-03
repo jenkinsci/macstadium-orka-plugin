@@ -12,7 +12,8 @@ import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
-    private static final String NOT_ENOUGH_RESOURCES_FORMAT = "Not enough resources on node. Required %s CPU, available %s";
+    private static final String NOT_ENOUGH_RESOURCES_FORMAT = "Not enough resources on node. " +
+            "Required %s CPU, available %s";
 
     private OrkaClientProxyFactory clientProxyFactory;
 
