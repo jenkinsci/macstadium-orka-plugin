@@ -19,7 +19,7 @@
           <c:select />
         </f:entry>
 
-        <f:entry title="${%Memory in GiB}" field="memory">
+        <f:entry title="${%Memory in G}" field="memory">
           <f:number />
         </f:entry>
       </f:optionalBlock>
