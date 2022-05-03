@@ -50,7 +50,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String configName;
     private String baseImage;
     private int numCPUs;
-    private String memory = "auto";
+    private String memory;
     private int numExecutors;
     private Mode mode;
     private String remoteFS;

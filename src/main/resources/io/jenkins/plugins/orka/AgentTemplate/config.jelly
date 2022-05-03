@@ -20,7 +20,7 @@
         </f:entry>
 
         <f:entry title="${%Memory in G}" field="memory" help="${descriptor.getHelpFile('memory')}">
-          <f:textbox checkMethod="post" />
+          <f:textbox checkMethod="post" default="auto"/>
         </f:entry>
       </f:optionalBlock>
 
