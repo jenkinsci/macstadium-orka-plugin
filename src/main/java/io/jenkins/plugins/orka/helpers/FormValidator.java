@@ -94,7 +94,6 @@ public class FormValidator {
     public FormValidation doCheckMemory(String memory) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
-        System.out.println(memory);
         try {
             if (StringUtils.isBlank(memory) || StringUtils.equals(memory, "auto")) {
                 return FormValidation.ok();
