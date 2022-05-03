@@ -7,13 +7,14 @@ import io.jenkins.plugins.orka.client.TokenStatusResponse;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
-    private static final String NOT_ENOUGH_RESOURCES_FORMAT = "Not enough resources on node. " +
-            "Required %s CPU, available %s";
+    private static final String NOT_ENOUGH_RESOURCES_FORMAT = "Not enough resources on node. "
+            + "Required %s CPU, available %s";
 
     private OrkaClientProxyFactory clientProxyFactory;
 
@@ -93,12 +94,12 @@ public class FormValidator {
     public FormValidation doCheckMemory(String memory) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
+        System.out.println(memory);
         try {
-            if (StringUtils.isBlank(memory) || memory == "auto") {
+            if (StringUtils.isBlank(memory) || StringUtils.equals(memory, "auto")) {
                 return FormValidation.ok();
             }
-            int m = Integer.parseInt(memory);
-            if (m < 1) {
+            if (Integer.parseInt(memory) < 1) {
                 return FormValidation.error("Memory should be greater than 0");
             }
             return FormValidation.ok();

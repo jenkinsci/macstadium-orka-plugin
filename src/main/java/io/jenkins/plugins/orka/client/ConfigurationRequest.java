@@ -51,7 +51,7 @@ public class ConfigurationRequest {
         this.configTemplate = configTemplate;
         this.cpuCount = cpuCount;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
-        if (memory != "auto" && memory != "" && Integer.parseInt(memory) > 0) {
+        if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Integer.parseInt(memory) > 0) {
             this.memory = Integer.parseInt(memory);
         }
     }
