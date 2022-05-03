@@ -36,7 +36,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String configName;
     private String baseImage;
     private int numCPUs;
-    private String memory;
+    private String memory = "auto";
     private String jvmOptions;
 
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,

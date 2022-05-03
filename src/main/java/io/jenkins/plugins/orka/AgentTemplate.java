@@ -50,7 +50,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String configName;
     private String baseImage;
     private int numCPUs;
-    private int memory;
+    private String memory = "auto";
     private int numExecutors;
     private Mode mode;
     private String remoteFS;
@@ -91,7 +91,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler) {
         this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
                 mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, jvmOptions,
-                scheduler, 0);
+                scheduler, "auto");
 
     }
 
@@ -99,7 +99,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, int memory) {
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
@@ -151,7 +151,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.numCPUs;
     }
 
-    public int getMemory() {
+    public String getMemory() {
         return this.memory;
     }
 
@@ -292,6 +292,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return formValidator.doCheckConfigName(configName, endpoint, credentialsId, useJenkinsProxySettings,
                     ignoreSSLErrors, createNewVMConfig);
+        }
+
+        @POST
+        public FormValidation doCheckMemory(@QueryParameter String memory) {
+            return this.formValidator.doCheckMemory(memory);
         }
 
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
