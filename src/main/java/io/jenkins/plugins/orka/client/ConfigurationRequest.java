@@ -40,19 +40,19 @@ public class ConfigurationRequest {
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             String scheduler) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, scheduler, 0);
+        this(vmName, image, baseImage, configTemplate, cpuCount, scheduler, "auto");
     }
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            String scheduler, int memory) {
+            String scheduler, String memory) {
         this.vmName = vmName;
         this.image = image;
         this.baseImage = baseImage;
         this.configTemplate = configTemplate;
         this.cpuCount = cpuCount;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
-        if (memory > 0) {
-            this.memory = memory;
+        if (memory != "auto" && memory != "" && Integer.parseInt(memory) > 0) {
+            this.memory = Integer.parseInt(memory);
         }
     }
 }

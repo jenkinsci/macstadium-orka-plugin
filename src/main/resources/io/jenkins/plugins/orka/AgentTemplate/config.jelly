@@ -19,8 +19,8 @@
           <c:select />
         </f:entry>
 
-        <f:entry title="${%Memory in G}" field="memory">
-          <f:number />
+        <f:entry title="${%Memory in G}" field="memory" help="${descriptor.getHelpFile('memory')}">
+          <f:textbox checkMethod="post" />
         </f:entry>
       </f:optionalBlock>
 

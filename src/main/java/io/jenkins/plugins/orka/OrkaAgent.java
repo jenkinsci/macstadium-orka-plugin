@@ -36,7 +36,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String configName;
     private String baseImage;
     private int numCPUs;
-    private int memory;
+    private String memory;
     private String jvmOptions;
 
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
@@ -67,14 +67,14 @@ public class OrkaAgent extends AbstractCloudSlave {
 
         this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
                 configName, baseImage, numCPUs, numExecutors, host, port, remoteFS,
-                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, 0);
+                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, "auto");
     }
 
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
             int numCPUs, int numExecutors, String host, int port, String remoteFS,
-            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, int memory)
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, String memory)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
@@ -139,7 +139,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         return this.numCPUs;
     }
 
-    public int getMemory() {
+    public String getMemory() {
         return this.memory;
     }
 
@@ -199,6 +199,11 @@ public class OrkaAgent extends AbstractCloudSlave {
 
             return this.formValidator.doCheckNode(value, orkaEndpoint, orkaCredentialsId,
                     useJenkinsProxySettings, ignoreSSLErrors, vm, createNewVMConfig, numCPUs);
+        }
+
+        @POST
+        public FormValidation doCheckMemory(@QueryParameter String memory) {
+            return this.formValidator.doCheckMemory(memory);
         }
 
         public ListBoxModel doFillOrkaCredentialsIdItems() {
