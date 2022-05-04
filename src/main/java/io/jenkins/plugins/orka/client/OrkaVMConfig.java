@@ -13,19 +13,17 @@ public class OrkaVMConfig {
     @SerializedName("orka_base_image")
     private String baseImage;
 
-    private int memory;
+    private String memory;
 
     public OrkaVMConfig(String name, int cpuCount, String baseImage) {
-        this(name, cpuCount, baseImage, 0);
+        this(name, cpuCount, baseImage, "auto");
     }
 
-    public OrkaVMConfig(String name, int cpuCount, String baseImage, int memory) {
+    public OrkaVMConfig(String name, int cpuCount, String baseImage, String memory) {
         this.name = name;
         this.cpuCount = cpuCount;
         this.baseImage = baseImage;
-        if (memory > 0) {
-            this.memory = memory;
-        }
+        this.memory = memory;
     }
 
     public String getName() {
@@ -40,7 +38,7 @@ public class OrkaVMConfig {
         return this.baseImage;
     }
 
-    public int getMemory() {
+    public String getMemory() {
         return this.memory;
     }
 
@@ -51,6 +49,7 @@ public class OrkaVMConfig {
         result = prime * result + ((baseImage == null) ? 0 : baseImage.hashCode());
         result = prime * result + cpuCount;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((memory == null) ? 0 : memory.hashCode());
         return result;
     }
 
@@ -78,6 +77,13 @@ public class OrkaVMConfig {
                 return false;
             }
         } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (memory == null) {
+            if (other.memory != null) {
+                return false;
+            }
+        } else if (!memory.equals(other.memory)) {
             return false;
         }
         return true;

@@ -22,24 +22,22 @@ public class OrkaVM {
     @SerializedName("configuration_template")
     private String configurationTemplate;
 
-    private int memory;
+    private String memory;
 
     public OrkaVM(String vmName, String deploymentStatus, int cpuCount, String baseImage, String image,
             String configurationTemplate) {
-        this(vmName, deploymentStatus, cpuCount, baseImage, image, configurationTemplate, 0);
+        this(vmName, deploymentStatus, cpuCount, baseImage, image, configurationTemplate, "auto");
     }
 
     public OrkaVM(String vmName, String deploymentStatus, int cpuCount, String baseImage, String image,
-            String configurationTemplate, int memory) {
+            String configurationTemplate, String memory) {
         this.vmName = vmName;
         this.deploymentStatus = deploymentStatus;
         this.cpuCount = cpuCount;
         this.baseImage = baseImage;
         this.image = image;
         this.configurationTemplate = configurationTemplate;
-        if (memory > 0) {
-            this.memory = memory;
-        }
+        this.memory = memory;
     }
 
     public String getVMName() {
@@ -66,7 +64,7 @@ public class OrkaVM {
         return this.configurationTemplate;
     }
 
-    public int getMemory() {
+    public String getMemory() {
         return this.memory;
     }
 
@@ -80,6 +78,7 @@ public class OrkaVM {
         result = prime * result + ((deploymentStatus == null) ? 0 : deploymentStatus.hashCode());
         result = prime * result + ((image == null) ? 0 : image.hashCode());
         result = prime * result + ((vmName == null) ? 0 : vmName.hashCode());
+        result = prime * result + ((memory == null) ? 0 : memory.hashCode());
         return result;
     }
 
@@ -131,6 +130,13 @@ public class OrkaVM {
                 return false;
             }
         } else if (!vmName.equals(other.vmName)) {
+            return false;
+        }
+        if (memory == null) {
+            if (other.memory != null) {
+                return false;
+            }
+        } else if (!memory.equals(other.memory)) {
             return false;
         }
         return true;

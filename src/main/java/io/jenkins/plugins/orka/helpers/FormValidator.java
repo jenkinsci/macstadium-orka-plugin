@@ -106,7 +106,7 @@ public class FormValidator {
             logger.log(Level.WARNING, "Exception in doCheckMemory", e);
         }
 
-        return FormValidation.error("Invalid Memory");
+        return FormValidation.error("Memory should be greater than 0");
     }
 
     public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings,
