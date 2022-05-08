@@ -3,13 +3,13 @@ package io.jenkins.plugins.orka.helpers;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 public class AESDecryptor {
     private static final Logger logger = Logger.getLogger(AESDecryptor.class.getName());
@@ -30,7 +30,7 @@ public class AESDecryptor {
 
     public static String decrypt(String cypherText, String password) {
         try {
-            byte[] dataBase64 = DatatypeConverter.parseBase64Binary(cypherText);
+            byte[] dataBase64 = Base64.getDecoder().decode(cypherText);
             byte[] salt = Arrays.copyOfRange(dataBase64, SALT_OFFSET, SALT_OFFSET + SALT_SIZE);
             byte[] encrypted = Arrays.copyOfRange(dataBase64, CIPHERTEXT_OFFSET, dataBase64.length);
 
