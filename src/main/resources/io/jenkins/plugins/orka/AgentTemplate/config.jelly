@@ -18,6 +18,10 @@
         <f:entry title="${%# of CPUs}" field="numCPUs">
           <c:select />
         </f:entry>
+
+        <f:entry title="${%Memory in G}" field="memory" help="${descriptor.getHelpFile('memory')}">
+          <f:textbox checkMethod="post" default="auto"/>
+        </f:entry>
       </f:optionalBlock>
 
       <f:entry title="${%Scheduler}" field="scheduler">

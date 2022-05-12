@@ -178,10 +178,15 @@ public class OrkaCloud extends Cloud {
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount, String scheduler) throws IOException {
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, scheduler, "auto");
+    }
+
+    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
+            int cpuCount, String scheduler, String memory) throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, scheduler);
+                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, scheduler, memory);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {

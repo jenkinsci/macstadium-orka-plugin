@@ -7,13 +7,14 @@ import io.jenkins.plugins.orka.client.TokenStatusResponse;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
-    private static final String NOT_ENOUGH_RESOURCES_FORMAT 
-        = "Not enough resources on node. Required %s CPU, available %s";
+    private static final String NOT_ENOUGH_RESOURCES_FORMAT = "Not enough resources on node. "
+            + "Required %s CPU, available %s";
 
     private OrkaClientProxyFactory clientProxyFactory;
 
@@ -24,7 +25,7 @@ public class FormValidator {
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, boolean createNewVMConfig) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-        
+
         if (createNewVMConfig) {
             if (configName.length() < 5) {
                 return FormValidation.error("Configuration name should NOT be shorter than 5 characters");
@@ -90,7 +91,25 @@ public class FormValidator {
         return FormValidation.error("There are no available nodes");
     }
 
-    public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings, 
+    public FormValidation doCheckMemory(String memory) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(memory) || StringUtils.equals(memory, "auto")) {
+                return FormValidation.ok();
+            }
+            if (Integer.parseInt(memory) < 1) {
+                return FormValidation.error("Memory should be greater than 0");
+            }
+            return FormValidation.ok();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doCheckMemory", e);
+        }
+
+        return FormValidation.error("Memory should be greater than 0");
+    }
+
+    public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors)
             throws IOException {
 
@@ -98,7 +117,7 @@ public class FormValidator {
 
         try {
             TokenStatusResponse response = new OrkaClientProxyFactory()
-                    .getOrkaClientProxy(endpoint, credentialsId, useJenkinsProxySettings, 
+                    .getOrkaClientProxy(endpoint, credentialsId, useJenkinsProxySettings,
                             ignoreSSLErrors)
                     .getTokenStatus();
             if (!response.isSuccessful() || !response.getIsValid()) {

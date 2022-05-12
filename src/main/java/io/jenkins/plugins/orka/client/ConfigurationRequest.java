@@ -31,17 +31,28 @@ public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String scheduler;
 
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private int memory;
+
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount) {
         this(vmName, image, baseImage, configTemplate, cpuCount, null);
     }
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             String scheduler) {
+        this(vmName, image, baseImage, configTemplate, cpuCount, scheduler, "auto");
+    }
+
+    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
+            String scheduler, String memory) {
         this.vmName = vmName;
         this.image = image;
         this.baseImage = baseImage;
         this.configTemplate = configTemplate;
         this.cpuCount = cpuCount;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
+        if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Integer.parseInt(memory) > 0) {
+            this.memory = Integer.parseInt(memory);
+        }
     }
 }

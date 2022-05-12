@@ -52,6 +52,10 @@
         <c:select />
       </f:entry>
 
+      <f:entry title="${%Memory in G}" field="memory" help="${descriptor.getHelpFile('memory')}">
+        <f:textbox checkMethod="post" default="auto"/>
+      </f:entry>
+
     </f:optionalBlock>
 
     <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
