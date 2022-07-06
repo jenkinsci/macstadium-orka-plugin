@@ -66,8 +66,7 @@ public class OrkaClient implements AutoCloseable {
     public VMResponse getVMs() throws IOException {
         HttpResponse httpResponse = this.get(this.endpoint + VM_PATH + LIST_PATH);
 
-        Gson gson = new Gson();
-        VMResponse response = gson.fromJson(httpResponse.getBody(), VMResponse.class);
+        VMResponse response = JsonHelper.fromJson(httpResponse.getBody(), VMResponse.class);
         response.setHttpResponse(httpResponse);
         return response;
     }
@@ -75,8 +74,7 @@ public class OrkaClient implements AutoCloseable {
     public VMConfigResponse getVMConfigs() throws IOException {
         HttpResponse httpResponse = this.get(this.endpoint + VM_PATH + CONFIG_PATH);
 
-        Gson gson = new Gson();
-        VMConfigResponse response = gson.fromJson(httpResponse.getBody(), VMConfigResponse.class);
+        VMConfigResponse response = JsonHelper.fromJson(httpResponse.getBody(), VMConfigResponse.class);
         response.setHttpResponse(httpResponse);
         return response;
     }
@@ -84,16 +82,15 @@ public class OrkaClient implements AutoCloseable {
     public NodeResponse getNodes() throws IOException {
         HttpResponse httpResponse = this.get(this.endpoint + NODE_PATH + LIST_PATH);
 
-        Gson gson = new Gson();
-        NodeResponse response = gson.fromJson(httpResponse.getBody(), NodeResponse.class);
+        NodeResponse response = JsonHelper.fromJson(httpResponse.getBody(), NodeResponse.class);
         response.setHttpResponse(httpResponse);
         return response;
     }
 
     public ImageResponse getImages() throws IOException {
         HttpResponse httpResponse = this.get(this.endpoint + IMAGE_PATH + LIST_PATH);
-        Gson gson = new Gson();
-        ImageResponse response = gson.fromJson(httpResponse.getBody(), ImageResponse.class);
+
+        ImageResponse response = JsonHelper.fromJson(httpResponse.getBody(), ImageResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
@@ -111,15 +108,14 @@ public class OrkaClient implements AutoCloseable {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler, String memory) throws IOException {
-        Gson gson = new Gson();
 
         ConfigurationRequest configRequest = new ConfigurationRequest(vmName, image, baseImage, configTemplate,
                 cpuCount, scheduler, memory);
 
-        String configRequestJson = gson.toJson(configRequest);
+        String configRequestJson = new Gson().toJson(configRequest);
 
         HttpResponse httpResponse = this.post(this.endpoint + VM_PATH + CREATE_PATH, configRequestJson);
-        ConfigurationResponse response = gson.fromJson(httpResponse.getBody(), ConfigurationResponse.class);
+        ConfigurationResponse response = JsonHelper.fromJson(httpResponse.getBody(), ConfigurationResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
@@ -134,13 +130,11 @@ public class OrkaClient implements AutoCloseable {
     }
 
     public DeploymentResponse deployVM(String vmName, String node, String scheduler) throws IOException {
-        Gson gson = new Gson();
-
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmName, node, scheduler);
-        String deploymentRequestJson = gson.toJson(deploymentRequest);
+        String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(this.endpoint + VM_PATH + DEPLOY_PATH, deploymentRequestJson);
-        DeploymentResponse response = gson.fromJson(httpResponse.getBody(), DeploymentResponse.class);
+        DeploymentResponse response = JsonHelper.fromJson(httpResponse.getBody(), DeploymentResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
@@ -151,13 +145,11 @@ public class OrkaClient implements AutoCloseable {
     }
 
     public DeletionResponse deleteVM(String vmName, String node) throws IOException {
-        Gson gson = new Gson();
-
         DeletionRequest deletionRequest = new DeletionRequest(vmName, node);
-        String deletionRequestJson = gson.toJson(deletionRequest);
+        String deletionRequestJson = new Gson().toJson(deletionRequest);
 
         HttpResponse httpResponse = this.delete(this.endpoint + VM_PATH + DELETE_PATH, deletionRequestJson);
-        DeletionResponse response = gson.fromJson(httpResponse.getBody(), DeletionResponse.class);
+        DeletionResponse response = JsonHelper.fromJson(httpResponse.getBody(), DeletionResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
@@ -165,7 +157,7 @@ public class OrkaClient implements AutoCloseable {
 
     public TokenStatusResponse getTokenStatus() throws IOException {
         HttpResponse httpResponse = this.get(this.endpoint + TOKEN_PATH);
-        TokenStatusResponse response = new Gson().fromJson(httpResponse.getBody(), TokenStatusResponse.class);
+        TokenStatusResponse response = JsonHelper.fromJson(httpResponse.getBody(), TokenStatusResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
@@ -178,11 +170,10 @@ public class OrkaClient implements AutoCloseable {
     @VisibleForTesting
     TokenResponse getToken(String email, String password) throws IOException {
         TokenRequest tokenRequest = new TokenRequest(email, password);
-        Gson gson = new Gson();
         String tokenRequestJson = new Gson().toJson(tokenRequest);
 
         HttpResponse httpResponse = this.post(this.endpoint + TOKEN_PATH, tokenRequestJson);
-        TokenResponse response = gson.fromJson(httpResponse.getBody(), TokenResponse.class);
+        TokenResponse response = JsonHelper.fromJson(httpResponse.getBody(), TokenResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
