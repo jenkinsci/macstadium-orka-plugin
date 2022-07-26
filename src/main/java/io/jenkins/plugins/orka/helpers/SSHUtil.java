@@ -12,6 +12,7 @@ import hudson.model.TaskListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
@@ -21,21 +22,25 @@ import java.util.stream.Collectors;
 
 public class SSHUtil {
     private static final Logger logger = Logger.getLogger(SSHUtil.class.getName());
+    private static final long fiveSecondTimeout = TimeUnit.SECONDS.toMillis(5);
+    private static final int connectionRetries = 10;
 
-    public static boolean waitForSSH(String host, int sshPort, int retries, int secondsBetweenRetries)
+    public static boolean waitForSSH(String host, int sshPort)
             throws IOException, InterruptedException {
         int attempts = 0;
-        while (attempts < retries) {
+        while (attempts < connectionRetries) {
             attempts++;
-            try (Socket s = new Socket(host, sshPort)) {
+            try (Socket s = new Socket()) {
+                s.setSoTimeout((int) fiveSecondTimeout);
+                s.connect(new InetSocketAddress(host, sshPort), (int) fiveSecondTimeout);
                 return true;
             } catch (IOException ex) {
-                if (attempts == retries) {
+                if (attempts == connectionRetries) {
                     throw ex;
                 }
             }
 
-            Thread.sleep(TimeUnit.SECONDS.toMillis(secondsBetweenRetries));
+            Thread.sleep(fiveSecondTimeout);
         }
 
         return false;
@@ -47,9 +52,6 @@ public class SSHUtil {
 
         Connection connection = new Connection(host, sshPort);
         try {
-            int connectionRetries = 10;
-            int secondsBetweenRetries = 5;
-            
             long launchTimeoutMilliseconds = TimeUnit.SECONDS.toMillis(launchTimeoutSeconds);
             int attempts = 0;
             while (attempts < connectionRetries) {
@@ -60,8 +62,8 @@ public class SSHUtil {
                                 byte[] serverHostKey) throws Exception {
                             return true;
                         }
-                    }, (int) launchTimeoutMilliseconds, 0, 
-                            (int) (launchTimeoutMilliseconds + TimeUnit.SECONDS.toMillis(5)));
+                    }, (int) launchTimeoutMilliseconds, 0,
+                            (int) (launchTimeoutMilliseconds + fiveSecondTimeout));
                     break;
                 } catch (Exception e) {
                     logger.log(Level.WARNING,
@@ -70,7 +72,7 @@ public class SSHUtil {
                         throw e;
                     }
                 }
-                Thread.sleep(TimeUnit.SECONDS.toMillis(secondsBetweenRetries));
+                Thread.sleep(fiveSecondTimeout);
             }
             logger.log(Level.FINE, "Connected via SSH for host " + host + " on port " + sshPort);
             if (SSHAuthenticator.newInstance(connection, credentials).authenticate(TaskListener.NULL)) {

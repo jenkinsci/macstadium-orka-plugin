@@ -43,16 +43,20 @@ public final class WaitSSHLauncher extends ComputerLauncher {
 
     @Override
     public void launch(SlaveComputer slaveComputer, TaskListener listener) throws IOException, InterruptedException {
-        int maxRetries = 12;
-        int retryWaitTime = 15;
-
         String host = launcher.getHost();
         int port = launcher.getPort();
 
         listener.getLogger().println("Waiting for SSH to be enabled");
         logger.fine("Waiting for SSH to be enabled on host  " + host + " on port " + port);
 
-        SSHUtil.waitForSSH(host, port, maxRetries, retryWaitTime);
+        try {
+            SSHUtil.waitForSSH(host, port);
+        } catch (IOException ex) {
+            listener.getLogger().println("SSH coonection failed with: " + ex);
+            logger.fine("SSH coonection failed for host " + host + " on port " + port + "with: " + ex);
+            this.deleteAgent(slaveComputer);
+            return;
+        }
 
         listener.getLogger().println("SSH enabled");
         logger.fine("SSH enabled on host " + host + " on port " + port);
