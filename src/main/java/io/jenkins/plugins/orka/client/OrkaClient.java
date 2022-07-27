@@ -24,12 +24,14 @@ import okhttp3.ResponseBody;
 
 public class OrkaClient implements AutoCloseable {
 
-    private static final int defaultHttpClientTimeout = 600;
+    protected static final int defaultHttpClientTimeout = 600;
     private static final OkHttpClient clientBase = new OkHttpClient();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 
+    protected static final String AUTHORIZATION_HEADER = "Authorization";
+    protected static final String BEARER = "Bearer ";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private static final String TOKEN_PATH = "/token";
+    protected static final String TOKEN_PATH = "/token";
     private static final String RESOURCE_PATH = "/resources";
     private static final String VM_PATH = RESOURCE_PATH + "/vm";
     private static final String NODE_PATH = RESOURCE_PATH + "/node";
@@ -39,6 +41,7 @@ public class OrkaClient implements AutoCloseable {
     private static final String DEPLOY_PATH = "/deploy";
     private static final String DELETE_PATH = "/delete";
     private static final String CONFIG_PATH = "/configs";
+    private static final String HEALTH_CHECK_PATH = "/health-check";
 
     private String endpoint;
     private TokenResponse tokenResponse;
@@ -58,9 +61,19 @@ public class OrkaClient implements AutoCloseable {
             throws IOException {
         this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
         this.endpoint = endpoint;
-        this.tokenResponse = this.getToken(email, password);
+        this.initToken(email, password);
+    }
 
-        this.verifyToken();
+    public OrkaClient(String endpoint, int httpClientTimeout, Proxy proxy,
+            boolean ignoreSSLErrors)
+            throws IOException {
+        this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
+        this.endpoint = endpoint;
+    }
+
+    @VisibleForTesting
+    TokenResponse getToken() {
+        return this.tokenResponse;
     }
 
     public VMResponse getVMs() throws IOException {
@@ -155,20 +168,27 @@ public class OrkaClient implements AutoCloseable {
         return response;
     }
 
-    public TokenStatusResponse getTokenStatus() throws IOException {
-        HttpResponse httpResponse = this.get(this.endpoint + TOKEN_PATH);
-        TokenStatusResponse response = JsonHelper.fromJson(httpResponse.getBody(), TokenStatusResponse.class);
+    public HealthCheckResponse getHealthCheck() throws IOException {
+        HttpResponse httpResponse = this.get(this.endpoint + HEALTH_CHECK_PATH);
+        HealthCheckResponse response = JsonHelper.fromJson(httpResponse.getBody(), HealthCheckResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
     }
 
     public void close() throws IOException {
-        this.delete(this.endpoint + TOKEN_PATH, "");
+        if (this.getToken() != null) {
+            this.delete(this.endpoint + TOKEN_PATH, "");
+        }
+    }
+
+    protected void initToken(String email, String password) throws IOException {
+        this.tokenResponse = this.createToken(email, password);
+        this.verifyToken(this.tokenResponse);
     }
 
     @VisibleForTesting
-    TokenResponse getToken(String email, String password) throws IOException {
+    TokenResponse createToken(String email, String password) throws IOException {
         TokenRequest tokenRequest = new TokenRequest(email, password);
         String tokenRequestJson = new Gson().toJson(tokenRequest);
 
@@ -202,23 +222,29 @@ public class OrkaClient implements AutoCloseable {
 
     private Builder getAuthenticatedBuilder(String url) throws IOException {
         Request.Builder builder = new Request.Builder().url(url);
-        if (this.tokenResponse != null) {
-            builder.addHeader("Authorization", "Bearer " + this.tokenResponse.getToken());
+        TokenResponse tokenResponse = this.getToken();
+        if (tokenResponse != null) {
+            builder.addHeader(AUTHORIZATION_HEADER, BEARER + tokenResponse.getToken());
         }
 
         return builder;
     }
 
-    private HttpResponse executeCall(Request request) throws IOException {
+    protected HttpResponse executeCall(Request request) throws IOException {
+        return executeCallImpl(request);
+    }
+
+    protected HttpResponse executeCallImpl(Request request) throws IOException {
         logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
+
         try (Response response = client.newCall(request).execute()) {
             ResponseBody body = response.body();
             return new HttpResponse(body != null ? body.string() : null, response.code(), response.isSuccessful());
         }
     }
 
-    private void verifyToken() throws IOException {
-        if (!this.tokenResponse.isSuccessful()) {
+    void verifyToken(TokenResponse tokenResponse) throws IOException {
+        if (!tokenResponse.isSuccessful()) {
             String error = String.format("Authentication failed with: %s", Utils.getErrorMessage(tokenResponse));
             throw new IOException(error);
         }
