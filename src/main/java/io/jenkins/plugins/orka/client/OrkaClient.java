@@ -40,6 +40,7 @@ public class OrkaClient implements AutoCloseable {
     private static final String DELETE_PATH = "/delete";
     private static final String CONFIG_PATH = "/configs";
 
+    private String email;
     private String endpoint;
     private TokenResponse tokenResponse;
     private OkHttpClient client;
@@ -58,9 +59,16 @@ public class OrkaClient implements AutoCloseable {
             throws IOException {
         this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
         this.endpoint = endpoint;
-        this.tokenResponse = this.getToken(email, password);
+        this.email = email;
+        this.initToken(email, password);
+    }
 
-        this.verifyToken();
+    protected String getEmail() {
+        return this.email;
+    }
+
+    protected TokenResponse getToken() {
+        return this.tokenResponse;
     }
 
     public VMResponse getVMs() throws IOException {
@@ -167,6 +175,11 @@ public class OrkaClient implements AutoCloseable {
         this.delete(this.endpoint + TOKEN_PATH, "");
     }
 
+    protected void initToken(String email, String password) throws IOException {
+        this.tokenResponse = this.getToken(email, password);
+        this.verifyToken(this.tokenResponse);
+    }
+
     @VisibleForTesting
     TokenResponse getToken(String email, String password) throws IOException {
         TokenRequest tokenRequest = new TokenRequest(email, password);
@@ -202,8 +215,9 @@ public class OrkaClient implements AutoCloseable {
 
     private Builder getAuthenticatedBuilder(String url) throws IOException {
         Request.Builder builder = new Request.Builder().url(url);
-        if (this.tokenResponse != null) {
-            builder.addHeader("Authorization", "Bearer " + this.tokenResponse.getToken());
+        TokenResponse tokenResponse = this.getToken();
+        if (tokenResponse != null) {
+            builder.addHeader("Authorization", "Bearer " + tokenResponse.getToken());
         }
 
         return builder;
@@ -217,8 +231,8 @@ public class OrkaClient implements AutoCloseable {
         }
     }
 
-    private void verifyToken() throws IOException {
-        if (!this.tokenResponse.isSuccessful()) {
+    void verifyToken(TokenResponse tokenResponse) throws IOException {
+        if (!tokenResponse.isSuccessful()) {
             String error = String.format("Authentication failed with: %s", Utils.getErrorMessage(tokenResponse));
             throw new IOException(error);
         }
