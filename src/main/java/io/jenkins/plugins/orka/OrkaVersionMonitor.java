@@ -33,6 +33,7 @@ public class OrkaVersionMonitor extends PeriodicWork {
                                     orka.getUseJenkinsProxySettings(), orka.getIgnoreSSLErrors())
                             .getHealthCheck();
 
+                    logger.fine("Server: " + orka.getEndpoint() + ". Version: " + healthCheck.getApiVersion());
                     OrkaClientProxyFactory.setServerVersion(orka.getEndpoint(), healthCheck.getApiVersion());
                 } catch (Exception e) {
                     logger.warning("Error while getting Orka version: " + e.getMessage());
