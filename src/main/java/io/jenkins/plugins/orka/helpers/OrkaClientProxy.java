@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.net.Proxy;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import jenkins.model.Jenkins;
+
+import org.apache.commons.lang.StringUtils;
 
 public class OrkaClientProxy {
     private static String firstVersionWithSingleToken = "2.1.1";

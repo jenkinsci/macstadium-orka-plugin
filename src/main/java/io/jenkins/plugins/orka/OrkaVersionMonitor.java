@@ -1,13 +1,14 @@
 package io.jenkins.plugins.orka;
 
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
 import hudson.Extension;
 import hudson.model.PeriodicWork;
 import hudson.slaves.Cloud;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
 import jenkins.model.Jenkins;
 
 @Extension
