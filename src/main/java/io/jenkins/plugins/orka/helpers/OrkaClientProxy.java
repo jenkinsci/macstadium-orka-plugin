@@ -8,7 +8,9 @@ import hudson.util.Secret;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeletionResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
+import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.client.OrkaClientV2;
 import io.jenkins.plugins.orka.client.OrkaNode;
 import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.client.OrkaVMConfig;
@@ -23,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import jenkins.model.Jenkins;
 
 public class OrkaClientProxy {
+    private static String firstVersionWithSingleToken = "2.1.1";
     private StandardUsernamePasswordCredentials credentials;
     private String endpoint;
     private int httpClientTimeout;
@@ -118,6 +121,12 @@ public class OrkaClientProxy {
         }
     }
 
+    public HealthCheckResponse getHealthCheck() throws IOException {
+        try (OrkaClient client = getOrkaClient()) {
+            return client.getHealthCheck();
+        }
+    }
+
     public TokenStatusResponse getTokenStatus() throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.getTokenStatus();
@@ -125,10 +134,16 @@ public class OrkaClientProxy {
     }
 
     private OrkaClient getOrkaClient() throws IOException {
-        if (StringUtils.isBlank(this.serverVersion)) {}
-        ComparableVersion version1_1 = new ComparableVersion("1.1");
+        if (StringUtils.isBlank(this.serverVersion)
+                || Utils.compareVersions(this.serverVersion, firstVersionWithSingleToken) < 0) {
 
-        return new OrkaClient(this.endpoint, this.credentials.getUsername(), Secret.toString(credentials.getPassword()),
+            return new OrkaClient(this.endpoint, this.credentials.getUsername(),
+                    Secret.toString(credentials.getPassword()),
+                    this.httpClientTimeout, this.proxy, this.ignoreSSLErrors);
+        }
+
+        return new OrkaClientV2(this.endpoint, this.credentials.getUsername(),
+                Secret.toString(credentials.getPassword()),
                 this.httpClientTimeout, this.proxy, this.ignoreSSLErrors);
     }
 

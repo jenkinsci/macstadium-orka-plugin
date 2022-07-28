@@ -179,7 +179,7 @@ public class OrkaClient implements AutoCloseable {
         return response;
     }
 
-    public HealthCheckResponse getHealthCheck(String vmName, String node) throws IOException {
+    public HealthCheckResponse getHealthCheck() throws IOException {
         HttpResponse httpResponse = this.get(this.endpoint + HEALTH_CHECK_PATH);
         HealthCheckResponse response = JsonHelper.fromJson(httpResponse.getBody(), HealthCheckResponse.class);
         response.setHttpResponse(httpResponse);

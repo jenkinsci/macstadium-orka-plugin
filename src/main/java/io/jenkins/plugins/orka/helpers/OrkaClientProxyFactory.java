@@ -2,12 +2,14 @@
 package io.jenkins.plugins.orka.helpers;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OrkaClientProxyFactory {
-    private static String serverVersion;
+    private static Map<String, String> endpointToVersion = new HashMap<String, String>();
 
-    public static void setServerVersion(String version) {
-        serverVersion = version;
+    public static void setServerVersion(String endpoint, String version) {
+        endpointToVersion.put(endpoint, version);
     }
 
     public OrkaClientProxy getOrkaClientProxy(String endpoint, String credentialsId, boolean useJenkinsProxySettings)
@@ -30,6 +32,6 @@ public class OrkaClientProxyFactory {
     public OrkaClientProxy getOrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors) throws IOException {
         return new OrkaClientProxy(endpoint, credentialsId, httpClientTimeout, useJenkinsProxySettings,
-                ignoreSSLErrors);
+                ignoreSSLErrors, endpointToVersion.get(endpoint));
     }
 }
