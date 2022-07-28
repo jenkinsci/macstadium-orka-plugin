@@ -29,9 +29,9 @@ public class OrkaClientTest {
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(tokenResponse);
-        when(client.getToken(anyString(), anyString())).thenCallRealMethod();
+        when(client.createToken(anyString(), anyString())).thenCallRealMethod();
 
-        String actualToken = client.getToken("email", "password").getToken();
+        String actualToken = client.createToken("email", "password").getToken();
 
         assertEquals(token, actualToken);
     }

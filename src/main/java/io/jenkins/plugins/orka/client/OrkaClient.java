@@ -24,7 +24,7 @@ import okhttp3.ResponseBody;
 
 public class OrkaClient implements AutoCloseable {
 
-    private static final int defaultHttpClientTimeout = 600;
+    protected static final int defaultHttpClientTimeout = 600;
     private static final OkHttpClient clientBase = new OkHttpClient();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 
@@ -176,12 +176,12 @@ public class OrkaClient implements AutoCloseable {
     }
 
     protected void initToken(String email, String password) throws IOException {
-        this.tokenResponse = this.getToken(email, password);
+        this.tokenResponse = this.createToken(email, password);
         this.verifyToken(this.tokenResponse);
     }
 
     @VisibleForTesting
-    TokenResponse getToken(String email, String password) throws IOException {
+    TokenResponse createToken(String email, String password) throws IOException {
         TokenRequest tokenRequest = new TokenRequest(email, password);
         String tokenRequestJson = new Gson().toJson(tokenRequest);
 

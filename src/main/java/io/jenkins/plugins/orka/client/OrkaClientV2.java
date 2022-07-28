@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OrkaClientV2 extends OrkaClient {
-
-    private static final int defaultHttpClientTimeout = 600;
-
     private static final Map<String, TokenResponse> tokens = new HashMap<String, TokenResponse>();
 
     public OrkaClientV2(String endpoint, String email, String password) throws IOException {
@@ -27,6 +24,10 @@ public class OrkaClientV2 extends OrkaClient {
     }
 
     @Override
+    public void close() throws IOException {
+    }
+
+    @Override
     protected TokenResponse getToken() {
         return tokens.get(this.getEmail());
     }
@@ -34,7 +35,7 @@ public class OrkaClientV2 extends OrkaClient {
     @Override
     protected void initToken(String email, String password) throws IOException {
         if (!tokens.containsKey(email)) {
-            TokenResponse tokenResponse = this.getToken(email, password);
+            TokenResponse tokenResponse = this.createToken(email, password);
             this.verifyToken(tokenResponse);
             tokens.put(email, tokenResponse);
         }
