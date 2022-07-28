@@ -35,21 +35,24 @@ public class Utils {
     }
 
     public static int compareVersions(String firstVersion, String secondVersion) {
-        int comparisonResult = 0;
+        String firstVersionWithoutPreview = firstVersion.split("-")[0].replace(".", "").replaceAll("0+$", "");
+        String secondVersionWithoutPreview = secondVersion.split("-")[0].replace(".", "").replaceAll("0+$", "");
 
-        String[] firstVersionSplits = firstVersion.split("\\.");
-        String[] secondVersionSplits = secondVersion.split("\\.");
-        int maxLengthOfVersionSplits = Math.max(firstVersionSplits.length, secondVersionSplits.length);
+        Integer v1 = Integer.parseInt(firstVersionWithoutPreview);
+        Integer v2 = Integer.parseInt(secondVersionWithoutPreview);
 
-        for (int i = 0; i < maxLengthOfVersionSplits; i++) {
-            Integer v1 = i < firstVersionSplits.length ? Integer.parseInt(firstVersionSplits[i]) : 0;
-            Integer v2 = i < secondVersionSplits.length ? Integer.parseInt(secondVersionSplits[i]) : 0;
-            int compare = v1.compareTo(v2);
-            if (compare != 0) {
-                comparisonResult = compare;
-                break;
+        if (v1 == v2) {
+            Boolean isFirstVersionPreview = firstVersion.contains("-");
+            Boolean isSecondVersionPreview = secondVersion.contains("-");
+
+            if (isFirstVersionPreview && isSecondVersionPreview || !isFirstVersionPreview && !isSecondVersionPreview) {
+                return 0;
+            } else if (isFirstVersionPreview) {
+                return -1;
+            } else if (isSecondVersionPreview) {
+                return 1;
             }
         }
-        return comparisonResult;
+        return v1.compareTo(v2);
     }
 }

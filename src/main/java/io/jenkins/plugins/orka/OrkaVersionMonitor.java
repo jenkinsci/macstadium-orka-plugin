@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import hudson.Extension;
 import hudson.model.PeriodicWork;
@@ -11,6 +12,7 @@ import jenkins.model.Jenkins;
 
 @Extension
 public class OrkaVersionMonitor extends PeriodicWork {
+    private static final Logger logger = Logger.getLogger(OrkaVersionMonitor.class.getName());
     OrkaClientProxyFactory clientFactory = new OrkaClientProxyFactory();
 
     @Override
@@ -32,7 +34,7 @@ public class OrkaVersionMonitor extends PeriodicWork {
 
                     OrkaClientProxyFactory.setServerVersion(orka.getEndpoint(), healthCheck.getApiVersion());
                 } catch (Exception e) {
-
+                    logger.warning("Error while getting Orka version: " + e.getMessage());
                 }
             }
         }
