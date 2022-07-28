@@ -39,6 +39,7 @@ public class OrkaClient implements AutoCloseable {
     private static final String DEPLOY_PATH = "/deploy";
     private static final String DELETE_PATH = "/delete";
     private static final String CONFIG_PATH = "/configs";
+    private static final String HEALTH_CHECK_PATH = "/health-check";
 
     private String email;
     private String endpoint;
@@ -61,6 +62,13 @@ public class OrkaClient implements AutoCloseable {
         this.endpoint = endpoint;
         this.email = email;
         this.initToken(email, password);
+    }
+
+    public OrkaClient(String endpoint, int httpClientTimeout, Proxy proxy,
+            boolean ignoreSSLErrors)
+            throws IOException {
+        this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
+        this.endpoint = endpoint;
     }
 
     protected String getEmail() {
@@ -171,8 +179,18 @@ public class OrkaClient implements AutoCloseable {
         return response;
     }
 
+    public HealthCheckResponse getHealthCheck(String vmName, String node) throws IOException {
+        HttpResponse httpResponse = this.get(this.endpoint + HEALTH_CHECK_PATH);
+        HealthCheckResponse response = JsonHelper.fromJson(httpResponse.getBody(), HealthCheckResponse.class);
+        response.setHttpResponse(httpResponse);
+
+        return response;
+    }
+
     public void close() throws IOException {
-        this.delete(this.endpoint + TOKEN_PATH, "");
+        if (this.getToken() != null) {
+            this.delete(this.endpoint + TOKEN_PATH, "");
+        }
     }
 
     protected void initToken(String email, String password) throws IOException {

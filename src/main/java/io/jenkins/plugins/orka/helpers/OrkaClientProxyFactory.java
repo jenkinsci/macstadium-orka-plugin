@@ -4,6 +4,12 @@ package io.jenkins.plugins.orka.helpers;
 import java.io.IOException;
 
 public class OrkaClientProxyFactory {
+    private static String serverVersion;
+
+    public static void setServerVersion(String version) {
+        serverVersion = version;
+    }
+
     public OrkaClientProxy getOrkaClientProxy(String endpoint, String credentialsId, boolean useJenkinsProxySettings)
             throws IOException {
         return this.getOrkaClientProxy(endpoint, credentialsId, useJenkinsProxySettings, false);

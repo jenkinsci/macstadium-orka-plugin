@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.net.Proxy;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import jenkins.model.Jenkins;
 
 public class OrkaClientProxy {
@@ -26,6 +28,7 @@ public class OrkaClientProxy {
     private int httpClientTimeout;
     private boolean ignoreSSLErrors;
     private Proxy proxy;
+    private String serverVersion;
 
     public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
             boolean useJenkinsProxySettings) {
@@ -34,11 +37,17 @@ public class OrkaClientProxy {
 
     public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
+        this(endpoint, credentialsId, httpClientTimeout, useJenkinsProxySettings, ignoreSSLErrors, null);
+    }
+
+    public OrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String serverVersion) {
         this.credentials = CredentialsHelper.lookupSystemCredentials(credentialsId);
         this.endpoint = endpoint;
         this.httpClientTimeout = httpClientTimeout;
         this.proxy = this.getProxy(useJenkinsProxySettings);
         this.ignoreSSLErrors = ignoreSSLErrors;
+        this.serverVersion = serverVersion;
     }
 
     public List<OrkaVM> getVMs() throws IOException {
@@ -116,6 +125,9 @@ public class OrkaClientProxy {
     }
 
     private OrkaClient getOrkaClient() throws IOException {
+        if (StringUtils.isBlank(this.serverVersion)) {}
+        ComparableVersion version1_1 = new ComparableVersion("1.1");
+
         return new OrkaClient(this.endpoint, this.credentials.getUsername(), Secret.toString(credentials.getPassword()),
                 this.httpClientTimeout, this.proxy, this.ignoreSSLErrors);
     }
