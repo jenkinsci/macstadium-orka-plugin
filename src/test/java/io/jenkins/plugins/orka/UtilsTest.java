@@ -15,7 +15,7 @@ public class UtilsTest {
         assertTrue(Utils.compareVersions("1.3.0", "1.3") == 0);
         assertTrue(Utils.compareVersions("2.1.0", "2.1.1") < 0);
         assertTrue(Utils.compareVersions("2.1.1-preview-1", "2.1.1") < 0);
-        assertTrue(Utils.compareVersions("2.1.1-preview-1", "2.1.1-preview-2") < 0);
+        assertTrue(Utils.compareVersions("2.1.1-preview-1", "2.1.1-preview-2") == 0);
         assertTrue(Utils.compareVersions("2.1.1", "2.0") > 0);
     }
 }

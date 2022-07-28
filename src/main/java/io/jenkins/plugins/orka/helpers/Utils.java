@@ -35,13 +35,18 @@ public class Utils {
     }
 
     public static int compareVersions(String firstVersion, String secondVersion) {
-        String firstVersionWithoutPreview = firstVersion.split("-")[0].replace(".", "").replaceAll("0+$", "");
-        String secondVersionWithoutPreview = secondVersion.split("-")[0].replace(".", "").replaceAll("0+$", "");
+        String firstVersionWithoutPreview = firstVersion.split("-")[0].replace(".", "");
+        String secondVersionWithoutPreview = secondVersion.split("-")[0].replace(".", "");
+
+        firstVersionWithoutPreview = firstVersionWithoutPreview.length() == 3 ? firstVersionWithoutPreview
+                : firstVersionWithoutPreview + "0";
+        secondVersionWithoutPreview = secondVersionWithoutPreview.length() == 3 ? secondVersionWithoutPreview
+                : secondVersionWithoutPreview + "0";
 
         Integer v1 = Integer.parseInt(firstVersionWithoutPreview);
         Integer v2 = Integer.parseInt(secondVersionWithoutPreview);
 
-        if (v1 == v2) {
+        if (v1.intValue() == v2.intValue()) {
             Boolean isFirstVersionPreview = firstVersion.contains("-");
             Boolean isSecondVersionPreview = secondVersion.contains("-");
 

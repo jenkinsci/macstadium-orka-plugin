@@ -75,7 +75,8 @@ public class OrkaClient implements AutoCloseable {
         return this.email;
     }
 
-    protected TokenResponse getToken() {
+    @VisibleForTesting
+    TokenResponse getToken() {
         return this.tokenResponse;
     }
 

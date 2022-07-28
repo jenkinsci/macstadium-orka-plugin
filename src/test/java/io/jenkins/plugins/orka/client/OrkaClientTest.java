@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -141,7 +142,7 @@ public class OrkaClientTest {
     @Test
     public void when_calling_close_should_call_delete() throws IOException {
         OrkaClient client = mock(OrkaClient.class);
-
+        doReturn(new TokenResponse("token", "message", null)).when(client).getToken();
         doCallRealMethod().when(client).close();
 
         client.close();
