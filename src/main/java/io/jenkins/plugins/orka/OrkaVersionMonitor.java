@@ -1,20 +1,26 @@
 package io.jenkins.plugins.orka;
 
 import hudson.Extension;
-import hudson.model.PeriodicWork;
+import hudson.model.AsyncPeriodicWork;
+import hudson.model.TaskListener;
 import hudson.slaves.Cloud;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
 @Extension
-public class OrkaVersionMonitor extends PeriodicWork {
+public class OrkaVersionMonitor extends AsyncPeriodicWork {
     private static final Logger logger = Logger.getLogger(OrkaVersionMonitor.class.getName());
     OrkaClientProxyFactory clientFactory = new OrkaClientProxyFactory();
+
+    public OrkaVersionMonitor() {
+        super("Orka version monitor");
+    }
 
     @Override
     public long getRecurrencePeriod() {
@@ -22,7 +28,9 @@ public class OrkaVersionMonitor extends PeriodicWork {
     }
 
     @Override
-    protected void doRun() throws Exception {
+    protected void execute(TaskListener listener) throws IOException, InterruptedException {
+        logger.fine("Running Orka version monitor");
+
         Jenkins jenkinsInstance = Jenkins.get();
         for (Cloud cloud : jenkinsInstance.clouds) {
             if ((cloud instanceof OrkaCloud)) {
@@ -41,5 +49,4 @@ public class OrkaVersionMonitor extends PeriodicWork {
             }
         }
     }
-
 }

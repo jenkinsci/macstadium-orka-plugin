@@ -28,6 +28,8 @@ public class OrkaClient implements AutoCloseable {
     private static final OkHttpClient clientBase = new OkHttpClient();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
 
+    protected static final String AUTHORIZATION_HEADER = "Authorization";
+    protected static final String BEARER = "Bearer ";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final String TOKEN_PATH = "/token";
     private static final String RESOURCE_PATH = "/resources";
@@ -41,7 +43,6 @@ public class OrkaClient implements AutoCloseable {
     private static final String CONFIG_PATH = "/configs";
     private static final String HEALTH_CHECK_PATH = "/health-check";
 
-    private String email;
     private String endpoint;
     private TokenResponse tokenResponse;
     private OkHttpClient client;
@@ -60,7 +61,6 @@ public class OrkaClient implements AutoCloseable {
             throws IOException {
         this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
         this.endpoint = endpoint;
-        this.email = email;
         this.initToken(email, password);
     }
 
@@ -69,10 +69,6 @@ public class OrkaClient implements AutoCloseable {
             throws IOException {
         this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
         this.endpoint = endpoint;
-    }
-
-    protected String getEmail() {
-        return this.email;
     }
 
     @VisibleForTesting
@@ -236,14 +232,19 @@ public class OrkaClient implements AutoCloseable {
         Request.Builder builder = new Request.Builder().url(url);
         TokenResponse tokenResponse = this.getToken();
         if (tokenResponse != null) {
-            builder.addHeader("Authorization", "Bearer " + tokenResponse.getToken());
+            builder.addHeader(AUTHORIZATION_HEADER, BEARER + tokenResponse.getToken());
         }
 
         return builder;
     }
 
-    private HttpResponse executeCall(Request request) throws IOException {
+    protected HttpResponse executeCall(Request request) throws IOException {
+        return executeCallImpl(request);
+    }
+
+    protected HttpResponse executeCallImpl(Request request) throws IOException {
         logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
+
         try (Response response = client.newCall(request).execute()) {
             ResponseBody body = response.body();
             return new HttpResponse(body != null ? body.string() : null, response.code(), response.isSuccessful());

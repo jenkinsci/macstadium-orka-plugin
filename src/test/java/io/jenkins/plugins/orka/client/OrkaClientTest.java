@@ -142,7 +142,7 @@ public class OrkaClientTest {
     @Test
     public void when_calling_close_should_call_delete() throws IOException {
         OrkaClient client = mock(OrkaClient.class);
-        doReturn(new TokenResponse("token", "message", null)).when(client).getToken();
+        doReturn(new initTokenImpl("token", "message", null)).when(client).getToken();
         doCallRealMethod().when(client).close();
 
         client.close();
