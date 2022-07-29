@@ -14,7 +14,6 @@ import io.jenkins.plugins.orka.client.OrkaClientV2;
 import io.jenkins.plugins.orka.client.OrkaNode;
 import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.client.OrkaVMConfig;
-import io.jenkins.plugins.orka.client.TokenStatusResponse;
 
 import java.io.IOException;
 import java.net.Proxy;
@@ -124,12 +123,6 @@ public class OrkaClientProxy {
     public HealthCheckResponse getHealthCheck() throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.getHealthCheck();
-        }
-    }
-
-    public TokenStatusResponse getTokenStatus() throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
-            return client.getTokenStatus();
         }
     }
 

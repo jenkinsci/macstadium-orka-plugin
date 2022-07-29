@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 
 import okhttp3.Request;
 
+import org.apache.commons.lang.StringUtils;
+
 public class OrkaClientV2 extends OrkaClient {
     private static final int HTTP_UNAUTHORIZED = 401;
     private static final Logger logger = Logger.getLogger(OrkaClientV2.class.getName());
@@ -28,7 +30,7 @@ public class OrkaClientV2 extends OrkaClient {
     public OrkaClientV2(String endpoint, String email, String password, int httpClientTimeout, Proxy proxy,
             boolean ignoreSSLErrors)
             throws IOException {
-        super(endpoint, email, password);
+        super(endpoint, email, password, httpClientTimeout, proxy, ignoreSSLErrors);
         this.email = email;
         this.password = password;
     }
@@ -38,17 +40,17 @@ public class OrkaClientV2 extends OrkaClient {
     }
 
     @Override
-    protected TokenResponse getToken() {
-        return tokens.get(this.email);
+    TokenResponse getToken() {
+        return tokens.containsKey(this.email) ? tokens.get(this.email) : null;
     }
 
-    private void setToken(TokenResponse token) {
-        tokens.put(this.email, token);
+    private void setToken(String email, TokenResponse token) {
+        tokens.put(email, token);
     }
 
     @Override
     protected void initToken(String email, String password) throws IOException {
-        if (!tokens.containsKey(email)) {
+        if (!tokens.containsKey(email) || tokens.get(email) == null) {
             this.initTokenImpl(email, password);
         }
     }
@@ -56,14 +58,16 @@ public class OrkaClientV2 extends OrkaClient {
     private void initTokenImpl(String email, String password) throws IOException {
         TokenResponse tokenResponse = this.createToken(email, password);
         this.verifyToken(tokenResponse);
-        this.setToken(tokenResponse);
+        this.setToken(email, tokenResponse);
     }
 
     @Override
     protected HttpResponse executeCall(Request request) throws IOException {
         HttpResponse response = executeCallImpl(request);
 
-        if (response.getCode() == HTTP_UNAUTHORIZED) {
+        String requestPath = request.url().url().getPath();
+        if (response.getCode() == HTTP_UNAUTHORIZED && requestPath != TOKEN_PATH
+                && StringUtils.isNotBlank(response.getBody()) && response.getBody().contains("revoked")) {
             logger.fine("Token was revoked. Create new token...");
 
             this.initTokenImpl(this.email, this.password);

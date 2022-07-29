@@ -31,7 +31,7 @@ public class OrkaClient implements AutoCloseable {
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String BEARER = "Bearer ";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private static final String TOKEN_PATH = "/token";
+    protected static final String TOKEN_PATH = "/token";
     private static final String RESOURCE_PATH = "/resources";
     private static final String VM_PATH = RESOURCE_PATH + "/vm";
     private static final String NODE_PATH = RESOURCE_PATH + "/node";
@@ -163,14 +163,6 @@ public class OrkaClient implements AutoCloseable {
 
         HttpResponse httpResponse = this.delete(this.endpoint + VM_PATH + DELETE_PATH, deletionRequestJson);
         DeletionResponse response = JsonHelper.fromJson(httpResponse.getBody(), DeletionResponse.class);
-        response.setHttpResponse(httpResponse);
-
-        return response;
-    }
-
-    public TokenStatusResponse getTokenStatus() throws IOException {
-        HttpResponse httpResponse = this.get(this.endpoint + TOKEN_PATH);
-        TokenStatusResponse response = JsonHelper.fromJson(httpResponse.getBody(), TokenStatusResponse.class);
         response.setHttpResponse(httpResponse);
 
         return response;
