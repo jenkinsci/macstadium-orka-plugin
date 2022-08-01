@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.FormValidation;
+import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.client.OrkaNode;
 import io.jenkins.plugins.orka.client.TokenStatusResponse;
 
@@ -116,11 +117,11 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            TokenStatusResponse response = new OrkaClientProxyFactory()
+            HealthCheckResponse response = new OrkaClientProxyFactory()
                     .getOrkaClientProxy(endpoint, credentialsId, useJenkinsProxySettings,
                             ignoreSSLErrors)
-                    .getTokenStatus();
-            if (!response.isSuccessful() || !response.getIsValid()) {
+                    .getHealthCheck();
+            if (!response.isSuccessful()) {
                 return failedConnection(Utils.getErrorMessage(response));
             }
         } catch (IOException e) {

@@ -6,7 +6,6 @@ import io.jenkins.plugins.orka.client.ResponseBase;
 
 import java.util.Date;
 
-
 public class Utils {
     public static String getTimestamp() {
         return String.format("[%1$tD %1$tT]", new Date());
@@ -28,10 +27,37 @@ public class Utils {
             if (idleMinutesValue <= 0) {
                 return FormValidation.error("Idle timeout must be a positive number.");
             }
-            
+
             return FormValidation.ok();
         } catch (NumberFormatException e) {
             return FormValidation.error("Idle timeout must be a positive number.");
         }
+    }
+
+    public static int compareVersions(String firstVersion, String secondVersion) {
+        String firstVersionWithoutPreview = firstVersion.split("-")[0].replace(".", "");
+        String secondVersionWithoutPreview = secondVersion.split("-")[0].replace(".", "");
+
+        firstVersionWithoutPreview = firstVersionWithoutPreview.length() == 3 ? firstVersionWithoutPreview
+                : firstVersionWithoutPreview + "0";
+        secondVersionWithoutPreview = secondVersionWithoutPreview.length() == 3 ? secondVersionWithoutPreview
+                : secondVersionWithoutPreview + "0";
+
+        Integer v1 = Integer.parseInt(firstVersionWithoutPreview);
+        Integer v2 = Integer.parseInt(secondVersionWithoutPreview);
+
+        if (v1.intValue() == v2.intValue()) {
+            Boolean isFirstVersionPreview = firstVersion.contains("-");
+            Boolean isSecondVersionPreview = secondVersion.contains("-");
+
+            if (isFirstVersionPreview && isSecondVersionPreview || !isFirstVersionPreview && !isSecondVersionPreview) {
+                return 0;
+            } else if (isFirstVersionPreview) {
+                return -1;
+            } else if (isSecondVersionPreview) {
+                return 1;
+            }
+        }
+        return v1.compareTo(v2);
     }
 }
