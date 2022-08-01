@@ -72,7 +72,7 @@ public class SSHUtil {
                         throw e;
                     }
                 }
-                Thread.sleep(fiveSecondTimeout);
+                Thread.sleep(timeout);
             }
             logger.log(Level.FINE, "Connected via SSH for host " + host + " on port " + sshPort);
             if (SSHAuthenticator.newInstance(connection, credentials).authenticate(TaskListener.NULL)) {
