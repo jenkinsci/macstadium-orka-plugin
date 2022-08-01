@@ -54,6 +54,7 @@ public class OrkaCloud extends Cloud {
     private int httpTimeout;
     private boolean useJenkinsProxySettings;
     private boolean ignoreSSLErrors;
+    private boolean noDelayProvisioning;
 
     private List<? extends AddressMapper> mappings;
     private final List<? extends AgentTemplate> templates;
@@ -73,9 +74,16 @@ public class OrkaCloud extends Cloud {
                 useJenkinsProxySettings, ignoreSSLErrors, mappings, templates);
     }
 
-    @DataBoundConstructor
     public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
             int httpTimeout, boolean useJenkinsProxySettings, boolean ignoreSSLErrors,
+            List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
+        this(name, credentialsId, endpoint, instanceCapSetting, timeout, defaultHttpTimeout,
+                useJenkinsProxySettings, ignoreSSLErrors, false, mappings, templates);
+    }
+
+    @DataBoundConstructor
+    public OrkaCloud(String name, String credentialsId, String endpoint, String instanceCapSetting, int timeout,
+            int httpTimeout, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, boolean noDelayProvisioning,
             List<? extends AddressMapper> mappings, List<? extends AgentTemplate> templates) {
         super(name);
 
@@ -86,6 +94,7 @@ public class OrkaCloud extends Cloud {
         this.httpTimeout = httpTimeout;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
         this.ignoreSSLErrors = ignoreSSLErrors;
+        this.noDelayProvisioning = noDelayProvisioning;
 
         this.mappings = mappings;
         this.templates = templates == null ? Collections.emptyList() : templates;
@@ -145,6 +154,10 @@ public class OrkaCloud extends Cloud {
 
     public List<? extends AgentTemplate> getTemplates() {
         return this.templates;
+    }
+
+    public boolean getNoDelayProvisioning() {
+        return this.noDelayProvisioning;
     }
 
     @Override
