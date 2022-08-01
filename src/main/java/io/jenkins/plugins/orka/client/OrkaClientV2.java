@@ -66,8 +66,7 @@ public class OrkaClientV2 extends OrkaClient {
         HttpResponse response = executeCallImpl(request);
 
         String requestPath = request.url().url().getPath();
-        if (response.getCode() == HTTP_UNAUTHORIZED && requestPath != TOKEN_PATH
-                && StringUtils.isNotBlank(response.getBody()) && response.getBody().contains("revoked")) {
+        if (response.getCode() == HTTP_UNAUTHORIZED && requestPath != TOKEN_PATH) {
             logger.fine("Token was revoked. Create new token...");
 
             this.initTokenImpl(this.email, this.password);
