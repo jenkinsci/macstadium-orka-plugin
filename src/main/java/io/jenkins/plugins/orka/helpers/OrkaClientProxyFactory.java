@@ -20,7 +20,7 @@ public class OrkaClientProxyFactory {
     public OrkaClientProxy getOrkaClientProxy(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors)
             throws IOException {
-        return new OrkaClientProxy(endpoint, credentialsId, 0, useJenkinsProxySettings, ignoreSSLErrors);
+        return this.getOrkaClientProxy(endpoint, credentialsId, 0, useJenkinsProxySettings, ignoreSSLErrors);
     }
 
     public OrkaClientProxy getOrkaClientProxy(String endpoint, String credentialsId, int httpClientTimeout,
