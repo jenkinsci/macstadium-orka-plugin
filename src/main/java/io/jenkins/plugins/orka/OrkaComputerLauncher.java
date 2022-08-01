@@ -97,7 +97,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         Jenkins.get().updateNode(slaveComputer.getNode());
 
         listener.getLogger().println("Waiting for VM to boot");
-        this.waitForVM(this.host, this.port);
+        SSHUtil.waitForSSH(this.host, this.port);
 
         this.launcher.launch(slaveComputer, listener);
     }
@@ -114,12 +114,6 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         if (launcher != null) {
             this.launcher.beforeDisconnect(computer, listener);
         }
-    }
-
-    private void waitForVM(String host, int sshPort) throws InterruptedException, IOException {
-        int retries = 12;
-        int secondsBetweenRetries = 15;
-        SSHUtil.waitForSSH(host, sshPort, retries, secondsBetweenRetries);
     }
 
     private boolean vmExists() {
