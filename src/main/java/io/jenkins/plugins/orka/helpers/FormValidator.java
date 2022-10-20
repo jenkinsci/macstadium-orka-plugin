@@ -99,7 +99,7 @@ public class FormValidator {
             if (StringUtils.isBlank(memory) || StringUtils.equals(memory, "auto")) {
                 return FormValidation.ok();
             }
-            if (Float.parseFloat(memory) < 0) {
+            if (Float.parseFloat(memory) <= 0) {
                 return FormValidation.error("Memory should be greater than 0");
             }
             return FormValidation.ok();
