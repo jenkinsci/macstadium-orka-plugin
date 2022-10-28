@@ -95,7 +95,6 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 scheduler, "auto");
     }
 
-    @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
