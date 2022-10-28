@@ -36,6 +36,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String configName;
     private String baseImage;
     private int numCPUs;
+    private boolean useNetBoost;
     private String memory;
     private String jvmOptions;
 
@@ -70,10 +71,20 @@ public class OrkaAgent extends AbstractCloudSlave {
                 useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, "auto");
     }
 
-    @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
             int numCPUs, int numExecutors, String host, int port, String remoteFS,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, String memory)
+            throws Descriptor.FormException, IOException {
+        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
+                configName, baseImage, numCPUs, false, numExecutors, host, port, remoteFS,
+                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, "auto");
+    }
+
+    @DataBoundConstructor
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
+            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
+            int numCPUs, boolean useNetBoost, int numExecutors, String host, int port, String remoteFS,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, String memory)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
@@ -87,6 +98,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.configName = configName;
         this.baseImage = baseImage;
         this.numCPUs = numCPUs;
+        this.useNetBoost = useNetBoost;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
         this.ignoreSSLErrors = ignoreSSLErrors;
         this.jvmOptions = jvmOptions;
@@ -137,6 +149,10 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     public int getNumCPUs() {
         return this.numCPUs;
+    }
+
+    public boolean getUseNetBoost() {
+        return this.useNetBoost;
     }
 
     public String getMemory() {

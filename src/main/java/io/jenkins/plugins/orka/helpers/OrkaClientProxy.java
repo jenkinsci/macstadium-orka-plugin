@@ -88,9 +88,16 @@ public class OrkaClientProxy {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler, String memory) throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, memory);
+    }
 
+    public ConfigurationResponse createConfiguration(
+        String vmName, String image, String baseImage, String configTemplate, int cpuCount, boolean useNetBoost,
+        String scheduler, String memory) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
-            return client.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler, memory);
+            return client.createConfiguration(
+                vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory
+            );
         }
     }
 

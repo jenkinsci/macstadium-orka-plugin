@@ -50,6 +50,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String configName;
     private String baseImage;
     private int numCPUs;
+    private boolean useNetBoost;
     private String memory;
     private int numExecutors;
     private Mode mode;
@@ -92,7 +93,6 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
                 mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, jvmOptions,
                 scheduler, "auto");
-
     }
 
     @DataBoundConstructor
@@ -100,12 +100,24 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, false, numExecutors, remoteFS,
+                mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, jvmOptions,
+                scheduler, memory);
+    }
+
+    @DataBoundConstructor
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, String remoteFS, Mode mode,
+            String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
+            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions, String scheduler, String memory) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
         this.configName = configName;
         this.baseImage = baseImage;
         this.numCPUs = numCPUs;
+        this.useNetBoost = useNetBoost;
         this.numExecutors = numExecutors;
         this.remoteFS = remoteFS;
         this.mode = mode;
@@ -149,6 +161,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public int getNumCPUs() {
         return this.numCPUs;
+    }
+
+    public boolean getUseNetBoost() {
+        return this.useNetBoost;
     }
 
     public String getMemory() {

@@ -52,6 +52,12 @@
         <c:select />
       </f:entry>
 
+      <f:entry title="${%Use Net Boost}" field="useNetBoost" description="If checked, use Net Boost. This leads to
+        better network throughput and is required for booting Ventura images. The option might need to be disabled on
+        older VM images." >
+        <f:checkbox default="true" />
+      </f:entry>
+
       <f:entry title="${%Memory in G}" field="memory" help="${descriptor.getHelpFile('memory')}">
         <f:textbox checkMethod="post" default="auto"/>
       </f:entry>

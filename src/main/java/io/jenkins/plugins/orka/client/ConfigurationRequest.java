@@ -28,6 +28,10 @@ public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private int cpuCount;
 
+    @SerializedName("net_boost")
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private boolean useNetBoost;
+
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String scheduler;
 
@@ -45,11 +49,17 @@ public class ConfigurationRequest {
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             String scheduler, String memory) {
+        this(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, memory);
+    }
+
+    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
+            boolean useNetBoost, String scheduler, String memory) {
         this.vmName = vmName;
         this.image = image;
         this.baseImage = baseImage;
         this.configTemplate = configTemplate;
         this.cpuCount = cpuCount;
+        this.useNetBoost = useNetBoost;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
         if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Integer.parseInt(memory) > 0) {
             this.memory = Integer.parseInt(memory);
