@@ -52,9 +52,8 @@
         <c:select />
       </f:entry>
 
-      <f:entry title="${%Use Net Boost}" field="useNetBoost" description="If checked, use Net Boost. This leads to
-        better network throughput and is required for booting Ventura images. The option might need to be disabled on
-        older VM images." >
+      <f:entry title="${%Use Net Boost}" field="useNetBoost" description="If checked, use Net Boost. This option is
+        required for booting macOS Ventura images. It must be disabled for Mojave and Catalina, as they don't support it.">
         <f:checkbox default="true" />
       </f:entry>
 
