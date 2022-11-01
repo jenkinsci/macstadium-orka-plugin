@@ -59,9 +59,17 @@ public class OrkaClient implements AutoCloseable {
     public OrkaClient(String endpoint, String email, String password, int httpClientTimeout, Proxy proxy,
             boolean ignoreSSLErrors)
             throws IOException {
+        this(endpoint, email, password, httpClientTimeout, proxy, ignoreSSLErrors, true);
+    }
+
+    public OrkaClient(String endpoint, String email, String password, int httpClientTimeout, Proxy proxy,
+            boolean ignoreSSLErrors, boolean initToken)
+            throws IOException {
         this.client = this.createClient(proxy, httpClientTimeout, ignoreSSLErrors);
         this.endpoint = endpoint;
-        this.initToken(email, password);
+        if (initToken) {
+            this.initToken(email, password);
+        }
     }
 
     public OrkaClient(String endpoint, int httpClientTimeout, Proxy proxy,

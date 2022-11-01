@@ -121,18 +121,22 @@ public class OrkaClientProxy {
     }
 
     public HealthCheckResponse getHealthCheck() throws IOException {
-        try (OrkaClient client = getOrkaClient()) {
+        try (OrkaClient client = getOrkaClient(false)) {
             return client.getHealthCheck();
         }
     }
 
     private OrkaClient getOrkaClient() throws IOException {
+        return getOrkaClient(true);
+    }
+
+    private OrkaClient getOrkaClient(boolean initToken) throws IOException {
         if (StringUtils.isBlank(this.serverVersion)
                 || Utils.compareVersions(this.serverVersion, firstVersionWithSingleToken) < 0) {
 
             return new OrkaClient(this.endpoint, this.credentials.getUsername(),
                     Secret.toString(credentials.getPassword()),
-                    this.httpClientTimeout, this.proxy, this.ignoreSSLErrors);
+                    this.httpClientTimeout, this.proxy, this.ignoreSSLErrors, initToken);
         }
 
         return new OrkaClientV2(this.endpoint, this.credentials.getUsername(),
