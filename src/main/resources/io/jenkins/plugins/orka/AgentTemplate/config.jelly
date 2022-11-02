@@ -29,6 +29,16 @@
         </f:entry>
       </f:optionalBlock>
 
+      <f:optionalBlock title="${%Overwrite Tag}" field="overwriteTag" inline="true">
+        <f:entry title="${%Tag}" field="tag" help="${descriptor.getHelpFile('tag')}">
+          <f:textbox/>
+        </f:entry>
+
+        <f:entry title="${%Tag Required}" field="tagRequired" help="${descriptor.getHelpFile('tagRequired')}">
+          <f:checkbox/>
+        </f:entry>
+      </f:optionalBlock>
+
       <f:entry title="${%Scheduler}" field="scheduler">
         <c:select />
       </f:entry>

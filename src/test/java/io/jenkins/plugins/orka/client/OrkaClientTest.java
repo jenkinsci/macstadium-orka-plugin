@@ -99,12 +99,12 @@ public class OrkaClientTest {
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
         when(client.createConfiguration(anyString(), anyString(), anyString(), anyString(), anyInt(), anyBoolean(),
-                anyString(), anyString()))
+                anyString(), anyString(), anyString(), anyBoolean()))
                 .thenCallRealMethod();
 
         ConfigurationResponse actualResponse = client.createConfiguration(
             "newVm", "image", "baseImage", "default", 24,
-            false, "most-allocated", "10");
+            false, "most-allocated", "10", "testTag", true);
 
         assertEquals(message, actualResponse.getMessage());
     }
@@ -118,9 +118,9 @@ public class OrkaClientTest {
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
-        when(client.deployVM(anyString(), anyString(), any())).thenCallRealMethod();
+        when(client.deployVM(anyString(), anyString(), any(), any(), any())).thenCallRealMethod();
 
-        DeploymentResponse actualResponse = client.deployVM("newVm", "macpro-2", null);
+        DeploymentResponse actualResponse = client.deployVM("newVm", "macpro-2", null, null, null);
 
         assertEquals(ip, actualResponse.getHost());
         assertEquals(sshPort, actualResponse.getSSHPort());

@@ -52,6 +52,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private int numCPUs;
     private boolean useNetBoost;
     private String memory;
+    private boolean overwriteTag;
+    private String tag;
+    private Boolean tagRequired;
     private int numExecutors;
     private Mode mode;
     private String remoteFS;
@@ -104,12 +107,23 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 scheduler, memory);
     }
 
-    @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, String remoteFS, Mode mode,
             String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, numExecutors,
+                remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties,
+                jvmOptions, scheduler, memory, false, null, null);
+    }
+
+    @DataBoundConstructor
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, String remoteFS, Mode mode,
+            String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
+            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
+            Boolean tagRequired) {
         this.vmCredentialsId = vmCredentialsId;
         this.vm = vm;
         this.createNewVMConfig = createNewVMConfig;
@@ -128,6 +142,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.jvmOptions = jvmOptions;
         this.scheduler = scheduler;
         this.memory = memory;
+        this.overwriteTag = overwriteTag;
+        this.tag = this.overwriteTag ? tag : null;
+        this.tagRequired = this.overwriteTag ? tagRequired : null;
     }
 
     public String getOrkaCredentialsId() {
@@ -168,6 +185,18 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public String getMemory() {
         return this.memory;
+    }
+
+    public boolean getOverwriteTag() {
+        return this.overwriteTag;
+    }
+
+    public String getTag() {
+        return this.tag;
+    }
+
+    public Boolean getTagRequired() {
+        return this.tagRequired;
     }
 
     public String getLabelString() {
@@ -228,7 +257,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         String vmName = this.createNewVMConfig ? this.configName : this.vm;
 
         logger.fine("Deploying VM with name " + vmName);
-        DeploymentResponse response = this.parent.deployVM(vmName, this.getScheduler());
+        DeploymentResponse response = this.parent.deployVM(vmName, this.getScheduler(), this.getTag(),
+            this.getTagRequired());
+
         try {
             logger.fine("Result deploying VM " + vmName + ":");
             logger.fine(response.toString());
@@ -261,7 +292,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
                 return parent.createConfiguration(this.configName, this.configName, this.baseImage,
-                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.scheduler, this.memory);
+                    Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.scheduler, this.memory,
+                    this.tag, this.tagRequired);
             }
         }
         return null;
@@ -375,9 +407,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return "AgentTemplate [baseImage=" + baseImage + ", configName=" + configName + ", createNewVMConfig="
                 + createNewVMConfig + ", idleTerminationMinutes=" + idleTerminationMinutes + ", labelString="
                 + labelString + ", namePrefix=" + namePrefix + ", mode=" + mode + ", nodeProperties="
-                + nodeProperties + ", numCPUs=" + numCPUs + ", memory=" + memory + ", numExecutors=" + numExecutors
-                + ", parent=" + parent + ", remoteFS=" + remoteFS + ", retentionStrategy=" + retentionStrategy
-                + ", verificationStrategy=" + verificationStrategy + ", vm=" + vm + ", vmCredentialsId="
-                + vmCredentialsId + " scheduler=" + scheduler + "]";
+                + nodeProperties + ", numCPUs=" + numCPUs + ", memory=" + memory + ", overwriteTag="
+                + overwriteTag + ", tag=" + tag + ", tagRequired=" + tagRequired + ", numExecutors="
+                + numExecutors + ", parent=" + parent + ", remoteFS=" + remoteFS + ", retentionStrategy="
+                + retentionStrategy + ", verificationStrategy=" + verificationStrategy + ", vm=" + vm
+                + ", vmCredentialsId=" + vmCredentialsId + " scheduler=" + scheduler + "]";
     }
 }

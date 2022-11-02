@@ -201,10 +201,18 @@ public class OrkaCloud extends Cloud {
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount, boolean useNetBoost, String scheduler, String memory) throws IOException {
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler,
+            memory, null, null);
+    }
+
+    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
+            int cpuCount, boolean useNetBoost, String scheduler, String memory, String tag,
+            Boolean tagRequired) throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory);
+                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory,
+                        tag, tagRequired);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {
@@ -212,10 +220,15 @@ public class OrkaCloud extends Cloud {
     }
 
     public DeploymentResponse deployVM(String name, String scheduler) throws IOException {
+        return this.deployVM(name, scheduler, null, null);
+    }
+
+    public DeploymentResponse deployVM(String name, String scheduler, String tag,
+        Boolean tagRequired) throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .deployVM(name, null, scheduler);
+                .deployVM(name, null, scheduler, tag, tagRequired);
     }
 
     public void deleteVM(String name) throws IOException {

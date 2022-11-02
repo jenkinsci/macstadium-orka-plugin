@@ -124,20 +124,28 @@ public class OrkaClient implements AutoCloseable {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler) throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler, "auto");
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler,
+            "auto");
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler, String memory) throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, "auto");
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, memory);
+    }
+
+    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, String memory)
+            throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler,
+            memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(
         String vmName, String image, String baseImage, String configTemplate, int cpuCount, boolean useNetBoost,
-        String scheduler, String memory) throws IOException {
+        String scheduler, String memory, String tag, Boolean tagRequired) throws IOException {
 
         ConfigurationRequest configRequest = new ConfigurationRequest(vmName, image, baseImage, configTemplate,
-                cpuCount, useNetBoost, scheduler, memory);
+                cpuCount, useNetBoost, scheduler, memory, tag, tagRequired);
 
         String configRequestJson = new Gson().toJson(configRequest);
 
@@ -157,7 +165,12 @@ public class OrkaClient implements AutoCloseable {
     }
 
     public DeploymentResponse deployVM(String vmName, String node, String scheduler) throws IOException {
-        DeploymentRequest deploymentRequest = new DeploymentRequest(vmName, node, scheduler);
+        return this.deployVM(vmName, node, scheduler, null, null);
+    }
+
+    public DeploymentResponse deployVM(String vmName, String node, String scheduler,
+        String tag, Boolean tagRequired) throws IOException {
+        DeploymentRequest deploymentRequest = new DeploymentRequest(vmName, node, scheduler, tag, tagRequired);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(this.endpoint + VM_PATH + DEPLOY_PATH, deploymentRequestJson);
