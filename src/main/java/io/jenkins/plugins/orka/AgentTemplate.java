@@ -261,7 +261,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
                 return parent.createConfiguration(this.configName, this.configName, this.baseImage,
-                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.scheduler, this.memory);
+                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.scheduler, this.memory);
             }
         }
         return null;
