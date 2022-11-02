@@ -19,6 +19,11 @@
           <c:select />
         </f:entry>
 
+        <f:entry title="${%Use Net Boost}" field="useNetBoost" description="If checked, use Net Boost. This option is
+          required for booting macOS Ventura images. It must be disabled for Mojave and Catalina, as they don't support it.">
+          <f:checkbox default="true" />
+        </f:entry>
+
         <f:entry title="${%Memory in G}" field="memory" help="${descriptor.getHelpFile('memory')}">
           <f:textbox checkMethod="post" default="auto"/>
         </f:entry>

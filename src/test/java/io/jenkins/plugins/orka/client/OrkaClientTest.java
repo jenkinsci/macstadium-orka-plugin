@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka.client;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.endsWith;
@@ -97,12 +98,13 @@ public class OrkaClientTest {
 
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
-        when(client.createConfiguration(anyString(), anyString(), anyString(), anyString(), anyInt(), anyString(),
-                anyString()))
+        when(client.createConfiguration(anyString(), anyString(), anyString(), anyString(), anyInt(), anyBoolean(),
+                anyString(), anyString()))
                 .thenCallRealMethod();
 
-        ConfigurationResponse actualResponse = client.createConfiguration("newVm", "image", "baseImage", "default", 24,
-                "most-allocated", "10");
+        ConfigurationResponse actualResponse = client.createConfiguration(
+            "newVm", "image", "baseImage", "default", 24,
+            false, "most-allocated", "10");
 
         assertEquals(message, actualResponse.getMessage());
     }
