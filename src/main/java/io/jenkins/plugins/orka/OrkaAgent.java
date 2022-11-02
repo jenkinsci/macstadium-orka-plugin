@@ -38,6 +38,9 @@ public class OrkaAgent extends AbstractCloudSlave {
     private int numCPUs;
     private boolean useNetBoost;
     private String memory;
+    private boolean overwriteTag;
+    private String tag;
+    private Boolean tagRequired;
     private String jvmOptions;
 
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
@@ -78,14 +81,25 @@ public class OrkaAgent extends AbstractCloudSlave {
             throws Descriptor.FormException, IOException {
         this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
                 configName, baseImage, numCPUs, false, numExecutors, host, port, remoteFS,
-                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, "auto");
+                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, memory);
+    }
+
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
+            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
+            int numCPUs, boolean useNetBoost, int numExecutors, String host, int port, String remoteFS,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, String memory)
+            throws Descriptor.FormException, IOException {
+        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
+                configName, baseImage, numCPUs, useNetBoost, numExecutors, host, port, remoteFS,
+                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, memory, false, null, null);
     }
 
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
             int numCPUs, boolean useNetBoost, int numExecutors, String host, int port, String remoteFS,
-            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, String memory)
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, String memory,
+            boolean overwriteTag, String tag, Boolean tagRequired)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
@@ -103,7 +117,9 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.ignoreSSLErrors = ignoreSSLErrors;
         this.jvmOptions = jvmOptions;
         this.memory = memory;
-
+        this.overwriteTag = overwriteTag;
+        this.tag = this.overwriteTag ? tag : null;
+        this.tagRequired = this.overwriteTag ? tagRequired : null;
         this.setNumExecutors(numExecutors);
     }
 
@@ -157,6 +173,18 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     public String getMemory() {
         return this.memory;
+    }
+
+    public boolean getOverwriteTag() {
+        return this.overwriteTag;
+    }
+
+    public String getTag() {
+        return this.tag;
+    }
+
+    public Boolean getTagRequired() {
+        return this.tagRequired;
     }
 
     public String getJvmOptions() {

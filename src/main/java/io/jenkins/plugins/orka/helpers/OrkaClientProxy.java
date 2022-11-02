@@ -91,12 +91,19 @@ public class OrkaClientProxy {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, memory);
     }
 
+    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, String memory)
+            throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, memory,
+                null, null);
+    }
+
     public ConfigurationResponse createConfiguration(
         String vmName, String image, String baseImage, String configTemplate, int cpuCount, boolean useNetBoost,
-        String scheduler, String memory) throws IOException {
+        String scheduler, String memory, String tag, Boolean tagRequired) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.createConfiguration(
-                vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory
+                vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory, tag, tagRequired
             );
         }
     }
@@ -109,9 +116,15 @@ public class OrkaClientProxy {
         return this.deployVM(vmName, node, null);
     }
 
-    public DeploymentResponse deployVM(String vmName, String node, String scheduler) throws IOException {
+    public DeploymentResponse deployVM(String vmName, String node,
+        String scheduler) throws IOException {
+        return this.deployVM(vmName, node, scheduler, null, null);
+    }
+
+    public DeploymentResponse deployVM(String vmName, String node, String scheduler,
+        String tag, Boolean tagRequired) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
-            return client.deployVM(vmName, node, scheduler);
+            return client.deployVM(vmName, node, scheduler, tag, tagRequired);
         }
     }
 

@@ -63,6 +63,16 @@
 
     </f:optionalBlock>
 
+    <f:optionalBlock title="${%Overwrite Tag}" field="overwriteTag" inline="true">
+      <f:entry title="${%Tag}" field="tag" help="${descriptor.getHelpFile('tag')}">
+        <f:textbox/>
+      </f:entry>
+
+      <f:entry title="${%Tag Required}" field="tagRequired" help="${descriptor.getHelpFile('tagRequired')}">
+        <f:checkbox/>
+      </f:entry>
+    </f:optionalBlock>
+
     <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
       <c:select />
     </f:entry>
