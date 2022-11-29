@@ -36,7 +36,7 @@ public class ConfigurationRequest {
     private String scheduler;
 
     @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private int memory;
+    private float memory;
 
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String tag;
@@ -73,8 +73,8 @@ public class ConfigurationRequest {
         this.cpuCount = cpuCount;
         this.useNetBoost = useNetBoost;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
-        if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Integer.parseInt(memory) > 0) {
-            this.memory = Integer.parseInt(memory);
+        if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Float.parseFloat(memory) > 0) {
+            this.memory = Float.parseFloat(memory);
         }
         this.tag = StringUtils.isNotBlank(tag) && tag != null ? tag : null;
         this.tagRequired = tagRequired != null ? tagRequired : null;
