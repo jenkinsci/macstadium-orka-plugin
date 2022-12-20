@@ -42,4 +42,21 @@ public class OrkaVersionChecker {
             }
         }
     }
+
+    public static void updateOrkaVersion(String endpoint, String credentialsId,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
+        logger.fine("Checking Orka version for endpoint: " + endpoint);
+
+        try {
+            HealthCheckResponse healthCheck = clientFactory
+                    .getOrkaClientProxy(endpoint, credentialsId,
+                            useJenkinsProxySettings, ignoreSSLErrors)
+                    .getHealthCheck();
+
+            logger.fine("Server: " + endpoint + ". Version: " + healthCheck.getApiVersion());
+            OrkaClientProxyFactory.setServerVersion(endpoint, healthCheck.getApiVersion());
+        } catch (Exception e) {
+            logger.warning("Error while getting Orka version: " + e.getMessage());
+        }
+    }
 }
