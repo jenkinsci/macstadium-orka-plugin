@@ -99,12 +99,12 @@ public class OrkaClientProxy {
     }
 
     public ConfigurationResponse createConfiguration(
-        String vmName, String image, String baseImage, String configTemplate, int cpuCount, boolean useNetBoost,
-        String scheduler, String memory, String tag, Boolean tagRequired) throws IOException {
+            String vmName, String image, String baseImage, String configTemplate, int cpuCount, boolean useNetBoost,
+            String scheduler, String memory, String tag, Boolean tagRequired) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.createConfiguration(
-                vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory, tag, tagRequired
-            );
+                    vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory, tag,
+                    tagRequired);
         }
     }
 
@@ -117,12 +117,12 @@ public class OrkaClientProxy {
     }
 
     public DeploymentResponse deployVM(String vmName, String node,
-        String scheduler) throws IOException {
+            String scheduler) throws IOException {
         return this.deployVM(vmName, node, scheduler, null, null);
     }
 
     public DeploymentResponse deployVM(String vmName, String node, String scheduler,
-        String tag, Boolean tagRequired) throws IOException {
+            String tag, Boolean tagRequired) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.deployVM(vmName, node, scheduler, tag, tagRequired);
         }
@@ -151,8 +151,8 @@ public class OrkaClientProxy {
     }
 
     private OrkaClient getOrkaClient(boolean initToken) throws IOException {
-        if (StringUtils.isBlank(this.serverVersion)
-                || Utils.compareVersions(this.serverVersion, firstVersionWithSingleToken) < 0) {
+        if (!StringUtils.isBlank(this.serverVersion)
+                && Utils.compareVersions(this.serverVersion, firstVersionWithSingleToken) < 0) {
 
             return new OrkaClient(this.endpoint, this.credentials.getUsername(),
                     Secret.toString(credentials.getPassword()),
