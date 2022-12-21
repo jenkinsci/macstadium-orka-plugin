@@ -28,22 +28,20 @@ public class OrkaVersionChecker {
         for (Cloud cloud : jenkinsInstance.clouds) {
             if ((cloud instanceof OrkaCloud)) {
                 OrkaCloud orka = (OrkaCloud) cloud;
-                try {
-                    HealthCheckResponse healthCheck = clientFactory
-                            .getOrkaClientProxy(orka.getEndpoint(), orka.getCredentialsId(), orka.getHttpTimeout(),
-                                    orka.getUseJenkinsProxySettings(), orka.getIgnoreSSLErrors())
-                            .getHealthCheck();
-
-                    logger.fine("Server: " + orka.getEndpoint() + ". Version: " + healthCheck.getApiVersion());
-                    OrkaClientProxyFactory.setServerVersion(orka.getEndpoint(), healthCheck.getApiVersion());
-                } catch (Exception e) {
-                    logger.warning("Error while getting Orka version: " + e.getMessage());
-                }
+                updateOrkaVersion(orka.getEndpoint(), orka.getCredentialsId(), orka.getHttpTimeout(),
+                        orka.getUseJenkinsProxySettings(), orka.getIgnoreSSLErrors());
             }
         }
     }
 
     public static void updateOrkaVersion(String endpoint, String credentialsId,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
+        logger.fine("Checking Orka version for endpoint: " + endpoint);
+
+        updateOrkaVersion(endpoint, credentialsId, 0, useJenkinsProxySettings, ignoreSSLErrors);
+    }
+
+    private static void updateOrkaVersion(String endpoint, String credentialsId, int httpTimeout,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
         logger.fine("Checking Orka version for endpoint: " + endpoint);
 
