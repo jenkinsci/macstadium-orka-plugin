@@ -77,6 +77,9 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
+        OrkaVersionChecker.updateOrkaVersion(agent.getOrkaEndpoint(), agent.getOrkaCredentialsId(),
+                agent.getUseJenkinsProxySettings(), agent.getIgnoreSSLErrors());
+
         OrkaClientProxy client = new OrkaClientProxyFactory().getOrkaClientProxy(agent.getOrkaEndpoint(),
                 agent.getOrkaCredentialsId(), agent.getUseJenkinsProxySettings(), agent.getIgnoreSSLErrors());
 
@@ -151,7 +154,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         String vmName = agent.getCreateNewVMConfig() ? agent.getConfigName() : agent.getVm();
 
         DeploymentResponse deploymentResponse = clientProxy.deployVM(vmName, agent.getNode(),
-            null, agent.getTag(), agent.getTagRequired());
+                null, agent.getTag(), agent.getTagRequired());
 
         if (!deploymentResponse.isSuccessful()) {
             logger.println(
