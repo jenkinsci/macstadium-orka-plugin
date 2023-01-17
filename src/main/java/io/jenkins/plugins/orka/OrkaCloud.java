@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jenkins.model.Jenkins;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -202,7 +204,7 @@ public class OrkaCloud extends Cloud {
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount, boolean useNetBoost, String scheduler, String memory) throws IOException {
         return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler,
-            memory, null, null);
+                memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
@@ -224,7 +226,7 @@ public class OrkaCloud extends Cloud {
     }
 
     public DeploymentResponse deployVM(String name, String scheduler, String tag,
-        Boolean tagRequired) throws IOException {
+            Boolean tagRequired) throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
@@ -347,6 +349,7 @@ public class OrkaCloud extends Cloud {
         }
 
         public ListBoxModel doFillCredentialsIdItems() {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 

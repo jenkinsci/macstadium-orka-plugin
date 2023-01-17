@@ -42,8 +42,8 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private String jvmOptions;
 
     public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
-            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString, 
-            RetentionStrategy<?> retentionStrategy, 
+            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
+            RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties)
             throws Descriptor.FormException, IOException {
         this(cloudId, namePrefix, vmId, node, host, sshPort, vmCredentialsId, numExecutors,
@@ -52,13 +52,13 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     @DataBoundConstructor
     public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
-            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString, 
-            RetentionStrategy<?> retentionStrategy, 
+            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
+            RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions)
             throws Descriptor.FormException, IOException {
 
-        super(StringUtils.isNotBlank(namePrefix) ? namePrefix + '_' + vmId : vmId, remoteFS, 
+        super(StringUtils.isNotBlank(namePrefix) ? namePrefix + '_' + vmId : vmId, remoteFS,
                 new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy, jvmOptions));
 
         this.setNumExecutors(numExecutors);
@@ -117,7 +117,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     public String getNamePrefix() {
         return this.namePrefix;
     }
-    
+
     public String getJvmOptions() {
         return this.jvmOptions;
     }
@@ -155,6 +155,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         }
 
         public ListBoxModel doFillVmCredentialsIdItems() {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
@@ -174,7 +175,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     @Override
     public String toString() {
         return "OrkaProvisionedAgent [cloudId=" + cloudId + ", host=" + host + ", node=" + node + ", sshPort=" + sshPort
-                + ", vmCredentialsId=" + vmCredentialsId + ", verificationStrategy=" + verificationStrategy 
+                + ", vmCredentialsId=" + vmCredentialsId + ", verificationStrategy=" + verificationStrategy
                 + ", namePrefix=" + namePrefix + "]" + ", vmId=" + vmId + "]";
     }
 }
