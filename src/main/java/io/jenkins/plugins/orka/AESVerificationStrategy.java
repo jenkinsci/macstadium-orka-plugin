@@ -17,6 +17,8 @@ import java.util.Base64.Encoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jenkins.model.Jenkins;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -99,6 +101,7 @@ public class AESVerificationStrategy extends OrkaVerificationStrategy {
         }
 
         public ListBoxModel doFillAesKeyIdItems() {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(PasswordCredentials.class);
         }
 

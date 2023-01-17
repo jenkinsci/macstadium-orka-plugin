@@ -258,7 +258,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         logger.fine("Deploying VM with name " + vmName);
         DeploymentResponse response = this.parent.deployVM(vmName, this.getScheduler(), this.getTag(),
-            this.getTagRequired());
+                this.getTagRequired());
 
         try {
             logger.fine("Result deploying VM " + vmName + ":");
@@ -292,8 +292,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
                 return parent.createConfiguration(this.configName, this.configName, this.baseImage,
-                    Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.scheduler, this.memory,
-                    this.tag, this.tagRequired);
+                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.scheduler, this.memory,
+                        this.tag, this.tagRequired);
             }
         }
         return null;
@@ -370,6 +370,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
                 @QueryParameter boolean createNewVMConfig) {
 
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, ignoreSSLErrors,
                     createNewVMConfig);
         }
@@ -381,6 +382,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
                 @QueryParameter boolean createNewVMConfig) {
 
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
                     ignoreSSLErrors, createNewVMConfig);
         }

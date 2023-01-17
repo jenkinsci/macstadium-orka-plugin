@@ -18,6 +18,8 @@ import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 
 import java.io.IOException;
 
+import jenkins.model.Jenkins;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
@@ -251,13 +253,16 @@ public class OrkaAgent extends AbstractCloudSlave {
         }
 
         public ListBoxModel doFillOrkaCredentialsIdItems() {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
         public ListBoxModel doFillVmCredentialsIdItems() {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
+        @POST
         public ListBoxModel doFillNodeItems(@QueryParameter String orkaEndpoint,
                 @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
                 @QueryParameter boolean ignoreSSLErrors) {
@@ -275,6 +280,7 @@ public class OrkaAgent extends AbstractCloudSlave {
                 @QueryParameter boolean useJenkinsProxySettings, @QueryParameter boolean ignoreSSLErrors,
                 @QueryParameter boolean createNewVMConfig) {
 
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return this.infoHelper.doFillVmItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
                     ignoreSSLErrors, createNewVMConfig);
         }
@@ -284,6 +290,7 @@ public class OrkaAgent extends AbstractCloudSlave {
                 @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
                 @QueryParameter boolean ignoreSSLErrors, @QueryParameter boolean createNewVMConfig) {
 
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return this.infoHelper.doFillBaseImageItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
                     ignoreSSLErrors, createNewVMConfig);
         }
