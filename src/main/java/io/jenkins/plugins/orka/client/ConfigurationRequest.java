@@ -32,6 +32,10 @@ public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private boolean useNetBoost;
 
+    @SerializedName("gpu_passthrough")
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private boolean useGpuPassthrough;
+
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String scheduler;
 
@@ -56,22 +60,25 @@ public class ConfigurationRequest {
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             String scheduler, String memory) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, memory);
+        this(vmName, image, baseImage, configTemplate, cpuCount, false, false, scheduler, memory);
     }
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            boolean useNetBoost, String scheduler, String memory) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory, null, null);
+            boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory) {
+        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, useGpuPassthrough, scheduler, 
+            memory, null, null);
     }
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            boolean useNetBoost, String scheduler, String memory, String tag, Boolean tagRequired) {
+            boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory, 
+            String tag, Boolean tagRequired) {
         this.vmName = vmName;
         this.image = image;
         this.baseImage = baseImage;
         this.configTemplate = configTemplate;
         this.cpuCount = cpuCount;
         this.useNetBoost = useNetBoost;
+        this.useGpuPassthrough = useGpuPassthrough;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
         if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Float.parseFloat(memory) > 0) {
             this.memory = Float.parseFloat(memory);

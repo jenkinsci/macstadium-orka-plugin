@@ -99,12 +99,12 @@ public class OrkaClientTest {
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), anyString())).thenReturn(response);
         when(client.createConfiguration(anyString(), anyString(), anyString(), anyString(), anyInt(), anyBoolean(),
-                anyString(), anyString(), anyString(), anyBoolean()))
+                anyBoolean(), anyString(), anyString(), anyString(), anyBoolean()))
                 .thenCallRealMethod();
 
         ConfigurationResponse actualResponse = client.createConfiguration(
             "newVm", "image", "baseImage", "default", 24,
-            false, "most-allocated", "10", "testTag", true);
+            false, false, "most-allocated", "10", "testTag", true);
 
         assertEquals(message, actualResponse.getMessage());
     }

@@ -20,7 +20,8 @@ import org.apache.commons.lang.StringUtils;
 
 public final class OrkaComputerLauncher extends ComputerLauncher {
     private static String configurationErrorFormat = "%s: Creating configuration with configName: %s, image: %s, "
-            + "baseImage: %s, template: %s, numCPUs: %s, useNetBoost: %s, memory: %s, tag: %s and tagRequired: %s "
+            + "baseImage: %s, template: %s, numCPUs: %s, useNetBoost: %s, useGpuPassthrough: %s, memory: %s, "
+            + "tag: %s and tagRequired: %s"
             + "failed with an error: %s. Stopping creation.";
     private static String deploymentErrorFormat = "%s: Deploying vm with name: %s, and node: %s"
             + "failed with an error: %s. Stopping creation.";
@@ -131,15 +132,16 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             String baseImage = agent.getBaseImage();
             int numCPUs = agent.getNumCPUs();
             boolean useNetBoost = agent.getUseNetBoost();
+            boolean useGpuPassthrough = agent.getUseGpuPassthrough();
             String memory = agent.getMemory();
             String tag = agent.getTag();
             boolean tagRequired = agent.getTagRequired();
 
             ConfigurationResponse configResponse = clientProxy.createConfiguration(configName, image, baseImage,
-                    template, numCPUs, useNetBoost, null, memory);
+                    template, numCPUs, useNetBoost, useGpuPassthrough, null, memory);
             if (!configResponse.isSuccessful()) {
                 logger.println(String.format(configurationErrorFormat, Utils.getTimestamp(), configName, image,
-                        baseImage, template, numCPUs, useNetBoost, memory, tag, tagRequired,
+                        baseImage, template, numCPUs, useNetBoost, useGpuPassthrough, memory, tag, tagRequired,
                         Utils.getErrorMessage(configResponse)));
                 return false;
             }
