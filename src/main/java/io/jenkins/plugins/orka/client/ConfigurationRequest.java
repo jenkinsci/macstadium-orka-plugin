@@ -64,6 +64,12 @@ public class ConfigurationRequest {
     }
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
+            boolean useNetBoost, String scheduler, String memory) {
+        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, false, scheduler, 
+            memory, null, null);
+    }
+
+    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory) {
         this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, useGpuPassthrough, scheduler, 
             memory, null, null);

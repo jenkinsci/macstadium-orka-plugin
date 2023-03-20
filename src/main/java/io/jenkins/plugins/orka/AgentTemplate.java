@@ -109,6 +109,17 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     }
 
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, 
+            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
+            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions, String scheduler, String memory) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false, 
+                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
+                nodeProperties, jvmOptions, scheduler, memory, false, null, null);
+    }
+
+
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors, 
             String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,

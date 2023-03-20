@@ -203,6 +203,13 @@ public class OrkaCloud extends Cloud {
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
+            int cpuCount, boolean useNetBoost, String scheduler, 
+            String memory) throws IOException {
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+                false, scheduler, memory, null, null);
+    }
+
+    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, 
             String memory) throws IOException {
         return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, 
