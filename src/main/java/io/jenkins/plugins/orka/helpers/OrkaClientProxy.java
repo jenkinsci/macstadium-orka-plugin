@@ -88,8 +88,16 @@ public class OrkaClientProxy {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler, String memory) throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, false, 
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, 
                 scheduler, memory);
+    }
+
+    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, 
+            String memory)
+            throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+                false, scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
@@ -97,7 +105,7 @@ public class OrkaClientProxy {
             String memory)
             throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
-                useGpuPassthrough, scheduler, memory, null, null);
+            useGpuPassthrough, scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(
