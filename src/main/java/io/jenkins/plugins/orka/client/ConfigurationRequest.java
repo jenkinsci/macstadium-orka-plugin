@@ -49,10 +49,12 @@ public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private Boolean tagRequired;
 
+    @Deprecated
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount) {
         this(vmName, image, baseImage, configTemplate, cpuCount, null);
     }
 
+    @Deprecated
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             String scheduler) {
         this(vmName, image, baseImage, configTemplate, cpuCount, scheduler, "auto");

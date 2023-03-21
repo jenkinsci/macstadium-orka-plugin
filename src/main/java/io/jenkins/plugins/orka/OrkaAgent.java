@@ -46,6 +46,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private Boolean tagRequired;
     private String jvmOptions;
 
+    @Deprecated
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
             int numCPUs, int numExecutors, String host, int port, String remoteFS)
@@ -55,6 +56,7 @@ public class OrkaAgent extends AbstractCloudSlave {
                 configName, baseImage, numCPUs, numExecutors, host, port, remoteFS, false, false, null);
     }
 
+    @Deprecated
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
             int numCPUs, int numExecutors, String host, int port, String remoteFS,
@@ -66,6 +68,7 @@ public class OrkaAgent extends AbstractCloudSlave {
                 useJenkinsProxySettings, ignoreSSLErrors, null);
     }
 
+    @Deprecated
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
             String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
             int numCPUs, int numExecutors, String host, int port, String remoteFS,

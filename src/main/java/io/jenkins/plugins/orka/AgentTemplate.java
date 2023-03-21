@@ -72,6 +72,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     private transient OrkaCloud parent;
 
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
@@ -80,6 +81,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, null);
     }
 
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
@@ -90,6 +92,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     }
 
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,

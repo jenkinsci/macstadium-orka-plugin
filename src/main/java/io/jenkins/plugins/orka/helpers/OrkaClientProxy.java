@@ -76,11 +76,13 @@ public class OrkaClientProxy {
         }
     }
 
+    @Deprecated
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount) throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, null);
     }
 
+    @Deprecated
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler) throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler, "auto");

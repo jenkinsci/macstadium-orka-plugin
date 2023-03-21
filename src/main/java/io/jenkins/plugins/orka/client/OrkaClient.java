@@ -117,11 +117,13 @@ public class OrkaClient implements AutoCloseable {
         return response;
     }
 
+    @Deprecated
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount) throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, null);
     }
 
+    @Deprecated
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler) throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler,
@@ -131,7 +133,7 @@ public class OrkaClient implements AutoCloseable {
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler, String memory) throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, false, 
-                scheduler, memory);
+                scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
@@ -140,14 +142,6 @@ public class OrkaClient implements AutoCloseable {
             throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
             false, scheduler, memory, null, null);
-    }
-
-    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
-            String configTemplate, int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, 
-            String memory)
-            throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
-            useGpuPassthrough, scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
