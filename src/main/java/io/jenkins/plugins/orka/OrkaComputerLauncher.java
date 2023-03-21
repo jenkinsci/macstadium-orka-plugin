@@ -138,7 +138,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             boolean tagRequired = agent.getTagRequired();
 
             ConfigurationResponse configResponse = clientProxy.createConfiguration(configName, image, baseImage,
-                    template, numCPUs, useNetBoost, useGpuPassthrough, null, memory);
+                    template, numCPUs, useNetBoost, useGpuPassthrough, null, memory, tag, tagRequired);
             if (!configResponse.isSuccessful()) {
                 logger.println(String.format(configurationErrorFormat, Utils.getTimestamp(), configName, image,
                         baseImage, template, numCPUs, useNetBoost, useGpuPassthrough, memory, tag, tagRequired,

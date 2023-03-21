@@ -101,11 +101,11 @@ public class OrkaClientProxy {
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
-            String configTemplate, int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, 
-            String memory)
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, 
+            String memory, String tag, Boolean tagRequired)
             throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
-            useGpuPassthrough, scheduler, memory, null, null);
+                false, scheduler, memory, tag, tagRequired);
     }
 
     public ConfigurationResponse createConfiguration(

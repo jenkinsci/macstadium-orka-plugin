@@ -105,7 +105,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory) {
         this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, false, false, 
                 numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
-                nodeProperties, jvmOptions, scheduler, memory);
+                nodeProperties, jvmOptions, scheduler, memory, false, null, null);
     }
 
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
@@ -118,15 +118,15 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 nodeProperties, jvmOptions, scheduler, memory, false, null, null);
     }
 
-
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors, 
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, 
             String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
-            String jvmOptions, String scheduler, String memory) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, useGpuPassthrough, 
+            String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
+            Boolean tagRequired) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false, 
                 numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
-                nodeProperties, jvmOptions, scheduler, memory, false, null, null);
+                nodeProperties, jvmOptions, scheduler, memory, overwriteTag, tag, tagRequired);
     }
 
     @DataBoundConstructor
