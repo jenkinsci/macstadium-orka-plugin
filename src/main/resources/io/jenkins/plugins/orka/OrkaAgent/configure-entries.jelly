@@ -52,10 +52,16 @@
         <c:select />
       </f:entry>
 
-      <f:entry title="${%Use Net Boost}" field="useNetBoost" description="If checked, use Net Boost. This option is
-        required for booting macOS Ventura images. It must be disabled for Mojave and Catalina, as they don't support it.">
+      <f:entry title="${%Use Net Boost}" field="useNetBoost" description="When checked, improves the network performance of Intel-based VMs. Required for macOS Ventura Intel-based VMs. 
+        NOTE: Applicable only to macOS BigSur and later. ">
         <f:checkbox default="true" />
       </f:entry>
+
+      <f:entry title="${%Use GPU Passthrough}" field="useGpuPassthrough" description="When checked, enables the VM to use the GPU available on the node. 
+          NOTE: GPU Passthrough must be enabled for the cluster.">
+          <f:checkbox default="false" />
+        </f:entry>
+
 
       <f:entry title="${%Memory in G}" field="memory" help="${descriptor.getHelpFile('memory')}">
         <f:textbox checkMethod="post" default="auto"/>

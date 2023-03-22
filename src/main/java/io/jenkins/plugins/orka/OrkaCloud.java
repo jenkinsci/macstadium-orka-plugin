@@ -198,23 +198,32 @@ public class OrkaCloud extends Cloud {
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
             int cpuCount, String scheduler, String memory) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, false, scheduler, memory);
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, false, false, 
+                scheduler, memory);
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, boolean useNetBoost, String scheduler, String memory) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler,
-                memory, null, null);
+            int cpuCount, boolean useNetBoost, String scheduler, 
+            String memory) throws IOException {
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+                false, scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, boolean useNetBoost, String scheduler, String memory, String tag,
+            int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, 
+            String memory) throws IOException {
+        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+                useGpuPassthrough, scheduler, memory, null, null);
+    }
+
+    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
+            int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory, String tag,
             Boolean tagRequired) throws IOException {
         return new OrkaClientProxyFactory()
                 .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler, memory,
-                        tag, tagRequired);
+                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, useGpuPassthrough, 
+                        scheduler, memory, tag, tagRequired);
     }
 
     public DeploymentResponse deployVM(String name) throws IOException {

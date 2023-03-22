@@ -51,6 +51,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String baseImage;
     private int numCPUs;
     private boolean useNetBoost;
+    private boolean useGpuPassthrough;
     private String memory;
     private boolean overwriteTag;
     private String tag;
@@ -71,6 +72,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     private transient OrkaCloud parent;
 
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
@@ -79,6 +81,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, null);
     }
 
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
@@ -89,6 +92,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     }
 
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
@@ -102,25 +106,36 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, false, numExecutors, remoteFS,
-                mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, jvmOptions,
-                scheduler, memory);
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, false, false, 
+                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
+                nodeProperties, jvmOptions, scheduler, memory, false, null, null);
     }
 
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, String remoteFS, Mode mode,
-            String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, 
+            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, numExecutors,
-                remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties,
-                jvmOptions, scheduler, memory, false, null, null);
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false, 
+                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
+                nodeProperties, jvmOptions, scheduler, memory, false, null, null);
+    }
+
+    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, 
+            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
+            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
+            Boolean tagRequired) {
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false, 
+                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
+                nodeProperties, jvmOptions, scheduler, memory, overwriteTag, tag, tagRequired);
     }
 
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, String remoteFS, Mode mode,
-            String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
+            String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors, 
+            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
             Boolean tagRequired) {
@@ -131,6 +146,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.baseImage = baseImage;
         this.numCPUs = numCPUs;
         this.useNetBoost = useNetBoost;
+        this.useGpuPassthrough = useGpuPassthrough;
         this.numExecutors = numExecutors;
         this.remoteFS = remoteFS;
         this.mode = mode;
@@ -181,6 +197,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public boolean getUseNetBoost() {
         return this.useNetBoost;
+    }
+
+    public boolean getUseGpuPassthrough() {
+        return this.useGpuPassthrough;
     }
 
     public String getMemory() {
@@ -292,8 +312,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
                 return parent.createConfiguration(this.configName, this.configName, this.baseImage,
-                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.scheduler, this.memory,
-                        this.tag, this.tagRequired);
+                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.useGpuPassthrough, 
+                        this.scheduler, this.memory, this.tag, this.tagRequired);
             }
         }
         return null;

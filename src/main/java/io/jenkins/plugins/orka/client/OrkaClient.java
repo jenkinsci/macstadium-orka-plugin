@@ -117,11 +117,13 @@ public class OrkaClient implements AutoCloseable {
         return response;
     }
 
+    @Deprecated
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount) throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, null);
     }
 
+    @Deprecated
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler) throws IOException {
         return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler,
@@ -130,22 +132,33 @@ public class OrkaClient implements AutoCloseable {
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler, String memory) throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, scheduler, memory);
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, false, 
+                scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
-            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, String memory)
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, 
+            String memory)
             throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, scheduler,
-            memory, null, null);
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+            false, scheduler, memory, null, null);
+    }
+
+    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, 
+            String memory, String tag, Boolean tagRequired)
+            throws IOException {
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+            false, scheduler, memory, tag, tagRequired);
     }
 
     public ConfigurationResponse createConfiguration(
         String vmName, String image, String baseImage, String configTemplate, int cpuCount, boolean useNetBoost,
-        String scheduler, String memory, String tag, Boolean tagRequired) throws IOException {
+        boolean useGpuPassthrough, String scheduler, String memory, 
+        String tag, Boolean tagRequired) throws IOException {
 
         ConfigurationRequest configRequest = new ConfigurationRequest(vmName, image, baseImage, configTemplate,
-                cpuCount, useNetBoost, scheduler, memory, tag, tagRequired);
+                cpuCount, useNetBoost, useGpuPassthrough, scheduler, memory, tag, tagRequired);
 
         String configRequestJson = new Gson().toJson(configRequest);
 
