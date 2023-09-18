@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.ctc.wstx.util.StringUtil;
 import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
@@ -33,11 +34,13 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
@@ -106,35 +109,35 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
             String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, false, false, 
-                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, false, false,
+                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy,
                 nodeProperties, jvmOptions, scheduler, memory, false, null, null);
     }
 
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, 
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors,
             String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false, 
-                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false,
+                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy,
                 nodeProperties, jvmOptions, scheduler, memory, false, null, null);
     }
 
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors, 
+            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors,
             String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
             Boolean tagRequired) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false, 
-                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy, 
+        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false,
+                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy,
                 nodeProperties, jvmOptions, scheduler, memory, overwriteTag, tag, tagRequired);
     }
 
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors, 
+            String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors,
             String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
@@ -312,7 +315,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
                 return parent.createConfiguration(this.configName, this.configName, this.baseImage,
-                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.useGpuPassthrough, 
+                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.useGpuPassthrough,
                         this.scheduler, this.memory, this.tag, this.tagRequired);
             }
         }
@@ -400,11 +403,27 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 @QueryParameter @RelativePath("..") String credentialsId,
                 @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
                 @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
-                @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter boolean createNewVMConfig, @QueryParameter String readonlyBaseImage) {
 
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            return this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
+            ListBoxModel model = this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
                     ignoreSSLErrors, createNewVMConfig);
+
+            if (StringUtils.isNotBlank(readonlyBaseImage)) {
+                if (!model.stream().filter(o -> o.value.equals(readonlyBaseImage)).findAny().isPresent()) {
+                    String sanitizedName = Utils.sanitizeK8sName(readonlyBaseImage);
+                    Optional<ListBoxModel.Option> existingImage = model.stream()
+                            .filter(o -> o.value.equals(sanitizedName))
+                            .findAny();
+                    if (existingImage.isPresent()) {
+                        existingImage.get().selected = true;
+                    } else {
+                        model.add(readonlyBaseImage);
+                    }
+                }
+            }
+
+            return model;
         }
 
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {

@@ -20,6 +20,10 @@ public class Utils {
         return userValue > 0 ? userValue : recommended;
     }
 
+    public static String sanitizeK8sName(String name) {
+        return name.toLowerCase().replace("_", "-");
+    }
+
     public static FormValidation checkInputValue(String userInput) {
         try {
             int idleMinutesValue = Integer.parseInt(userInput);

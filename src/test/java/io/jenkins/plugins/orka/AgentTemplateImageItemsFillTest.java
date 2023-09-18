@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -21,33 +23,34 @@ import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
 import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
 
 @RunWith(Parameterized.class)
-public class ImageItemsFillTest {
+public class AgentTemplateImageItemsFillTest {
     @ClassRule
     public static JenkinsRule r = new JenkinsRule();
 
-    @Parameterized.Parameters(name = "{index}: Test with createNewConfig={0}, endpoint={1}, credentials={2}")
+    @Parameterized.Parameters(name = "{index}: Test with selectedImage={0}, resultSize={1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-                new Object[][] { { true, "endpoint", "credentials", 2 }, { false, "endpoint", "credentials", 0 },
-                        { true, null, "credentials", 0 }, { true, "endpoint", null, 0 }, });
+                new Object[][] { { null, null, 5 }, { "sanitized-image", null, 5 },
+                        { "SanitizedImage", null, 5 },
+                        { "ventura-image", null, 5 },
+                        { "Ventura_Image", "ventura-image", 5 },
+                        { "missingImage", null, 6 } });
     }
 
     private OrkaClientProxyFactory clientProxyFactory;
-    private final boolean createNewConfig;
-    private final String endpoint;
-    private final String credentials;
+    private final String currentImage;
+    private final String selectedImage;
     private final int resultSize;
 
-    public ImageItemsFillTest(boolean createNewConfig, String endpoint, String credentials, int resultSize) {
-        this.createNewConfig = createNewConfig;
-        this.endpoint = endpoint;
-        this.credentials = credentials;
+    public AgentTemplateImageItemsFillTest(String currentImage, String selectedImage, int resultSize) {
+        this.currentImage = currentImage;
+        this.selectedImage = selectedImage;
         this.resultSize = resultSize;
     }
 
     @Before
     public void initialize() throws IOException {
-        String[] response = { "Mojave.img", "SnowLeopard.img" };
+        String[] response = { "Mojave.img", "SnowLeopard.img", "sanitized-image", "SanitizedImage", "ventura-image" };
 
         OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
 
@@ -58,24 +61,19 @@ public class ImageItemsFillTest {
     }
 
     @Test
-    public void when_fill_image_items_in_orka_agent_should_return_correct_result_size() throws IOException {
-        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
-
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                false, this.createNewConfig);
-
-        assertEquals(this.resultSize, baseImages.size());
-    }
-
-    @Test
-    public void when_fill_image_items_in_agent_template_should_return_correct_result_size() throws IOException {
+    public void when_fill_image_items_in_agent_template_should_select_the_right_image() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setClientProxyFactory(this.clientProxyFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                false, this.createNewConfig, "");
+        ListBoxModel baseImages = descriptor.doFillBaseImageItems("http://10.221.188.100", "this.credentials", false,
+                false, true, this.currentImage);
 
         assertEquals(this.resultSize, baseImages.size());
+        Optional<ListBoxModel.Option> selectedOption = baseImages.stream().filter(o -> o.selected).findFirst();
+        if (this.selectedImage != null) {
+            assertEquals(this.selectedImage, selectedOption.get().value);
+        } else {
+            assertTrue(!selectedOption.isPresent());
+        }
     }
 }
