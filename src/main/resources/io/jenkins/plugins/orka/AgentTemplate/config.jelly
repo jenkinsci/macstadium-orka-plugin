@@ -11,6 +11,10 @@
           <f:textbox checkMethod="post"/>
         </f:entry>
 
+        <f:invisibleEntry>
+          <f:readOnlyTextbox name="readonlyBaseImage" value="${instance.baseImage}"/>
+        </f:invisibleEntry>
+
         <f:entry title="${%Base Image}" field="baseImage">
           <f:select checkMethod="post"/>
         </f:entry>
