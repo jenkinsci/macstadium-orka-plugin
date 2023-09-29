@@ -29,7 +29,8 @@ public class AgentTemplateTest {
         String id = "vm-machine";
 
         OrkaCloud cloud = mock(OrkaCloud.class);
-        when(cloud.deployVM(anyString(), any(), any(), any())).thenReturn(new DeploymentResponse(ip, sshPort, id, null, null));
+        when(cloud.deployVM(anyString(), any(), any(), any()))
+                .thenReturn(new DeploymentResponse(ip, sshPort, id, null, null));
         when(cloud.getRealHost(anyString())).thenReturn(ip);
         agentTemplate.setParent(cloud);
 
@@ -46,9 +47,10 @@ public class AgentTemplateTest {
     }
 
     private AgentTemplate getAgentTemplate() {
-        return new AgentTemplate("vmCredentialsId", "my-vm", false, "configName", "baseImage", 12, 1, "remoteFS",
+        return new AgentTemplate("vmCredentialsId", "my-vm", false, "configName", "baseImage", 12, true, false, 1,
+                "remoteFS",
                 Mode.NORMAL, "label", "prefix", new IdleTimeCloudRetentionStrategy(5),
                 new DefaultVerificationStrategy(),
-                Collections.emptyList());
+                Collections.emptyList(), null, "default", "", false, null, false);
     }
 }

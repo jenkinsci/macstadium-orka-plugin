@@ -70,40 +70,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String jvmOptions;
     private String scheduler;
 
-    @Deprecated
-    private transient int idleTerminationMinutes;
-
     private transient OrkaCloud parent;
-
-    @Deprecated
-    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
-            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
-                mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, null);
-    }
-
-    @Deprecated
-    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
-            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
-                mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, jvmOptions,
-                null);
-
-    }
-
-    @Deprecated
-    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
-            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, numExecutors, remoteFS,
-                mode, labelString, namePrefix, retentionStrategy, verificationStrategy, nodeProperties, jvmOptions,
-                scheduler, "auto");
-    }
 
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
@@ -328,7 +295,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     protected Object readResolve() {
         if (this.retentionStrategy == null) {
-            this.retentionStrategy = new IdleTimeCloudRetentionStrategy(this.idleTerminationMinutes);
+            this.retentionStrategy = new IdleTimeCloudRetentionStrategy(30);
         }
         if (this.verificationStrategy == null) {
             this.verificationStrategy = new DefaultVerificationStrategy();
@@ -446,7 +413,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     @Override
     public String toString() {
         return "AgentTemplate [baseImage=" + baseImage + ", configName=" + configName + ", createNewVMConfig="
-                + createNewVMConfig + ", idleTerminationMinutes=" + idleTerminationMinutes + ", labelString="
+                + createNewVMConfig + ", labelString="
                 + labelString + ", namePrefix=" + namePrefix + ", mode=" + mode + ", nodeProperties="
                 + nodeProperties + ", numCPUs=" + numCPUs + ", memory=" + memory + ", overwriteTag="
                 + overwriteTag + ", tag=" + tag + ", tagRequired=" + tagRequired + ", numExecutors="

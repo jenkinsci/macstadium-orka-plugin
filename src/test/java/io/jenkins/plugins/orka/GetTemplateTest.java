@@ -63,8 +63,10 @@ public class GetTemplateTest {
     }
 
     private AgentTemplate getAgentTemplate(Mode mode, String label) {
-        return new AgentTemplate("vmCredentialsId", "name", false, "configName", "baseImage", 12, 1, "remoteFS",
-                this.mode, this.label, "prefix", new IdleTimeCloudRetentionStrategy(5), new DefaultVerificationStrategy(),
-                Collections.emptyList());
+        return new AgentTemplate("vmCredentialsId", "name", false, "configName", "baseImage", 12, true, false, 1,
+                "remoteFS",
+                this.mode, this.label, "prefix", new IdleTimeCloudRetentionStrategy(5),
+                new DefaultVerificationStrategy(),
+                Collections.emptyList(), null, "default", "", false, null, false);
     }
 }

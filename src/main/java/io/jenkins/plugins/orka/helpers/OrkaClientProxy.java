@@ -76,47 +76,35 @@ public class OrkaClientProxy {
         }
     }
 
-    @Deprecated
-    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
-            String configTemplate, int cpuCount) throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, null);
-    }
-
-    @Deprecated
-    public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
-            String configTemplate, int cpuCount, String scheduler) throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, scheduler, "auto");
-    }
-
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
             String configTemplate, int cpuCount, String scheduler, String memory) throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false, 
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, false,
                 scheduler, memory);
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
-            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, 
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler,
             String memory)
             throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost,
                 false, scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String vmName, String image, String baseImage,
-            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler, 
+            String configTemplate, int cpuCount, boolean useNetBoost, String scheduler,
             String memory, String tag, Boolean tagRequired)
             throws IOException {
-        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+        return this.createConfiguration(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost,
                 false, scheduler, memory, tag, tagRequired);
     }
 
     public ConfigurationResponse createConfiguration(
             String vmName, String image, String baseImage, String configTemplate, int cpuCount, boolean useNetBoost,
-            boolean useGpuPassthrough, String scheduler, String memory, 
+            boolean useGpuPassthrough, String scheduler, String memory,
             String tag, Boolean tagRequired) throws IOException {
         try (OrkaClient client = getOrkaClient()) {
             return client.createConfiguration(
-                    vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, useGpuPassthrough, scheduler, 
+                    vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, useGpuPassthrough, scheduler,
                     memory, tag, tagRequired);
         }
     }

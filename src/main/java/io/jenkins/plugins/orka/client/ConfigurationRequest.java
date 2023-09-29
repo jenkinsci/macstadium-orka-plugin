@@ -49,17 +49,6 @@ public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private Boolean tagRequired;
 
-    @Deprecated
-    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, null);
-    }
-
-    @Deprecated
-    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            String scheduler) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, scheduler, "auto");
-    }
-
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             String scheduler, String memory) {
         this(vmName, image, baseImage, configTemplate, cpuCount, false, false, scheduler, memory, null, null);
@@ -67,18 +56,18 @@ public class ConfigurationRequest {
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             boolean useNetBoost, String scheduler, String memory) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, false, scheduler, 
-            memory, null, null);
+        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, false, scheduler,
+                memory, null, null);
     }
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
             boolean useNetBoost, String scheduler, String memory, String tag, Boolean tagRequired) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, false, scheduler, 
-            memory, tag, tagRequired);
+        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, false, scheduler,
+                memory, tag, tagRequired);
     }
 
     public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory, 
+            boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory,
             String tag, Boolean tagRequired) {
         this.vmName = vmName;
         this.image = image;
