@@ -1,7 +1,6 @@
 package io.jenkins.plugins.orka;
 
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
-import com.ctc.wstx.util.StringUtil;
 import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
@@ -24,7 +23,7 @@ import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
@@ -259,16 +258,16 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 return null;
             }
 
-            String host = this.parent.getRealHost(response.getHost());
-            String vmId = response.getId();
+            String host = this.parent.getRealHost(response.getIP());
+            String vmId = response.getName();
 
-            return new OrkaProvisionedAgent(this.parent.getDisplayName(), this.namePrefix, vmId, response.getHost(),
-                    host, response.getSSHPort(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
+            return new OrkaProvisionedAgent(this.parent.getDisplayName(), this.namePrefix, vmId, response.getIP(),
+                    host, response.getSSH(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
                     this.labelString, this.retentionStrategy, this.verificationStrategy,
                     this.nodeProperties, this.jvmOptions);
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
-            this.parent.deleteVM(response.getId());
+            this.parent.deleteVM(response.getName());
 
             throw e;
         }
@@ -281,8 +280,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
             if (!configExist) {
                 logger.fine("Creating config with name " + this.configName);
-                return parent.createConfiguration(this.configName, this.configName, this.baseImage,
-                        Constants.DEFAULT_CONFIG_NAME, this.numCPUs, this.useNetBoost, this.useGpuPassthrough,
+                return parent.createConfiguration(this.configName, this.baseImage,
+                        this.numCPUs, this.useNetBoost, this.useGpuPassthrough,
                         this.scheduler, this.memory, this.tag, this.tagRequired);
             }
         }
@@ -308,15 +307,15 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<AgentTemplate> {
-        private OrkaClientProxyFactory clientProxyFactory = new OrkaClientProxyFactory();
-        private FormValidator formValidator = new FormValidator(this.clientProxyFactory);
-        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(this.clientProxyFactory);
+        private OrkaClientFactory clientFactory = new OrkaClientFactory();
+        private FormValidator formValidator = new FormValidator(this.clientFactory);
+        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(this.clientFactory);
 
         @VisibleForTesting
-        void setClientProxyFactory(OrkaClientProxyFactory clientProxyFactory) {
-            this.clientProxyFactory = clientProxyFactory;
-            this.formValidator = new FormValidator(this.clientProxyFactory);
-            this.infoHelper = new OrkaInfoHelper(this.clientProxyFactory);
+        void setclientFactory(OrkaClientFactory clientFactory) {
+            this.clientFactory = clientFactory;
+            this.formValidator = new FormValidator(this.clientFactory);
+            this.infoHelper = new OrkaInfoHelper(this.clientFactory);
         }
 
         @POST

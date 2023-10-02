@@ -15,12 +15,11 @@ import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeletionResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.client.OrkaVM;
 import io.jenkins.plugins.orka.client.OrkaVMConfig;
 import io.jenkins.plugins.orka.helpers.CapacityHandler;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
@@ -172,57 +171,47 @@ public class OrkaCloud extends Cloud {
                 .findFirst().orElse(null);
     }
 
-    public List<OrkaVM> getVMs() throws IOException {
-        return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
-                        this.ignoreSSLErrors)
-                .getVMs();
-    }
-
     public List<OrkaVMConfig> getVMConfigs() throws IOException {
-        return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
+        return new OrkaClientFactory()
+                .getOrkaClient(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .getVMConfigs();
+                .getVMConfigs().getConfigs();
     }
 
-    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, null);
+    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount) throws IOException {
+        return this.createConfiguration(name, image, cpuCount, null);
     }
 
-    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, String scheduler) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, scheduler, "auto");
+    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, String scheduler)
+            throws IOException {
+        return this.createConfiguration(name, image, cpuCount, scheduler, "auto");
     }
 
-    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, String scheduler, String memory) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, false, false, 
-                scheduler, memory);
-    }
-
-    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, boolean useNetBoost, String scheduler, 
+    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, String scheduler,
             String memory) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+        return this.createConfiguration(name, image, cpuCount, false, scheduler, memory);
+    }
+
+    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, boolean useNetBoost,
+            String scheduler, String memory) throws IOException {
+        return this.createConfiguration(name, image, cpuCount, useNetBoost,
                 false, scheduler, memory, null, null);
     }
 
     public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, 
+            int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler,
             String memory) throws IOException {
-        return this.createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, 
+        return this.createConfiguration(name, image, cpuCount, useNetBoost,
                 useGpuPassthrough, scheduler, memory, null, null);
     }
 
-    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory, String tag,
+    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, boolean useNetBoost,
+            boolean useGpuPassthrough, String scheduler, String memory, String tag,
             Boolean tagRequired) throws IOException {
-        return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
+        return new OrkaClientFactory()
+                .getOrkaClient(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .createConfiguration(name, image, baseImage, configTemplate, cpuCount, useNetBoost, useGpuPassthrough, 
+                .createConfiguration(name, image, cpuCount, useNetBoost, useGpuPassthrough,
                         scheduler, memory, tag, tagRequired);
     }
 
@@ -236,17 +225,17 @@ public class OrkaCloud extends Cloud {
 
     public DeploymentResponse deployVM(String name, String scheduler, String tag,
             Boolean tagRequired) throws IOException {
-        return new OrkaClientProxyFactory()
-                .getOrkaClientProxy(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
+        return new OrkaClientFactory()
+                .getOrkaClient(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .deployVM(name, null, scheduler, tag, tagRequired);
+                .deployVM(name, "orka-default", null, scheduler, tag, tagRequired);
     }
 
     public void deleteVM(String name) throws IOException {
         try {
-            DeletionResponse deletionResponse = new OrkaClientProxyFactory().getOrkaClientProxy(this.endpoint,
+            DeletionResponse deletionResponse = new OrkaClientFactory().getOrkaClient(this.endpoint,
                     this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings, this.ignoreSSLErrors)
-                    .deleteVM(name);
+                    .deleteVM(name, "orka-default");
 
             if (deletionResponse.isSuccessful()) {
                 logger.info("VM " + name + " is successfully deleted.");
@@ -341,8 +330,8 @@ public class OrkaCloud extends Cloud {
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<Cloud> {
-        private OrkaClientProxyFactory clientProxyFactory = new OrkaClientProxyFactory();
-        private FormValidator formValidator = new FormValidator(this.clientProxyFactory);
+        private OrkaClientFactory clientFactory = new OrkaClientFactory();
+        private FormValidator formValidator = new FormValidator(this.clientFactory);
 
         @Override
         public String getDisplayName() {

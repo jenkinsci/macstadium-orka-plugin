@@ -2,8 +2,7 @@ package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
-import io.jenkins.plugins.orka.client.OrkaNode;
-import io.jenkins.plugins.orka.client.TokenStatusResponse;
+import io.jenkins.plugins.orka.client.OrkaClient;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -14,13 +13,11 @@ import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
-    private static final String NOT_ENOUGH_RESOURCES_FORMAT = "Not enough resources on node. "
-            + "Required %s CPU, available %s";
 
-    private OrkaClientProxyFactory clientProxyFactory;
+    private OrkaClientFactory clientFactory;
 
-    public FormValidator(OrkaClientProxyFactory clientProxyFactory) {
-        this.clientProxyFactory = clientProxyFactory;
+    public FormValidator(OrkaClientFactory clientFactory) {
+        this.clientFactory = clientFactory;
     }
 
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
@@ -34,10 +31,10 @@ public class FormValidator {
 
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                    OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
+                    OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                             orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
-                    boolean alreadyInUse = clientProxy.getVMs().stream()
-                            .anyMatch(vm -> vm.getVMName().equalsIgnoreCase(configName));
+                    boolean alreadyInUse = client.getVMConfigs().getConfigs().stream()
+                            .anyMatch(vmc -> vmc.getName().equalsIgnoreCase(configName));
                     if (alreadyInUse) {
                         return FormValidation.error("Configuration name is already in use");
                     }
@@ -48,48 +45,6 @@ public class FormValidator {
         }
 
         return FormValidation.ok();
-    }
-
-    public FormValidation doCheckNode(String node, String orkaEndpoint, String orkaCredentialsId,
-            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String vm, boolean createNewConfig, int numCPUs) {
-        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-
-        boolean hasAvailableNodes = true;
-        boolean canDeployVM = true;
-        int requiredCPU = 0;
-        int availableCPU = 0;
-
-        try {
-            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
-                OrkaClientProxy clientProxy = this.clientProxyFactory.getOrkaClientProxy(orkaEndpoint,
-                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
-                hasAvailableNodes = clientProxy.getNodes().stream().filter(ProvisioningHelper::canDeployOnNode)
-                        .anyMatch(n -> true);
-
-                if (hasAvailableNodes) {
-                    requiredCPU = numCPUs;
-                    if (!createNewConfig) {
-                        requiredCPU = clientProxy.getVMs().stream().filter(v -> v.getVMName().equals(vm)).findFirst()
-                                .get().getCPUCount();
-                    }
-
-                    OrkaNode nodeDetails = clientProxy.getNodes().stream().filter(n -> n.getHostname().equals(node))
-                            .findFirst().get();
-                    canDeployVM = ProvisioningHelper.canDeployOnNode(nodeDetails, requiredCPU);
-                    availableCPU = nodeDetails.getAvailableCPU();
-                }
-
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception in doCheckNode", e);
-        }
-
-        if (hasAvailableNodes) {
-            return canDeployVM ? FormValidation.ok()
-                    : FormValidation.error(String.format(NOT_ENOUGH_RESOURCES_FORMAT, requiredCPU, availableCPU));
-        }
-
-        return FormValidation.error("There are no available nodes");
     }
 
     public FormValidation doCheckMemory(String memory) {
@@ -117,8 +72,8 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            HealthCheckResponse response = new OrkaClientProxyFactory()
-                    .getOrkaClientProxy(endpoint, credentialsId, useJenkinsProxySettings,
+            HealthCheckResponse response = new OrkaClientFactory()
+                    .getOrkaClient(endpoint, credentialsId, useJenkinsProxySettings,
                             ignoreSSLErrors)
                     .getHealthCheck();
             if (!response.isSuccessful()) {

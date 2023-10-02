@@ -30,7 +30,7 @@ public class AgentTemplateTest {
 
         OrkaCloud cloud = mock(OrkaCloud.class);
         when(cloud.deployVM(anyString(), any(), any(), any()))
-                .thenReturn(new DeploymentResponse(ip, sshPort, id, null, null));
+                .thenReturn(new DeploymentResponse(ip, sshPort, id, null));
         when(cloud.getRealHost(anyString())).thenReturn(ip);
         agentTemplate.setParent(cloud);
 

@@ -18,9 +18,10 @@ import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.FormValidation;
-import io.jenkins.plugins.orka.client.OrkaVM;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.client.OrkaVMConfig;
+import io.jenkins.plugins.orka.client.VMConfigResponse;
+import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 
 @RunWith(Parameterized.class)
 public class ConfigNameCheckTest {
@@ -33,35 +34,34 @@ public class ConfigNameCheckTest {
                 { "second", "second", FormValidation.Kind.ERROR }, { "second", "s", FormValidation.Kind.ERROR }, });
     }
 
-    private OrkaClientProxyFactory clientProxyFactory;
-    private final String vmName;
+    private OrkaClientFactory clientFactory;
     private final String configName;
     private final FormValidation.Kind validationKind;
 
     public ConfigNameCheckTest(String vmName, String newConfigName, FormValidation.Kind validationKind) {
-        this.vmName = vmName;
         this.configName = newConfigName;
         this.validationKind = validationKind;
     }
 
     @Before
     public void initialize() throws IOException {
-        OrkaVM firstVM = new OrkaVM("first", "deployed", 12, "Mojave.img", "firstImage", "default");
-        OrkaVM secondVM = new OrkaVM(this.vmName, "not deployed", 24, "Mojave.img", "secondImage", "default");
-        List<OrkaVM> response = Arrays.asList(firstVM, secondVM);
+        OrkaVMConfig firstVM = new OrkaVMConfig("first", 12, "Mojave.img", 12);
+        OrkaVMConfig secondVM = new OrkaVMConfig("second", 24, "Mojave.img", 15);
 
-        OrkaClientProxy client = mock(OrkaClientProxy.class);
+        List<OrkaVMConfig> response = Arrays.asList(firstVM, secondVM);
 
-        this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
+        OrkaClient client = mock(OrkaClient.class);
+
+        this.clientFactory = mock(OrkaClientFactory.class);
+        when(clientFactory.getOrkaClient(anyString(), anyString(), anyBoolean(), anyBoolean()))
                 .thenReturn(client);
-        when(client.getVMs()).thenReturn(response);
+        when(client.getVMConfigs()).thenReturn(new VMConfigResponse(response, null));
     }
 
     @Test
     public void when_check_config_name_in_orka_agent_should_return_correct_validation_kind() throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
+        descriptor.setclientFactory(this.clientFactory);
 
         FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false,
                 false, true);
@@ -72,7 +72,7 @@ public class ConfigNameCheckTest {
     @Test
     public void when_check_config_name_in_agent_template_should_return_correct_validation_kind() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
+        descriptor.setclientFactory(this.clientFactory);
 
         FormValidation validation = descriptor.doCheckConfigName(this.configName, "127.0.0.1", "credentialsId", false,
                 false, true);

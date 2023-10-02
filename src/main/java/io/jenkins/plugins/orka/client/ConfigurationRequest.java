@@ -1,40 +1,24 @@
 package io.jenkins.plugins.orka.client;
 
-import com.google.gson.annotations.SerializedName;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.apache.commons.lang.StringUtils;
 
 public class ConfigurationRequest {
-
-    @SerializedName("orka_vm_name")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private String vmName;
+    private String name;
 
-    @SerializedName("orka_image")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String image;
 
-    @SerializedName("orka_base_image")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private String baseImage;
+    private int cpu;
 
-    @SerializedName("orka_vm_config_template_name")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private String configTemplate;
+    private boolean netBoost;
 
-    @SerializedName("orka_cpu_core")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private int cpuCount;
-
-    @SerializedName("net_boost")
-    @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private boolean useNetBoost;
-
-    @SerializedName("gpu_passthrough")
-    @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private boolean useGpuPassthrough;
+    private boolean gpuPassthrough;
 
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String scheduler;
@@ -45,37 +29,17 @@ public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String tag;
 
-    @SerializedName("tag_required")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private Boolean tagRequired;
 
-    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            String scheduler, String memory) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, false, false, scheduler, memory, null, null);
-    }
-
-    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            boolean useNetBoost, String scheduler, String memory) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, false, scheduler,
-                memory, null, null);
-    }
-
-    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            boolean useNetBoost, String scheduler, String memory, String tag, Boolean tagRequired) {
-        this(vmName, image, baseImage, configTemplate, cpuCount, useNetBoost, false, scheduler,
-                memory, tag, tagRequired);
-    }
-
-    public ConfigurationRequest(String vmName, String image, String baseImage, String configTemplate, int cpuCount,
-            boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String memory,
+    public ConfigurationRequest(String name, String image, int cpu,
+            boolean netBoost, boolean gpuPassthrough, String scheduler, String memory,
             String tag, Boolean tagRequired) {
-        this.vmName = vmName;
+        this.name = name;
         this.image = image;
-        this.baseImage = baseImage;
-        this.configTemplate = configTemplate;
-        this.cpuCount = cpuCount;
-        this.useNetBoost = useNetBoost;
-        this.useGpuPassthrough = useGpuPassthrough;
+        this.cpu = cpu;
+        this.netBoost = netBoost;
+        this.gpuPassthrough = gpuPassthrough;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
         if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Float.parseFloat(memory) > 0) {
             this.memory = Float.parseFloat(memory);

@@ -13,7 +13,7 @@ import hudson.util.ListBoxModel;
 
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 
 import java.io.IOException;
@@ -191,19 +191,19 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     @Extension
     public static final class DescriptorImpl extends SlaveDescriptor {
-        private OrkaClientProxyFactory clientProxyFactory = new OrkaClientProxyFactory();
-        private FormValidator formValidator = new FormValidator(clientProxyFactory);
-        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(clientProxyFactory);
+        private OrkaClientFactory clientFactory = new OrkaClientFactory();
+        private FormValidator formValidator = new FormValidator(clientFactory);
+        private OrkaInfoHelper infoHelper = new OrkaInfoHelper(clientFactory);
 
         public DescriptorImpl() {
             load();
         }
 
         @VisibleForTesting
-        void setClientProxyFactory(OrkaClientProxyFactory clientProxyFactory) {
-            this.clientProxyFactory = clientProxyFactory;
-            this.formValidator = new FormValidator(this.clientProxyFactory);
-            this.infoHelper = new OrkaInfoHelper(this.clientProxyFactory);
+        void setclientFactory(OrkaClientFactory clientFactory) {
+            this.clientFactory = clientFactory;
+            this.formValidator = new FormValidator(this.clientFactory);
+            this.infoHelper = new OrkaInfoHelper(this.clientFactory);
         }
 
         public String getDisplayName() {
@@ -222,16 +222,6 @@ public class OrkaAgent extends AbstractCloudSlave {
 
             return this.formValidator.doCheckConfigName(configName, orkaEndpoint, orkaCredentialsId,
                     useJenkinsProxySettings, ignoreSSLErrors, createNewVMConfig);
-        }
-
-        @POST
-        public FormValidation doCheckNode(@QueryParameter String value, @QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
-                @QueryParameter boolean ignoreSSLErrors, @QueryParameter String vm,
-                @QueryParameter boolean createNewVMConfig, @QueryParameter int numCPUs) {
-
-            return this.formValidator.doCheckNode(value, orkaEndpoint, orkaCredentialsId,
-                    useJenkinsProxySettings, ignoreSSLErrors, vm, createNewVMConfig, numCPUs);
         }
 
         @POST

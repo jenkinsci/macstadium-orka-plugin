@@ -1,13 +1,16 @@
 package io.jenkins.plugins.orka.client;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Collections;
 import java.util.List;
 
 public class NodeResponse extends ResponseBase {
+    @SerializedName("items")
     private List<OrkaNode> nodes;
 
-    public NodeResponse(List<OrkaNode> nodes, String message, OrkaError[] errors) {
-        super(message, errors);
+    public NodeResponse(List<OrkaNode> nodes, String message) {
+        super(message);
         this.nodes = nodes;
     }
 

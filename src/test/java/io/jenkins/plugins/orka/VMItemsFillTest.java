@@ -18,9 +18,10 @@ import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.ListBoxModel;
-import io.jenkins.plugins.orka.client.OrkaVM;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.client.OrkaVMConfig;
+import io.jenkins.plugins.orka.client.VMConfigResponse;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 
 @RunWith(Parameterized.class)
 public class VMItemsFillTest {
@@ -34,7 +35,7 @@ public class VMItemsFillTest {
                         { false, null, "credentials", 0 }, { false, "endpoint", null, 0 }, });
     }
 
-    private OrkaClientProxyFactory clientProxyFactory;
+    private OrkaClientFactory clientFactory;
     private final boolean createNewConfig;
     private final String endpoint;
     private final String credentials;
@@ -49,22 +50,22 @@ public class VMItemsFillTest {
 
     @Before
     public void initialize() throws IOException {
-        OrkaVM firstVM = new OrkaVM("first", "deployed", 12, "Mojave.img", "firstImage", "default");
-        OrkaVM secondVM = new OrkaVM("second", "not deployed", 24, "Mojave.img", "secondImage", "default");
-        List<OrkaVM> response = Arrays.asList(firstVM, secondVM);
+        OrkaVMConfig firstVM = new OrkaVMConfig("first", 12, "Mojave.img", 12);
+        OrkaVMConfig secondVM = new OrkaVMConfig("second", 24, "Mojave.img", 15);
+        VMConfigResponse configResponse = new VMConfigResponse(Arrays.asList(firstVM, secondVM), null);
 
-        OrkaClientProxy client = mock(OrkaClientProxy.class);
+        OrkaClient client = mock(OrkaClient.class);
 
-        this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
+        this.clientFactory = mock(OrkaClientFactory.class);
+        when(clientFactory.getOrkaClient(anyString(), anyString(), anyBoolean(), anyBoolean()))
                 .thenReturn(client);
-        when(client.getVMs()).thenReturn(response);
+        when(client.getVMConfigs()).thenReturn(configResponse);
     }
 
     @Test
     public void when_fill_vm_items_in_orka_agent_should_return_correct_vm_size() throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
+        descriptor.setclientFactory(this.clientFactory);
 
         ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
                 this.createNewConfig);
@@ -75,7 +76,7 @@ public class VMItemsFillTest {
     @Test
     public void when_fill_vm_items_in_agent_template_should_return_correct_vm_size() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
+        descriptor.setclientFactory(this.clientFactory);
 
         ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
                 this.createNewConfig);

@@ -7,8 +7,8 @@ import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
 import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.SSHUtil;
 import io.jenkins.plugins.orka.helpers.Utils;
 
@@ -78,10 +78,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
-        OrkaVersionChecker.updateOrkaVersion(agent.getOrkaEndpoint(), agent.getOrkaCredentialsId(),
-                agent.getUseJenkinsProxySettings(), agent.getIgnoreSSLErrors());
-
-        OrkaClientProxy client = new OrkaClientProxyFactory().getOrkaClientProxy(agent.getOrkaEndpoint(),
+        OrkaClient client = new OrkaClientFactory().getOrkaClient(agent.getOrkaEndpoint(),
                 agent.getOrkaCredentialsId(), agent.getUseJenkinsProxySettings(), agent.getIgnoreSSLErrors());
 
         PrintStream logger = listener.getLogger();
@@ -95,8 +92,8 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
-        this.host = StringUtils.isNotBlank(this.redirectHost) ? redirectHost : deploymentResponse.getHost();
-        this.port = deploymentResponse.getSSHPort();
+        this.host = StringUtils.isNotBlank(this.redirectHost) ? redirectHost : deploymentResponse.getIP();
+        this.port = deploymentResponse.getSSH();
         this.launcher = this.getLauncher(agent.getVmCredentialsId());
         Jenkins.get().updateNode(slaveComputer.getNode());
 
@@ -124,7 +121,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return StringUtils.isNotBlank(this.host) && this.port != 0;
     }
 
-    private boolean createConfiguration(OrkaAgent agent, OrkaClientProxy clientProxy, PrintStream logger)
+    private boolean createConfiguration(OrkaAgent agent, OrkaClient client, PrintStream logger)
             throws IOException {
         if (agent.getCreateNewVMConfig()) {
             String configName = agent.getConfigName();
@@ -137,8 +134,8 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             String tag = agent.getTag();
             boolean tagRequired = agent.getTagRequired();
 
-            ConfigurationResponse configResponse = clientProxy.createConfiguration(configName, image, baseImage,
-                    template, numCPUs, useNetBoost, useGpuPassthrough, null, memory, tag, tagRequired);
+            ConfigurationResponse configResponse = client.createConfiguration(configName, image, numCPUs, useNetBoost,
+                    useGpuPassthrough, null, memory, tag, tagRequired);
             if (!configResponse.isSuccessful()) {
                 logger.println(String.format(configurationErrorFormat, Utils.getTimestamp(), configName, image,
                         baseImage, template, numCPUs, useNetBoost, useGpuPassthrough, memory, tag, tagRequired,
@@ -151,11 +148,11 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return true;
     }
 
-    private DeploymentResponse deployVM(OrkaAgent agent, OrkaClientProxy clientProxy, PrintStream logger)
+    private DeploymentResponse deployVM(OrkaAgent agent, OrkaClient client, PrintStream logger)
             throws IOException {
         String vmName = agent.getCreateNewVMConfig() ? agent.getConfigName() : agent.getVm();
 
-        DeploymentResponse deploymentResponse = clientProxy.deployVM(vmName, agent.getNode(),
+        DeploymentResponse deploymentResponse = client.deployVM(vmName, "orka-defautl", agent.getNode(),
                 null, agent.getTag(), agent.getTagRequired());
 
         if (!deploymentResponse.isSuccessful()) {
