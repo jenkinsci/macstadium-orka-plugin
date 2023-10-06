@@ -2,6 +2,7 @@ package io.jenkins.plugins.orka.helpers;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
+import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
+
 import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
@@ -25,10 +27,6 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         if (createNewVMConfig) {
-            if (configName.length() < 5) {
-                return FormValidation.error("Configuration name should NOT be shorter than 5 characters");
-            }
-
             try {
                 if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                     OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
@@ -63,6 +61,35 @@ public class FormValidator {
         }
 
         return FormValidation.error("Memory should be greater than 0");
+    }
+
+    public FormValidation doCheckNamespace(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
+            boolean ignoreSSLErrors, String namespace) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        if (StringUtils.startsWith(namespace, "orka-")) {
+            try {
+                if (StringUtils.isNotBlank(endpoint) && StringUtils.isNotBlank(credentialsId)) {
+                    OrkaClient client = this.clientFactory.getOrkaClient(endpoint,
+                            credentialsId, useJenkinsProxySettings, ignoreSSLErrors);
+                    NodeResponse response = client.getNodes(namespace);
+                    if (!response.getHttpResponse().getIsSuccessful()) {
+                        if (response.getHttpResponse().getCode() == 403) {
+                            return FormValidation.error(String.format(
+                                    "The user or service account does not have access to namespace: %s", namespace));
+                        }
+                        logger.fine(String.format("Check namespace failed with %s", response.getMessage()));
+                    }
+
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception in doCheckNamespace", e);
+            }
+
+            return FormValidation.ok();
+        }
+
+        return FormValidation.error("Namespace must start with 'orka-'");
     }
 
     public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings,

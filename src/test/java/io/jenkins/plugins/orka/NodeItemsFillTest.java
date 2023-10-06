@@ -79,7 +79,8 @@ public class NodeItemsFillTest {
                 OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
                 descriptor.setclientFactory(clientFactory);
 
-                ListBoxModel nodes = descriptor.doFillNodeItems(this.endpoint, this.credentials, false, false);
+                ListBoxModel nodes = descriptor.doFillNodeItems(this.endpoint, this.credentials,
+                                Constants.DEFAULT_NAMESPACE, false, false);
 
                 assertEquals(this.resultSize, nodes.size());
         }

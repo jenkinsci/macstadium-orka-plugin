@@ -11,7 +11,11 @@
 
   <f:section title="${%ORKA VM Details}">
 
-    <f:entry title="${%VM ID}" field="vmId">
+    <f:entry title="${%VM Name}" field="vmId">
+      <f:readOnlyTextbox />
+    </f:entry>
+
+    <f:entry title="${%Namespace}" field="namespace">
       <f:readOnlyTextbox />
     </f:entry>
 
@@ -67,9 +71,6 @@
         </f:dropdownListBlock>
       </j:forEach>
     </f:dropdownList>
-    <f:advanced>
-       <f:dropdownDescriptorSelector title="${%Verification Strategy}" field="verificationStrategy" descriptors="${descriptor.getVerificationStrategyDescriptors()}" />
-    </f:advanced>
   </f:section>
 
   <f:descriptorList title="${%Node Properties}" descriptors="${h.getNodePropertyDescriptors(descriptor.clazz)}"

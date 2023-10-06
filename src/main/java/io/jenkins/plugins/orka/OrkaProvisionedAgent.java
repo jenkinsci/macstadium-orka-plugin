@@ -12,7 +12,6 @@ import hudson.slaves.RetentionStrategy;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
-import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -20,8 +19,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
-
-import org.apache.commons.lang.StringUtils;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -34,30 +31,19 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private String node;
     private String host;
     private int sshPort;
+    private String namespace;
     private String vmCredentialsId;
     private String namePrefix;
-    private OrkaVerificationStrategy verificationStrategy;
     private String jvmOptions;
 
-    public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
-            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
-            RetentionStrategy<?> retentionStrategy,
-            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties)
-            throws Descriptor.FormException, IOException {
-        this(cloudId, namePrefix, vmId, node, host, sshPort, vmCredentialsId, numExecutors,
-                remoteFS, mode, labelString, retentionStrategy, verificationStrategy, nodeProperties, null);
-    }
-
     @DataBoundConstructor
-    public OrkaProvisionedAgent(String cloudId, String namePrefix, String vmId, String node, String host, int sshPort,
+    public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort, String namespace,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
-            RetentionStrategy<?> retentionStrategy,
-            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions)
             throws Descriptor.FormException, IOException {
 
-        super(StringUtils.isNotBlank(namePrefix) ? namePrefix + '_' + vmId : vmId, remoteFS,
-                new WaitSSHLauncher(host, sshPort, vmCredentialsId, verificationStrategy, jvmOptions));
+        super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, jvmOptions));
 
         this.setNumExecutors(numExecutors);
         this.setMode(mode);
@@ -75,17 +61,9 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         this.node = node;
         this.host = host;
         this.sshPort = sshPort;
+        this.namespace = namespace;
         this.vmCredentialsId = vmCredentialsId;
-        this.namePrefix = namePrefix;
-        this.verificationStrategy = verificationStrategy;
         this.jvmOptions = jvmOptions;
-    }
-
-    protected Object readResolve() {
-        if (this.verificationStrategy == null) {
-            this.verificationStrategy = new DefaultVerificationStrategy();
-        }
-        return this;
     }
 
     public String getCloudId() {
@@ -108,6 +86,10 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         return this.sshPort;
     }
 
+    public String getNamespace() {
+        return this.namespace;
+    }
+
     public String getVmCredentialsId() {
         return this.vmCredentialsId;
     }
@@ -120,15 +102,11 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         return this.jvmOptions;
     }
 
-    public OrkaVerificationStrategy getVerificationStrategy() {
-        return this.verificationStrategy;
-    }
-
     @Override
     protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
         logger.info("Terminating agent. VM id: " + this.vmId);
 
-        this.getCloud().deleteVM(this.vmId);
+        this.getCloud().deleteVM(this.vmId, this.namespace);
     }
 
     @Override
@@ -160,10 +138,6 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {
             return OrkaRetentionStrategy.getRetentionStrategyDescriptors();
         }
-
-        public static List<Descriptor<OrkaVerificationStrategy>> getVerificationStrategyDescriptors() {
-            return OrkaVerificationStrategyProvider.getVerificationStrategyDescriptors();
-        }
     }
 
     private OrkaCloud getCloud() {
@@ -173,7 +147,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     @Override
     public String toString() {
         return "OrkaProvisionedAgent [cloudId=" + cloudId + ", host=" + host + ", node=" + node + ", sshPort=" + sshPort
-                + ", vmCredentialsId=" + vmCredentialsId + ", verificationStrategy=" + verificationStrategy
+                + ", vmCredentialsId=" + vmCredentialsId
                 + ", namePrefix=" + namePrefix + "]" + ", vmId=" + vmId + "]";
     }
 }

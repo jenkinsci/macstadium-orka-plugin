@@ -5,7 +5,6 @@ import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
 import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
-import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
@@ -19,17 +18,10 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 public final class OrkaComputerLauncher extends ComputerLauncher {
-    private static String configurationErrorFormat = "%s: Creating configuration with configName: %s, image: %s, "
-            + "baseImage: %s, template: %s, numCPUs: %s, useNetBoost: %s, useGpuPassthrough: %s, memory: %s, "
-            + "tag: %s and tagRequired: %s"
-            + "failed with an error: %s. Stopping creation.";
     private static String deploymentErrorFormat = "%s: Deploying vm with name: %s, and node: %s"
             + "failed with an error: %s. Stopping creation.";
 
-    private static String configurationSuccessFormat = "%s: Creating configuration returned result: %s";
     private static String deploymentSuccessFormat = "%s: Deploying vm returned result: %s";
-
-    private static final String template = Constants.DEFAULT_CONFIG_NAME;
 
     private int launchTimeoutSeconds = 300;
     private int maxRetries = 3;
@@ -82,11 +74,6 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
                 agent.getOrkaCredentialsId(), agent.getUseJenkinsProxySettings(), agent.getIgnoreSSLErrors());
 
         PrintStream logger = listener.getLogger();
-
-        if (!createConfiguration(agent, client, logger)) {
-            return;
-        }
-
         DeploymentResponse deploymentResponse = this.deployVM(agent, client, logger);
         if (deploymentResponse == null) {
             return;
@@ -121,47 +108,23 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return StringUtils.isNotBlank(this.host) && this.port != 0;
     }
 
-    private boolean createConfiguration(OrkaAgent agent, OrkaClient client, PrintStream logger)
-            throws IOException {
-        if (agent.getCreateNewVMConfig()) {
-            String configName = agent.getConfigName();
-            String image = configName;
-            String baseImage = agent.getBaseImage();
-            int numCPUs = agent.getNumCPUs();
-            boolean useNetBoost = agent.getUseNetBoost();
-            boolean useGpuPassthrough = agent.getUseGpuPassthrough();
-            String memory = agent.getMemory();
-            String tag = agent.getTag();
-            boolean tagRequired = agent.getTagRequired();
-
-            ConfigurationResponse configResponse = client.createConfiguration(configName, image, numCPUs, useNetBoost,
-                    useGpuPassthrough, null, memory, tag, tagRequired);
-            if (!configResponse.isSuccessful()) {
-                logger.println(String.format(configurationErrorFormat, Utils.getTimestamp(), configName, image,
-                        baseImage, template, numCPUs, useNetBoost, useGpuPassthrough, memory, tag, tagRequired,
-                        Utils.getErrorMessage(configResponse)));
-                return false;
-            }
-            logger.println(
-                    String.format(configurationSuccessFormat, Utils.getTimestamp(), configResponse.getMessage()));
-        }
-        return true;
-    }
-
     private DeploymentResponse deployVM(OrkaAgent agent, OrkaClient client, PrintStream logger)
             throws IOException {
-        String vmName = agent.getCreateNewVMConfig() ? agent.getConfigName() : agent.getVm();
 
-        DeploymentResponse deploymentResponse = client.deployVM(vmName, "orka-defautl", agent.getNode(),
+        DeploymentResponse deploymentResponse = client.deployVM(null,
+                agent.getNamespace(), agent.getNamePrefix(), agent.getImage(), agent.getCpu(), agent.getMemory(),
+                agent.getNode(),
                 null, agent.getTag(), agent.getTagRequired());
 
         if (!deploymentResponse.isSuccessful()) {
             logger.println(
-                    String.format(deploymentErrorFormat, Utils.getTimestamp(), vmName, agent.getNode(),
+                    String.format(deploymentErrorFormat, Utils.getTimestamp(), agent.getNamePrefix(),
+                            agent.getNode(),
                             Utils.getErrorMessage(deploymentResponse)));
             return null;
         }
-        logger.println(String.format(deploymentSuccessFormat, Utils.getTimestamp(), deploymentResponse.getMessage()));
+        logger.println(String.format(deploymentSuccessFormat, Utils.getTimestamp(),
+                deploymentResponse.toString()));
         return deploymentResponse;
     }
 

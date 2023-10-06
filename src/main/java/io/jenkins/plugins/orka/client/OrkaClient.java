@@ -31,7 +31,6 @@ public class OrkaClient {
     private static final String VM_PATH = "vms";
     private static final String NODE_PATH = "nodes";
     private static final String IMAGE_PATH = RESOURCE_PATH + "/orka-default/images";
-    private static final String HEALTH_CHECK_PATH = "cluster-info";
 
     private String endpoint;
     private String token;
@@ -54,8 +53,7 @@ public class OrkaClient {
 
     public NodeResponse getNodes(String namespace) throws IOException {
         HttpResponse httpResponse = this
-                .get(String.format("%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, NODE_PATH));
-
+                .get(String.format("%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, NODE_PATH));
         NodeResponse response = JsonHelper.fromJson(httpResponse.getBody(), NodeResponse.class);
         response.setHttpResponse(httpResponse);
         return response;
@@ -86,9 +84,13 @@ public class OrkaClient {
         return response;
     }
 
-    public DeploymentResponse deployVM(String vmConfig, String namespace, String node, String scheduler,
+    public DeploymentResponse deployVM(String vmConfig, String namespace, String namePrefix, String image, Integer cpu,
+            String memory, String node,
+            String scheduler,
             String tag, Boolean tagRequired) throws IOException {
-        DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, node, scheduler, tag, tagRequired);
+        DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, namePrefix, image, cpu, memory, node,
+                scheduler, tag,
+                tagRequired);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(
@@ -101,7 +103,7 @@ public class OrkaClient {
 
     public DeletionResponse deleteVM(String vmName, String namespace) throws IOException {
         HttpResponse httpResponse = this
-                .delete(String.format("%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, VM_PATH, vmName));
+                .delete(String.format("%s/%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, VM_PATH, vmName));
         DeletionResponse response = JsonHelper.fromJson(httpResponse.getBody(), DeletionResponse.class);
         response.setHttpResponse(httpResponse);
 
@@ -109,7 +111,7 @@ public class OrkaClient {
     }
 
     public HealthCheckResponse getHealthCheck() throws IOException {
-        HttpResponse httpResponse = this.get(String.format("%s/%s", this.endpoint, RESOURCE_PATH, HEALTH_CHECK_PATH));
+        HttpResponse httpResponse = this.get(String.format("%s/%s", this.endpoint, VM_CONFIG_PATH));
         HealthCheckResponse response = JsonHelper.fromJson(httpResponse.getBody(), HealthCheckResponse.class);
         response.setHttpResponse(httpResponse);
 

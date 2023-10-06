@@ -1,8 +1,6 @@
 package io.jenkins.plugins.orka.client;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,25 +69,6 @@ public class OrkaClientTest {
     }
 
     @Test
-    public void when_calling_create_configuration_should_return_success() throws IOException {
-        String message = "Succesfully Created";
-        String body = "{ \"message\": \"" + message + "\"}";
-        HttpResponse response = new HttpResponse(body, 200, true);
-
-        OrkaClient client = mock(OrkaClient.class);
-        when(client.post(anyString(), anyString())).thenReturn(response);
-        when(client.createConfiguration(anyString(), anyString(), anyInt(), anyBoolean(),
-                anyBoolean(), anyString(), anyString(), anyString(), anyBoolean()))
-                .thenCallRealMethod();
-
-        ConfigurationResponse actualResponse = client.createConfiguration(
-                "newVm", "image", 24,
-                false, false, "most-allocated", "10", "testTag", true);
-
-        assertEquals(message, actualResponse.getMessage());
-    }
-
-    @Test
     public void when_calling_deploy_vm_should_return_ip_and_ssh_port() throws IOException {
         String ip = "199.92.12.1";
         int sshPort = 9281;
@@ -97,10 +76,14 @@ public class OrkaClientTest {
         HttpResponse response = new HttpResponse(body, 200, true);
 
         OrkaClient client = mock(OrkaClient.class);
-        when(client.post(anyString(), anyString())).thenReturn(response);
-        when(client.deployVM(anyString(), anyString(), anyString(), any(), any(), any())).thenCallRealMethod();
+        when(client.post(anyString(), any())).thenReturn(response);
+        when(client.deployVM(any(), anyString(), any(), any(), any(), any(), any(), any(),
+                any(), any()))
+                .thenCallRealMethod();
 
-        DeploymentResponse actualResponse = client.deployVM("newVm", "orka-default", "macpro-2", null, null, null);
+        DeploymentResponse actualResponse = client.deployVM("newVm", "orka-default", null, "foo.img", 6, "12", null,
+                null,
+                null, false);
 
         assertEquals(ip, actualResponse.getIP());
         assertEquals(sshPort, actualResponse.getSSH());

@@ -19,14 +19,12 @@ import hudson.slaves.RetentionStrategy;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
-import io.jenkins.plugins.orka.helpers.OrkaVerificationStrategyProvider;
 import io.jenkins.plugins.orka.helpers.Utils;
 
 import java.io.IOException;
@@ -35,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
@@ -46,90 +45,102 @@ import org.kohsuke.stapler.verb.POST;
 
 public class AgentTemplate implements Describable<AgentTemplate> {
     private static final Logger logger = Logger.getLogger(AgentTemplate.class.getName());
+    private static final String orka3xOption = "orka3xOption";
+    private static final String orka2xOption = "orka2xOption";
     private String vmCredentialsId;
-    private boolean createNewVMConfig;
-    private String vm;
-    private String configName;
-    private String baseImage;
-    private int numCPUs;
+
+    private String namePrefix;
+    private String image;
+    private Integer cpu;
+    private String memory;
+    private String namespace;
     private boolean useNetBoost;
     private boolean useGpuPassthrough;
-    private String memory;
-    private boolean overwriteTag;
+    private String scheduler;
+    private String config;
     private String tag;
     private Boolean tagRequired;
+
+    private String legacyConfigScheduler;
+    private String legacyConfigTag;
+    private Boolean legacyConfigTagRequired;
+
+    private String deploymentOption;
+
     private int numExecutors;
     private Mode mode;
     private String remoteFS;
     private String labelString;
-    private String namePrefix;
+
     private RetentionStrategy<?> retentionStrategy;
-    private OrkaVerificationStrategy verificationStrategy;
+
     private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
     private String jvmOptions;
-    private String scheduler;
 
     private transient OrkaCloud parent;
 
-    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, int numExecutors, String remoteFS, Mode mode, String labelString,
-            String namePrefix, RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy,
-            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, false, false,
-                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy,
-                nodeProperties, jvmOptions, scheduler, memory, false, null, null);
-    }
+    private transient String vm;
+    private transient String baseImage;
+    private transient int numCPUs;
+    private transient boolean createNewVMConfig;
 
-    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors,
-            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
-            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
-            String jvmOptions, String scheduler, String memory) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false,
-                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy,
-                nodeProperties, jvmOptions, scheduler, memory, false, null, null);
-    }
-
-    public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, int numExecutors,
-            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
-            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
-            String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
-            Boolean tagRequired) {
-        this(vmCredentialsId, vm, createNewVMConfig, configName, baseImage, numCPUs, useNetBoost, false,
-                numExecutors, remoteFS, mode, labelString, namePrefix, retentionStrategy, verificationStrategy,
-                nodeProperties, jvmOptions, scheduler, memory, overwriteTag, tag, tagRequired);
-    }
-
-    @DataBoundConstructor
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
             String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors,
             String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
             Boolean tagRequired) {
+
+        this(vmCredentialsId, createNewVMConfig ? orka3xOption : orka2xOption, namePrefix, baseImage, numCPUs, memory,
+                Constants.DEFAULT_NAMESPACE, useNetBoost,
+                useGpuPassthrough,
+                scheduler,
+                tag,
+                tagRequired,
+                vm,
+                scheduler,
+                tag,
+                tagRequired,
+                numExecutors, mode, remoteFS, labelString, retentionStrategy,
+                nodeProperties, jvmOptions);
+    }
+
+    @DataBoundConstructor
+    public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image, int cpu,
+            String memory,
+            String namespace, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String tag,
+            Boolean tagRequired, String config, String legacyConfigScheduler,
+            String legacyConfigTag, boolean legacyConfigTagRequired, int numExecutors, Mode mode,
+            String remoteFS,
+            String labelString, RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions) {
+
         this.vmCredentialsId = vmCredentialsId;
-        this.vm = vm;
-        this.createNewVMConfig = createNewVMConfig;
-        this.configName = configName;
-        this.baseImage = baseImage;
-        this.numCPUs = numCPUs;
-        this.useNetBoost = useNetBoost;
-        this.useGpuPassthrough = useGpuPassthrough;
-        this.numExecutors = numExecutors;
-        this.remoteFS = remoteFS;
-        this.mode = mode;
-        this.labelString = labelString;
         this.namePrefix = namePrefix;
+        this.namespace = namespace;
+        this.labelString = labelString;
+        this.numExecutors = numExecutors;
+        this.mode = mode;
+        this.remoteFS = remoteFS;
         this.retentionStrategy = retentionStrategy;
-        this.verificationStrategy = verificationStrategy;
         this.nodeProperties = new DescribableList<>(Saveable.NOOP, Util.fixNull(nodeProperties));
         this.jvmOptions = jvmOptions;
-        this.scheduler = scheduler;
+        this.deploymentOption = deploymentOption;
+
+        this.config = config;
+        this.legacyConfigScheduler = legacyConfigScheduler;
+        this.legacyConfigTag = legacyConfigTag;
+        this.legacyConfigTagRequired = legacyConfigTagRequired;
+
+        this.image = image;
+        this.cpu = cpu;
         this.memory = memory;
-        this.overwriteTag = overwriteTag;
-        this.tag = this.overwriteTag ? tag : null;
-        this.tagRequired = this.overwriteTag ? tagRequired : null;
+        this.useNetBoost = useNetBoost;
+        this.useGpuPassthrough = useGpuPassthrough;
+        this.scheduler = scheduler;
+        this.tag = tag;
+        this.tagRequired = tagRequired;
     }
 
     public String getOrkaCredentialsId() {
@@ -144,40 +155,32 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.vmCredentialsId;
     }
 
-    public boolean getCreateNewVMConfig() {
-        return this.createNewVMConfig;
+    public String getConfig() {
+        return this.config;
     }
 
-    public String getVm() {
-        return this.vm;
+    public String getImage() {
+        return this.image;
     }
 
-    public String getConfigName() {
-        return this.configName;
-    }
-
-    public String getBaseImage() {
-        return this.baseImage;
-    }
-
-    public int getNumCPUs() {
-        return this.numCPUs;
-    }
-
-    public boolean getUseNetBoost() {
-        return this.useNetBoost;
-    }
-
-    public boolean getUseGpuPassthrough() {
-        return this.useGpuPassthrough;
+    public Integer getCpu() {
+        return this.cpu;
     }
 
     public String getMemory() {
         return this.memory;
     }
 
-    public boolean getOverwriteTag() {
-        return this.overwriteTag;
+    public boolean isUseNetBoost() {
+        return this.useNetBoost;
+    }
+
+    public boolean isUseGpuPassthrough() {
+        return this.useGpuPassthrough;
+    }
+
+    public String getScheduler() {
+        return this.scheduler;
     }
 
     public String getTag() {
@@ -216,16 +219,24 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.jvmOptions;
     }
 
-    public String getScheduler() {
-        return this.scheduler;
+    public String getDeploymentOption() {
+        return this.deploymentOption;
+    }
+
+    public String getLegacyConfigScheduler() {
+        return this.legacyConfigScheduler;
+    }
+
+    public String getLegacyConfigTag() {
+        return this.legacyConfigTag;
+    }
+
+    public Boolean getLegacyConfigTagRequired() {
+        return this.legacyConfigTagRequired;
     }
 
     public RetentionStrategy<?> getRetentionStrategy() {
         return this.retentionStrategy;
-    }
-
-    public OrkaVerificationStrategy getVerificationStrategy() {
-        return this.verificationStrategy;
     }
 
     public DescribableList<NodeProperty<?>, NodePropertyDescriptor> getNodeProperties() {
@@ -237,20 +248,12 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     }
 
     public OrkaProvisionedAgent provision() throws IOException, FormException {
-        ConfigurationResponse configurationResponse = this.ensureConfigurationExist();
-        if (configurationResponse != null && !configurationResponse.isSuccessful()) {
-            logger.warning("Creating VM configuration failed with: " + Utils.getErrorMessage(configurationResponse));
-            return null;
-        }
-
-        String vmName = this.createNewVMConfig ? this.configName : this.vm;
-
-        logger.fine("Deploying VM with name " + vmName);
-        DeploymentResponse response = this.parent.deployVM(vmName, this.getScheduler(), this.getTag(),
-                this.getTagRequired());
+        String vmDeployID = "[deployID=" + UUID.randomUUID().toString() + "] ";
+        logger.fine("Deploying VM for label " + this.labelString + vmDeployID);
+        DeploymentResponse response = this.deployVM(vmDeployID);
 
         try {
-            logger.fine("Result deploying VM " + vmName + ":");
+            logger.fine("Result deploying VM with label " + this.labelString + vmDeployID + ":");
             logger.fine(response.toString());
 
             if (!response.isSuccessful()) {
@@ -261,31 +264,28 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             String host = this.parent.getRealHost(response.getIP());
             String vmId = response.getName();
 
-            return new OrkaProvisionedAgent(this.parent.getDisplayName(), this.namePrefix, vmId, response.getIP(),
-                    host, response.getSSH(), this.vmCredentialsId, this.numExecutors, this.remoteFS, this.mode,
-                    this.labelString, this.retentionStrategy, this.verificationStrategy,
+            return new OrkaProvisionedAgent(this.parent.getDisplayName(), vmId, response.getIP(),
+                    host, response.getSSH(), this.namespace, this.vmCredentialsId, this.numExecutors, this.remoteFS,
+                    this.mode,
+                    this.labelString, this.retentionStrategy,
                     this.nodeProperties, this.jvmOptions);
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
-            this.parent.deleteVM(response.getName());
+            this.parent.deleteVM(response.getName(), this.namespace);
 
             throw e;
         }
     }
 
-    private ConfigurationResponse ensureConfigurationExist() throws IOException {
-        if (this.createNewVMConfig) {
-            boolean configExist = parent.getVMConfigs().stream()
-                    .anyMatch(vm -> vm.getName().equalsIgnoreCase(configName));
-
-            if (!configExist) {
-                logger.fine("Creating config with name " + this.configName);
-                return parent.createConfiguration(this.configName, this.baseImage,
-                        this.numCPUs, this.useNetBoost, this.useGpuPassthrough,
-                        this.scheduler, this.memory, this.tag, this.tagRequired);
-            }
+    private DeploymentResponse deployVM(String vmDeployID) throws IOException {
+        if (StringUtils.equals(deploymentOption, orka2xOption)) {
+            logger.fine("Using Orka 2x deployment for ID:" + vmDeployID);
+            return this.parent.deployVM(this.namespace, this.namePrefix, this.config, null, null, null,
+                    this.legacyConfigScheduler, this.legacyConfigTag, this.legacyConfigTagRequired);
         }
-        return null;
+        logger.fine("Using Orka 3x deployment");
+        return this.parent.deployVM(this.namespace, this.namePrefix, null, this.image,
+                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired);
     }
 
     void setParent(OrkaCloud parent) {
@@ -296,12 +296,24 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         if (this.retentionStrategy == null) {
             this.retentionStrategy = new IdleTimeCloudRetentionStrategy(30);
         }
-        if (this.verificationStrategy == null) {
-            this.verificationStrategy = new DefaultVerificationStrategy();
-        }
         if (this.nodeProperties == null) {
             this.nodeProperties = new DescribableList<>(Saveable.NOOP, Collections.emptyList());
         }
+        if (StringUtils.isBlank(this.namespace)) {
+            this.namespace = Constants.DEFAULT_NAMESPACE;
+        }
+        if (this.createNewVMConfig && StringUtils.isNotBlank(this.baseImage)) {
+            this.image = this.baseImage;
+            this.cpu = this.numCPUs;
+        }
+        if (!this.createNewVMConfig && StringUtils.isNotBlank(vm)) {
+            this.config = this.vm;
+            this.legacyConfigTagRequired = tagRequired;
+            this.legacyConfigTag = tag;
+            this.legacyConfigScheduler = scheduler;
+            this.deploymentOption = orka2xOption;
+        }
+
         return this;
     }
 
@@ -319,24 +331,21 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }
 
         @POST
-        public FormValidation doCheckConfigName(@QueryParameter String configName,
-                @QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId,
-                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
-                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
-                @QueryParameter boolean createNewVMConfig) {
-            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            return formValidator.doCheckConfigName(configName, endpoint, credentialsId, useJenkinsProxySettings,
-                    ignoreSSLErrors, createNewVMConfig);
-        }
-
-        @POST
-        public FormValidation doCheckMemory(@QueryParameter String memory) {
-            return this.formValidator.doCheckMemory(memory);
+        public FormValidation doCheckMemory(@QueryParameter String value) {
+            return this.formValidator.doCheckMemory(value);
         }
 
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
             return FormValidation.validatePositiveInteger(value);
+        }
+
+        @POST
+        public FormValidation doCheckNamespace(@QueryParameter @RelativePath("..") String endpoint,
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors, @QueryParameter String value) {
+            return this.formValidator.doCheckNamespace(endpoint, credentialsId, useJenkinsProxySettings,
+                    ignoreSSLErrors, value);
         }
 
         public ListBoxModel doFillVmCredentialsIdItems() {
@@ -344,47 +353,41 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return CredentialsHelper.getCredentials(StandardCredentials.class);
         }
 
-        public ListBoxModel doFillNumCPUsItems() {
-            return this.infoHelper.doFillNumCPUsItems();
-        }
-
         public ListBoxModel doFillSchedulerItems() {
             return this.infoHelper.doFillSchedulerItems();
         }
 
         @POST
-        public ListBoxModel doFillVmItems(@QueryParameter @RelativePath("..") String endpoint,
+        public ListBoxModel doFillConfigItems(@QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId,
                 @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
-                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
-                @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors) {
 
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, ignoreSSLErrors,
-                    createNewVMConfig);
+            return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, ignoreSSLErrors);
         }
 
         @POST
-        public ListBoxModel doFillBaseImageItems(@QueryParameter @RelativePath("..") String endpoint,
+        public ListBoxModel doFillImageItems(@QueryParameter @RelativePath("..") String endpoint,
                 @QueryParameter @RelativePath("..") String credentialsId,
                 @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
                 @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
-                @QueryParameter boolean createNewVMConfig, @QueryParameter String readonlyBaseImage) {
+                @QueryParameter String readonlyImage) {
 
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             ListBoxModel model = this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
-                    ignoreSSLErrors, createNewVMConfig);
+                    ignoreSSLErrors);
 
-            if (StringUtils.isNotBlank(readonlyBaseImage)) {
-                if (!model.stream().filter(o -> o.value.equals(readonlyBaseImage)).findAny().isPresent()) {
-                    String sanitizedName = Utils.sanitizeK8sName(readonlyBaseImage);
+            if (StringUtils.isNotBlank(readonlyImage)) {
+                if (!model.stream().filter(o -> readonlyImage.equals(o.value)).findAny().isPresent()) {
+                    String sanitizedName = Utils.sanitizeK8sName(readonlyImage);
                     Optional<ListBoxModel.Option> existingImage = model.stream()
-                            .filter(o -> o.value.equals(sanitizedName))
+                            .filter(o -> sanitizedName.equals(o.value))
                             .findAny();
                     if (existingImage.isPresent()) {
                         existingImage.get().selected = true;
                     } else {
-                        model.add(readonlyBaseImage);
+                        model.add(readonlyImage);
                     }
                 }
             }
@@ -396,28 +399,32 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return OrkaRetentionStrategy.getRetentionStrategyDescriptors();
         }
 
-        public static List<Descriptor<OrkaVerificationStrategy>> getVerificationStrategyDescriptors() {
-            return OrkaVerificationStrategyProvider.getVerificationStrategyDescriptors();
-        }
-
-        public static Descriptor<OrkaVerificationStrategy> getDefaultVerificationDescriptor() {
-            return OrkaVerificationStrategyProvider.getDefaultVerificationDescriptor();
-        }
-
         public List<NodePropertyDescriptor> getNodePropertyDescriptors() {
             return NodePropertyDescriptor.for_(NodeProperty.all(), OrkaProvisionedAgent.class);
+        }
+
+        public String getDefaultNamespace() {
+            return Constants.DEFAULT_NAMESPACE;
+        }
+
+        public String getOrka2xOption() {
+            return AgentTemplate.orka2xOption;
+        }
+
+        public String getOrka3xOption() {
+            return AgentTemplate.orka3xOption;
         }
     }
 
     @Override
     public String toString() {
-        return "AgentTemplate [baseImage=" + baseImage + ", configName=" + configName + ", createNewVMConfig="
-                + createNewVMConfig + ", labelString="
-                + labelString + ", namePrefix=" + namePrefix + ", mode=" + mode + ", nodeProperties="
-                + nodeProperties + ", numCPUs=" + numCPUs + ", memory=" + memory + ", overwriteTag="
-                + overwriteTag + ", tag=" + tag + ", tagRequired=" + tagRequired + ", numExecutors="
-                + numExecutors + ", parent=" + parent + ", remoteFS=" + remoteFS + ", retentionStrategy="
-                + retentionStrategy + ", verificationStrategy=" + verificationStrategy + ", vm=" + vm
-                + ", vmCredentialsId=" + vmCredentialsId + " scheduler=" + scheduler + "]";
+        return "AgentTemplate [namePrefix=" + namePrefix + ", image=" + image + ", cpu=" + cpu + ", memory=" + memory
+                + ", namespace=" + namespace + ", useNetBoost=" + useNetBoost + ", useGpuPassthrough="
+                + useGpuPassthrough + ", scheduler=" + scheduler + ", config=" + config + ", tag=" + tag
+                + ", tagRequired=" + tagRequired + ", legacyConfigScheduler=" + legacyConfigScheduler
+                + ", legacyConfigTag=" + legacyConfigTag + ", legacyConfigTagRequired=" + legacyConfigTagRequired
+                + ", deploymentOption=" + deploymentOption + ", numExecutors="
+                + numExecutors + ", mode=" + mode + ", remoteFS=" + remoteFS + ", labelString=" + labelString
+                + ", retentionStrategy=" + retentionStrategy + "]";
     }
 }

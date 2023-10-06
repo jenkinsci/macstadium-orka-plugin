@@ -12,7 +12,6 @@ import hudson.slaves.NodeProvisioner.PlannedNode;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
-import io.jenkins.plugins.orka.client.ConfigurationResponse;
 import io.jenkins.plugins.orka.client.DeletionResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaVMConfig;
@@ -178,64 +177,21 @@ public class OrkaCloud extends Cloud {
                 .getVMConfigs().getConfigs();
     }
 
-    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount) throws IOException {
-        return this.createConfiguration(name, image, cpuCount, null);
-    }
-
-    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, String scheduler)
-            throws IOException {
-        return this.createConfiguration(name, image, cpuCount, scheduler, "auto");
-    }
-
-    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, String scheduler,
-            String memory) throws IOException {
-        return this.createConfiguration(name, image, cpuCount, false, scheduler, memory);
-    }
-
-    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, boolean useNetBoost,
-            String scheduler, String memory) throws IOException {
-        return this.createConfiguration(name, image, cpuCount, useNetBoost,
-                false, scheduler, memory, null, null);
-    }
-
-    public ConfigurationResponse createConfiguration(String name, String image, String baseImage, String configTemplate,
-            int cpuCount, boolean useNetBoost, boolean useGpuPassthrough, String scheduler,
-            String memory) throws IOException {
-        return this.createConfiguration(name, image, cpuCount, useNetBoost,
-                useGpuPassthrough, scheduler, memory, null, null);
-    }
-
-    public ConfigurationResponse createConfiguration(String name, String image, int cpuCount, boolean useNetBoost,
-            boolean useGpuPassthrough, String scheduler, String memory, String tag,
-            Boolean tagRequired) throws IOException {
-        return new OrkaClientFactory()
-                .getOrkaClient(this.endpoint, this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings,
-                        this.ignoreSSLErrors)
-                .createConfiguration(name, image, cpuCount, useNetBoost, useGpuPassthrough,
-                        scheduler, memory, tag, tagRequired);
-    }
-
-    public DeploymentResponse deployVM(String name) throws IOException {
-        return this.deployVM(name, null);
-    }
-
-    public DeploymentResponse deployVM(String name, String scheduler) throws IOException {
-        return this.deployVM(name, scheduler, null, null);
-    }
-
-    public DeploymentResponse deployVM(String name, String scheduler, String tag,
+    public DeploymentResponse deployVM(String namespace, String namePrefix, String vmConfig, String image, Integer cpu,
+            String memory, String scheduler,
+            String tag,
             Boolean tagRequired) throws IOException {
         return new OrkaClientFactory()
                 .getOrkaClient(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .deployVM(name, "orka-default", null, scheduler, tag, tagRequired);
+                .deployVM(vmConfig, namespace, namePrefix, image, cpu, memory, null, scheduler, tag, tagRequired);
     }
 
-    public void deleteVM(String name) throws IOException {
+    public void deleteVM(String name, String namespace) throws IOException {
         try {
             DeletionResponse deletionResponse = new OrkaClientFactory().getOrkaClient(this.endpoint,
                     this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings, this.ignoreSSLErrors)
-                    .deleteVM(name, "orka-default");
+                    .deleteVM(name, namespace);
 
             if (deletionResponse.isSuccessful()) {
                 logger.info("VM " + name + " is successfully deleted.");
@@ -244,7 +200,7 @@ public class OrkaCloud extends Cloud {
                 logger.warning("Deleting VM " + name + " failed with: " + Utils.getErrorMessage(deletionResponse));
             }
         } catch (Exception ex) {
-            logger.log(Level.WARNING, "Failed to delete a VM with name" + name, ex);
+            logger.log(Level.WARNING, "Failed to delete a VM with name:" + name, ex);
         }
     }
 

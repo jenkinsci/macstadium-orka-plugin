@@ -4,6 +4,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
+import hudson.RelativePath;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
@@ -32,79 +33,43 @@ public class OrkaAgent extends AbstractCloudSlave {
     public String vmCredentialsId;
     private boolean useJenkinsProxySettings;
     private boolean ignoreSSLErrors;
-    private boolean createNewVMConfig;
-    private String vm;
     private String node;
-    private String configName;
-    private String baseImage;
-    private int numCPUs;
+    private String namespace;
+    private String image;
+    private Integer cpu;
     private boolean useNetBoost;
     private boolean useGpuPassthrough;
     private String memory;
-    private boolean overwriteTag;
     private String tag;
     private Boolean tagRequired;
+    private String namePrefix;
     private String jvmOptions;
 
-    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
-            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
-            int numCPUs, int numExecutors, String host, int port, String remoteFS,
-            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions, String memory)
-            throws Descriptor.FormException, IOException {
-        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
-                configName, baseImage, numCPUs, false, false, numExecutors, host, port, remoteFS,
-                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, memory, false, null, null);
-    }
-
-    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
-            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
-            int numCPUs, boolean useNetBoost, int numExecutors, String host,
-            int port, String remoteFS, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions,
-            String memory)
-            throws Descriptor.FormException, IOException {
-        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
-                configName, baseImage, numCPUs, useNetBoost, false, numExecutors, host, port, remoteFS,
-                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, memory, false, null, null);
-    }
-
-    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
-            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
-            int numCPUs, boolean useNetBoost, int numExecutors, String host,
-            int port, String remoteFS, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions,
-            String memory, boolean overwriteTag, String tag, Boolean tagRequired)
-            throws Descriptor.FormException, IOException {
-        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, vm, node, redirectHost, createNewVMConfig,
-                configName, baseImage, numCPUs, useNetBoost, false, numExecutors, host, port, remoteFS,
-                useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, memory, overwriteTag, tag, tagRequired);
-    }
-
     @DataBoundConstructor
-    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId, String vm,
-            String node, String redirectHost, boolean createNewVMConfig, String configName, String baseImage,
-            int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors, String host,
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
+            String node, String namespace, String namePrefix, String redirectHost, String image,
+            Integer cpu, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors, String host,
             int port, String remoteFS, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions,
-            String memory, boolean overwriteTag, String tag, Boolean tagRequired)
+            String memory, String tag, Boolean tagRequired)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
         this.orkaCredentialsId = orkaCredentialsId;
         this.orkaEndpoint = orkaEndpoint;
         this.vmCredentialsId = vmCredentialsId;
-        this.vm = vm;
+        this.namespace = namespace;
+        this.namePrefix = namePrefix;
         this.node = node;
-        this.createNewVMConfig = createNewVMConfig;
-        this.configName = configName;
-        this.baseImage = baseImage;
-        this.numCPUs = numCPUs;
+        this.image = image;
+        this.cpu = cpu;
         this.useNetBoost = useNetBoost;
         this.useGpuPassthrough = useGpuPassthrough;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
         this.ignoreSSLErrors = ignoreSSLErrors;
         this.jvmOptions = jvmOptions;
         this.memory = memory;
-        this.overwriteTag = overwriteTag;
-        this.tag = this.overwriteTag ? tag : null;
-        this.tagRequired = this.overwriteTag ? tagRequired : null;
+        this.tag = tag;
+        this.tagRequired = tagRequired;
         this.setNumExecutors(numExecutors);
     }
 
@@ -128,28 +93,24 @@ public class OrkaAgent extends AbstractCloudSlave {
         return this.ignoreSSLErrors;
     }
 
-    public boolean getCreateNewVMConfig() {
-        return this.createNewVMConfig;
+    public String getNamespace() {
+        return this.namespace;
     }
 
-    public String getVm() {
-        return this.vm;
+    public String getNamePrefix() {
+        return this.namePrefix;
     }
 
     public String getNode() {
         return this.node;
     }
 
-    public String getConfigName() {
-        return this.configName;
+    public String getImage() {
+        return this.image;
     }
 
-    public String getBaseImage() {
-        return this.baseImage;
-    }
-
-    public int getNumCPUs() {
-        return this.numCPUs;
+    public int getCpu() {
+        return this.cpu;
     }
 
     public boolean getUseNetBoost() {
@@ -162,10 +123,6 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     public String getMemory() {
         return this.memory;
-    }
-
-    public boolean getOverwriteTag() {
-        return this.overwriteTag;
     }
 
     public String getTag() {
@@ -216,15 +173,6 @@ public class OrkaAgent extends AbstractCloudSlave {
         }
 
         @POST
-        public FormValidation doCheckConfigName(@QueryParameter String configName, @QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
-                @QueryParameter boolean ignoreSSLErrors, @QueryParameter boolean createNewVMConfig) {
-
-            return this.formValidator.doCheckConfigName(configName, orkaEndpoint, orkaCredentialsId,
-                    useJenkinsProxySettings, ignoreSSLErrors, createNewVMConfig);
-        }
-
-        @POST
         public FormValidation doCheckMemory(@QueryParameter String memory) {
             return this.formValidator.doCheckMemory(memory);
         }
@@ -241,12 +189,23 @@ public class OrkaAgent extends AbstractCloudSlave {
 
         @POST
         public ListBoxModel doFillNodeItems(@QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
+                @QueryParameter String orkaCredentialsId, @QueryParameter String namespace,
+                @QueryParameter boolean useJenkinsProxySettings,
                 @QueryParameter boolean ignoreSSLErrors) {
 
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return this.infoHelper.doFillNodeItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
+                    namespace,
                     ignoreSSLErrors);
+        }
+
+        @POST
+        public FormValidation doCheckNamespace(@QueryParameter @RelativePath("..") String orkaEndpoint,
+                @QueryParameter @RelativePath("..") String orkaCredentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors, @QueryParameter String value) {
+            return this.formValidator.doCheckNamespace(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
+                    ignoreSSLErrors, value);
         }
 
         public ListBoxModel doFillNumCPUsItems() {
@@ -254,23 +213,13 @@ public class OrkaAgent extends AbstractCloudSlave {
         }
 
         @POST
-        public ListBoxModel doFillVmItems(@QueryParameter String orkaEndpoint, @QueryParameter String orkaCredentialsId,
-                @QueryParameter boolean useJenkinsProxySettings, @QueryParameter boolean ignoreSSLErrors,
-                @QueryParameter boolean createNewVMConfig) {
-
-            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            return this.infoHelper.doFillVmItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
-                    ignoreSSLErrors, createNewVMConfig);
-        }
-
-        @POST
-        public ListBoxModel doFillBaseImageItems(@QueryParameter String orkaEndpoint,
+        public ListBoxModel doFillImageItems(@QueryParameter String orkaEndpoint,
                 @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
-                @QueryParameter boolean ignoreSSLErrors, @QueryParameter boolean createNewVMConfig) {
+                @QueryParameter boolean ignoreSSLErrors) {
 
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return this.infoHelper.doFillBaseImageItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
-                    ignoreSSLErrors, createNewVMConfig);
+                    ignoreSSLErrors);
         }
 
         @POST
@@ -281,6 +230,10 @@ public class OrkaAgent extends AbstractCloudSlave {
 
             return this.formValidator.doTestConnection(orkaCredentialsId, orkaEndpoint, useJenkinsProxySettings,
                     ignoreSSLErrors);
+        }
+
+        public String getDefaultNamespace() {
+            return Constants.DEFAULT_NAMESPACE;
         }
     }
 }

@@ -14,22 +14,22 @@ public class OrkaInfoHelper {
 
     private static final String[] supportedCPUs = new String[] { "3", "4", "6", "8", "12", "24" };
     private static final String[] supportedSchedulers = new String[] { "default", "most-allocated" };
-    private static final String defaultNamespace = "orka-default";
 
     public OrkaInfoHelper(OrkaClientFactory clientFactory) {
         this.clientFactory = clientFactory;
     }
 
     public ListBoxModel doFillNodeItems(String orkaEndpoint, String orkaCredentialsId,
-            boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
+            boolean useJenkinsProxySettings, String namespace, boolean ignoreSSLErrors) {
 
         ListBoxModel model = new ListBoxModel();
 
         try {
-            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null
+                    && StringUtils.isNotBlank(namespace)) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                         orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
-                client.getNodes(defaultNamespace).getNodes().forEach(n -> model.add(n.getName()));
+                client.getNodes(namespace).getNodes().forEach(n -> model.add(n.getName()));
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception in doFillNodeItems", e);
@@ -39,12 +39,12 @@ public class OrkaInfoHelper {
     }
 
     public ListBoxModel doFillVmItems(String orkaEndpoint, String orkaCredentialsId, boolean useJenkinsProxySettings,
-            boolean ignoreSSLErrors, boolean createNewVMConfig) {
+            boolean ignoreSSLErrors) {
 
         ListBoxModel model = new ListBoxModel();
 
         try {
-            if (StringUtils.isNotBlank(orkaEndpoint) && !createNewVMConfig && orkaCredentialsId != null) {
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                         orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 client.getVMConfigs().getConfigs().forEach(vm -> model.add(vm.getName()));
@@ -57,11 +57,11 @@ public class OrkaInfoHelper {
     }
 
     public ListBoxModel doFillBaseImageItems(String orkaEndpoint, String orkaCredentialsId,
-            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, boolean createNewVMConfig) {
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
 
         ListBoxModel model = new ListBoxModel();
         try {
-            if (StringUtils.isNotBlank(orkaEndpoint) && createNewVMConfig && orkaCredentialsId != null) {
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                         orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 client.getImages().getImages().forEach(image -> model.add(image.getName()));
@@ -81,7 +81,6 @@ public class OrkaInfoHelper {
 
     public ListBoxModel doFillSchedulerItems() {
         ListBoxModel model = new ListBoxModel();
-        model.add("config-default", "");
         Arrays.stream(supportedSchedulers).forEach(scheduler -> model.add(scheduler));
         return model;
     }

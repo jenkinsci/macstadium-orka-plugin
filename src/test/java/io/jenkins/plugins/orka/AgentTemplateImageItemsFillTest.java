@@ -70,8 +70,8 @@ public class AgentTemplateImageItemsFillTest {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setclientFactory(this.clientFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems("http://10.221.188.100", "this.credentials", false,
-                false, true, this.currentImage);
+        ListBoxModel baseImages = descriptor.doFillImageItems("http://10.221.188.100", "this.credentials", false,
+                false, this.currentImage);
 
         assertEquals(this.resultSize, baseImages.size());
         Optional<ListBoxModel.Option> selectedOption = baseImages.stream().filter(o -> o.selected).findFirst();

@@ -7,7 +7,7 @@
         <f:textbox/>
     </f:entry>
 
-    <f:entry field="credentialsId" title="${%Orka Credentials}" description="Credentials used to access Orka">
+    <f:entry field="credentialsId" title="${%Orka Token}" description="Service account token used to access Orka">
       <c:select />
     </f:entry>
 

@@ -28,7 +28,6 @@ public class DeploymentResponse extends ResponseBase {
 
     @Override
     public String toString() {
-        return "DeploymentResponse [IP=" + ip + ", name=" + name
-                + ", message=" + this.getMessage() + ", ssh=" + ssh + "]";
+        return "DeploymentResponse [Name=" + name + ", IP=" + ip + ", SSH=" + ssh + "]";
     }
 }

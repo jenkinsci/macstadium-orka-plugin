@@ -27,21 +27,19 @@ public class ImageItemsFillTest {
     @ClassRule
     public static JenkinsRule r = new JenkinsRule();
 
-    @Parameterized.Parameters(name = "{index}: Test with createNewConfig={0}, endpoint={1}, credentials={2}")
+    @Parameterized.Parameters(name = "{index}: Test with endpoint={0}, credentials={1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-                new Object[][] { { true, "endpoint", "credentials", 2 }, { false, "endpoint", "credentials", 0 },
-                        { true, null, "credentials", 0 }, { true, "endpoint", null, 0 }, });
+                new Object[][] { { "endpoint", "credentials", 2 }, { "endpoint", "credentials", 2 },
+                        { null, "credentials", 0 }, { "endpoint", null, 0 }, });
     }
 
     private OrkaClientFactory clientFactory;
-    private final boolean createNewConfig;
     private final String endpoint;
     private final String credentials;
     private final int resultSize;
 
-    public ImageItemsFillTest(boolean createNewConfig, String endpoint, String credentials, int resultSize) {
-        this.createNewConfig = createNewConfig;
+    public ImageItemsFillTest(String endpoint, String credentials, int resultSize) {
         this.endpoint = endpoint;
         this.credentials = credentials;
         this.resultSize = resultSize;
@@ -64,8 +62,8 @@ public class ImageItemsFillTest {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
         descriptor.setclientFactory(this.clientFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                false, this.createNewConfig);
+        ListBoxModel baseImages = descriptor.doFillImageItems(this.endpoint, this.credentials, false,
+                false);
 
         assertEquals(this.resultSize, baseImages.size());
     }
@@ -75,8 +73,8 @@ public class ImageItemsFillTest {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setclientFactory(this.clientFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                false, this.createNewConfig, "");
+        ListBoxModel baseImages = descriptor.doFillImageItems(this.endpoint, this.credentials, false,
+                false, "");
 
         assertEquals(this.resultSize, baseImages.size());
     }

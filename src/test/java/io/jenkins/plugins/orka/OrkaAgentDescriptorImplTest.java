@@ -26,17 +26,8 @@ public class OrkaAgentDescriptorImplTest {
     }
 
     @Test
-    public void when_not_creating_new_config_should_return_ok() throws IOException {
-        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        
-        FormValidation validation = descriptor.doCheckConfigName("a", "127.0.0.1", "credentialsId", false, false,
-                false);
-
-        assertEquals(FormValidation.ok(), validation);
-    }
-
-    @Test
-    public void when_do_fill_orka_credentials_id_items_with_no_credentials_should_return_empty_credentials() throws IOException {
+    public void when_do_fill_orka_credentials_id_items_with_no_credentials_should_return_empty_credentials()
+            throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
 
         ListBoxModel model = descriptor.doFillOrkaCredentialsIdItems();
@@ -45,10 +36,12 @@ public class OrkaAgentDescriptorImplTest {
     }
 
     @Test
-    public void when_do_fill_orka_credentials_id_items_with_one_credential_should_return_two_credentials() throws IOException {
+    public void when_do_fill_orka_credentials_id_items_with_one_credential_should_return_two_credentials()
+            throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        UsernamePasswordCredentialsImpl credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM, "uniqueId", "description", "foo", "bar");
-        SystemCredentialsProvider.getInstance().getCredentials().add(credentials);        
+        UsernamePasswordCredentialsImpl credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM,
+                "uniqueId", "description", "foo", "bar");
+        SystemCredentialsProvider.getInstance().getCredentials().add(credentials);
         SystemCredentialsProvider.getInstance().save();
 
         ListBoxModel model = descriptor.doFillOrkaCredentialsIdItems();
@@ -58,7 +51,8 @@ public class OrkaAgentDescriptorImplTest {
     }
 
     @Test
-    public void when_do_fill_vm_credentials_id_items_with_no_credentials_should_return_empty_credentials() throws IOException {
+    public void when_do_fill_vm_credentials_id_items_with_no_credentials_should_return_empty_credentials()
+            throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
 
         ListBoxModel model = descriptor.doFillVmCredentialsIdItems();
@@ -67,10 +61,12 @@ public class OrkaAgentDescriptorImplTest {
     }
 
     @Test
-    public void when_do_fill_vm_credentials_id_items_with_one_credential_should_return_two_credentials() throws IOException {
+    public void when_do_fill_vm_credentials_id_items_with_one_credential_should_return_two_credentials()
+            throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        UsernamePasswordCredentialsImpl credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM, "uniqueId", "description", "foo", "bar");
-        SystemCredentialsProvider.getInstance().getCredentials().add(credentials);        
+        UsernamePasswordCredentialsImpl credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM,
+                "uniqueId", "description", "foo", "bar");
+        SystemCredentialsProvider.getInstance().getCredentials().add(credentials);
         SystemCredentialsProvider.getInstance().save();
 
         ListBoxModel model = descriptor.doFillVmCredentialsIdItems();

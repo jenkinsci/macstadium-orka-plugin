@@ -19,14 +19,6 @@
            <f:readOnlyTextbox name="orkaEndpoint" value="${instance.orkaEndpoint}" />
         </f:invisibleEntry>
 
-        <f:invisibleEntry>
-           <f:readOnlyTextbox name="host" value="${instance.launcher.host}" />
-        </f:invisibleEntry>
-
-        <f:invisibleEntry>
-          <f:number name="port" value="${instance.launcher.port}" />
-        </f:invisibleEntry>
-
         <f:section title="${%ORKA VM Details}">
 
           <f:entry title="${%Node}" field="node">
@@ -39,11 +31,17 @@
             </f:entry>
           </j:if>
 
-          <j:if test="${instance.configName != null and instance.configName != ''}">
-            <f:entry title="${%Config Name}" field="configName">
-              <f:readOnlyTextbox checkMethod="post"/>
-            </f:entry>
-          </j:if>
+          <f:entry title="${%Namespace}" field="namespace">
+            <f:readOnlyTextbox />
+          </f:entry>
+
+          <f:entry>
+            <f:readOnlyTextbox name="host" value="${instance.launcher.host}" />
+          </f:entry>
+
+          <f:entry>
+            <f:number name="port" value="${instance.launcher.port}" />
+          </f:entry>
 
           <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
             <c:select />

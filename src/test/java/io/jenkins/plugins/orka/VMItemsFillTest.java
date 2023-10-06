@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -28,21 +27,19 @@ public class VMItemsFillTest {
     @ClassRule
     public static JenkinsRule r = new JenkinsRule();
 
-    @Parameterized.Parameters(name = "{index}: Test with createNewConfig={0}, endpoint={1}, credentials={2}")
+    @Parameterized.Parameters(name = "{index}: Test with endpoint={0}, credentials={1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-                new Object[][] { { false, "endpoint", "credentials", 2 }, { true, "endpoint", "credentials", 0 },
-                        { false, null, "credentials", 0 }, { false, "endpoint", null, 0 }, });
+                new Object[][] { { "endpoint", "credentials", 2 }, { "endpoint", "credentials", 2 },
+                        { null, "credentials", 0 }, { "endpoint", null, 0 }, });
     }
 
     private OrkaClientFactory clientFactory;
-    private final boolean createNewConfig;
     private final String endpoint;
     private final String credentials;
     private final int resultSize;
 
-    public VMItemsFillTest(boolean createNewConfig, String endpoint, String credentials, int resultSize) {
-        this.createNewConfig = createNewConfig;
+    public VMItemsFillTest(String endpoint, String credentials, int resultSize) {
         this.endpoint = endpoint;
         this.credentials = credentials;
         this.resultSize = resultSize;
@@ -63,23 +60,11 @@ public class VMItemsFillTest {
     }
 
     @Test
-    public void when_fill_vm_items_in_orka_agent_should_return_correct_vm_size() throws IOException {
-        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setclientFactory(this.clientFactory);
-
-        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
-                this.createNewConfig);
-
-        assertEquals(this.resultSize, vms.size());
-    }
-
-    @Test
     public void when_fill_vm_items_in_agent_template_should_return_correct_vm_size() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
         descriptor.setclientFactory(this.clientFactory);
 
-        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
-                this.createNewConfig);
+        ListBoxModel vms = descriptor.doFillConfigItems(this.endpoint, this.credentials, false, false);
 
         assertEquals(this.resultSize, vms.size());
     }
