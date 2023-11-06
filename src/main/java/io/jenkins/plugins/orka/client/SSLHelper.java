@@ -17,7 +17,7 @@ import okhttp3.OkHttpClient;
 
 public class SSLHelper {
     private static final Logger logger = Logger.getLogger(SSLHelper.class.getName());
-    
+
     public static OkHttpClient.Builder ignoreSSLErrors(OkHttpClient.Builder builder) {
         try {
             final TrustManager[] trustAllCerts = new TrustManager[] {
@@ -34,7 +34,7 @@ public class SSLHelper {
 
                     @Override
                     public X509Certificate[] getAcceptedIssuers() {
-                        return new java.security.cert.X509Certificate[]{};
+                        return new java.security.cert.X509Certificate[] {};
                     }
                 }
             };
@@ -43,17 +43,17 @@ public class SSLHelper {
             sslContext.init(null, trustAllCerts, new SecureRandom());
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override
-                    public boolean verify(String hostname, SSLSession session) {
+                public boolean verify(String hostname, SSLSession session) {
                     return true;
                 }
             });
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Exception while ignoring SSL", e);
         }
-        
+
         return builder;
     }
 }

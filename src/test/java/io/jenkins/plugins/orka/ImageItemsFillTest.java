@@ -17,29 +17,29 @@ import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.ListBoxModel;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.client.Image;
+import io.jenkins.plugins.orka.client.ImageResponse;
+import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 
 @RunWith(Parameterized.class)
 public class ImageItemsFillTest {
     @ClassRule
     public static JenkinsRule r = new JenkinsRule();
 
-    @Parameterized.Parameters(name = "{index}: Test with createNewConfig={0}, endpoint={1}, credentials={2}")
+    @Parameterized.Parameters(name = "{index}: Test with endpoint={0}, credentials={1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-                new Object[][] { { true, "endpoint", "credentials", 2 }, { false, "endpoint", "credentials", 0 },
-                        { true, null, "credentials", 0 }, { true, "endpoint", null, 0 }, });
+                new Object[][] { { "endpoint", "credentials", 2 }, { "endpoint", "credentials", 2 },
+                        { null, "credentials", 0 }, { "endpoint", null, 0 }, });
     }
 
-    private OrkaClientProxyFactory clientProxyFactory;
-    private final boolean createNewConfig;
+    private OrkaClientFactory clientFactory;
     private final String endpoint;
     private final String credentials;
     private final int resultSize;
 
-    public ImageItemsFillTest(boolean createNewConfig, String endpoint, String credentials, int resultSize) {
-        this.createNewConfig = createNewConfig;
+    public ImageItemsFillTest(String endpoint, String credentials, int resultSize) {
         this.endpoint = endpoint;
         this.credentials = credentials;
         this.resultSize = resultSize;
@@ -47,23 +47,23 @@ public class ImageItemsFillTest {
 
     @Before
     public void initialize() throws IOException {
-        String[] response = { "Mojave.img", "SnowLeopard.img" };
+        Image[] images = { new Image("Mojave.img", "", "amd64"), new Image("SnowLeopard.img", "", "amd64") };
 
-        OrkaClientProxy clientProxy = mock(OrkaClientProxy.class);
+        OrkaClient client = mock(OrkaClient.class);
 
-        this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
-                .thenReturn(clientProxy);
-        when(clientProxy.getImages()).thenReturn(Arrays.asList((response)));
+        this.clientFactory = mock(OrkaClientFactory.class);
+        when(clientFactory.getOrkaClient(anyString(), anyString(), anyBoolean(), anyBoolean()))
+                .thenReturn(client);
+        when(client.getImages()).thenReturn(new ImageResponse(Arrays.asList(images), ""));
     }
 
     @Test
     public void when_fill_image_items_in_orka_agent_should_return_correct_result_size() throws IOException {
         OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
+        descriptor.setclientFactory(this.clientFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                false, this.createNewConfig);
+        ListBoxModel baseImages = descriptor.doFillImageItems(this.endpoint, this.credentials, false,
+                false);
 
         assertEquals(this.resultSize, baseImages.size());
     }
@@ -71,10 +71,10 @@ public class ImageItemsFillTest {
     @Test
     public void when_fill_image_items_in_agent_template_should_return_correct_result_size() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
+        descriptor.setclientFactory(this.clientFactory);
 
-        ListBoxModel baseImages = descriptor.doFillBaseImageItems(this.endpoint, this.credentials, false,
-                false, this.createNewConfig, "");
+        ListBoxModel baseImages = descriptor.doFillImageItems(this.endpoint, this.credentials, false,
+                false, "");
 
         assertEquals(this.resultSize, baseImages.size());
     }

@@ -1,88 +1,70 @@
 package io.jenkins.plugins.orka.client;
 
-import com.google.gson.annotations.SerializedName;
-
 public class OrkaNode {
-    @SerializedName("name")
     private String name;
 
-    @SerializedName("address")
-    private String address;
+    private String nodeIP;
 
-    @SerializedName("total_cpu")
-    private int totalCPU;
+    private int allocatableCpu;
 
-    @SerializedName("available_cpu")
-    private int availableCPU;
+    private int availableCpu;
 
-    @SerializedName("host_name")
-    private String hostname;
+    private String allocatableMemory;
 
-    @SerializedName("total_memory")
-    private String totalMemory;
-
-    @SerializedName("available_memory")
     private String availableMemory;
 
-    @SerializedName("state")
-    private String state;
+    private String phase;
 
-    public OrkaNode(String name, String address, int totalCPU, int availableCPU, String totalMemory,
-            String availableMemory, String hostname, String state) {
+    public OrkaNode(String name, String nodeIP, int allocatableCpu, int availableCpu, String allocatableMemory,
+            String availableMemory, String phase) {
         this.name = name;
-        this.address = address;
-        this.totalCPU = totalCPU;
-        this.availableCPU = availableCPU;
-        this.totalMemory = totalMemory;
+        this.nodeIP = nodeIP;
+        this.allocatableCpu = allocatableCpu;
+        this.availableCpu = availableCpu;
+        this.allocatableMemory = allocatableMemory;
         this.availableMemory = availableMemory;
-        this.hostname = hostname;
-        this.state = state;
+        this.phase = phase;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public String getAddress() {
-        return this.address;
+    public String getNodeIP() {
+        return this.nodeIP;
     }
 
-    public int getTotalCPU() {
-        return this.totalCPU;
+    public int getAllocatableCpu() {
+        return this.allocatableCpu;
     }
 
-    public int getAvailableCPU() {
-        return this.availableCPU;
+    public int getAvailableCpu() {
+        return this.availableCpu;
     }
 
-    public String getTotalMemory() {
-        return this.totalMemory;
+    public String getAllocatableMemory() {
+        return this.allocatableMemory;
     }
 
     public String getAvailableMemory() {
         return this.availableMemory;
     }
 
-    public String getHostname() {
-        return this.hostname;
-    }
-
-    public String getState() {
-        return this.state;
+    public String getPhase() {
+        return this.phase;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((address == null) ? 0 : address.hashCode());
-        result = prime * result + availableCPU;
+        result = prime * result + ((nodeIP == null) ? 0 : nodeIP.hashCode());
+        result = prime * result + availableCpu;
         result = prime * result + ((availableMemory == null) ? 0 : availableMemory.hashCode());
-        result = prime * result + ((hostname == null) ? 0 : hostname.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((state == null) ? 0 : state.hashCode());
-        result = prime * result + totalCPU;
-        result = prime * result + ((totalMemory == null) ? 0 : totalMemory.hashCode());
+        result = prime * result + ((phase == null) ? 0 : phase.hashCode());
+        result = prime * result + allocatableCpu;
+        result = prime * result + ((allocatableMemory == null) ? 0 : allocatableMemory.hashCode());
         return result;
     }
 
@@ -98,14 +80,14 @@ public class OrkaNode {
             return false;
         }
         OrkaNode other = (OrkaNode) obj;
-        if (address == null) {
-            if (other.address != null) {
+        if (nodeIP == null) {
+            if (other.nodeIP != null) {
                 return false;
             }
-        } else if (!address.equals(other.address)) {
+        } else if (!nodeIP.equals(other.nodeIP)) {
             return false;
         }
-        if (availableCPU != other.availableCPU) {
+        if (allocatableCpu != other.allocatableCpu) {
             return false;
         }
         if (availableMemory == null) {
@@ -115,13 +97,6 @@ public class OrkaNode {
         } else if (!availableMemory.equals(other.availableMemory)) {
             return false;
         }
-        if (hostname == null) {
-            if (other.hostname != null) {
-                return false;
-            }
-        } else if (!hostname.equals(other.hostname)) {
-            return false;
-        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -129,21 +104,21 @@ public class OrkaNode {
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (state == null) {
-            if (other.state != null) {
+        if (phase == null) {
+            if (other.phase != null) {
                 return false;
             }
-        } else if (!state.equals(other.state)) {
+        } else if (!phase.equals(other.phase)) {
             return false;
         }
-        if (totalCPU != other.totalCPU) {
+        if (allocatableCpu != other.allocatableCpu) {
             return false;
         }
-        if (totalMemory == null) {
-            if (other.totalMemory != null) {
+        if (allocatableMemory == null) {
+            if (other.allocatableMemory != null) {
                 return false;
             }
-        } else if (!totalMemory.equals(other.totalMemory)) {
+        } else if (!allocatableMemory.equals(other.allocatableMemory)) {
             return false;
         }
         return true;

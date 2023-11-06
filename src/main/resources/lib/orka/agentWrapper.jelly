@@ -1,0 +1,21 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:d="jelly:define" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
+  <st:documentation> <![CDATA[
+    Renders deployment option as radioBlock or directly
+    ]]>
+    <st:attribute name="name" use="required" />
+    <st:attribute name="value" use="required" />
+    <st:attribute name="title" use="required" />
+    <st:attribute name="checked" use="required" />
+  </st:documentation>
+  <j:choose>
+    <j:when test="${instance.config != null}">
+      <f:radioBlock name="${name}" value="${value}" title="${title}" checked="${checked}" inline="true" help="${descriptor.getHelpFile('newDeployment')}">
+        <d:invokeBody/>
+      </f:radioBlock>
+    </j:when>
+    <j:otherwise>
+       <d:invokeBody/>
+    </j:otherwise>
+  </j:choose>
+</j:jelly>

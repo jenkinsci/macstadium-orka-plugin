@@ -13,7 +13,7 @@ public class Utils {
 
     public static String getErrorMessage(ResponseBase response) {
         return String.format("HTTP Code: %s, Error: %s", response.getHttpResponse().getCode(),
-                response.getErrorMessage());
+                response.getMessage());
     }
 
     public static int normalizeIdleTime(int userValue, int recommended) {

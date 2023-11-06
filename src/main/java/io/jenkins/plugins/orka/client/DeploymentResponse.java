@@ -1,41 +1,33 @@
 package io.jenkins.plugins.orka.client;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.Arrays;
-
 public class DeploymentResponse extends ResponseBase {
-    @SerializedName("ip")
-    private String host;
+    private String ip;
 
-    @SerializedName("ssh_port")
-    private int sshPort;
+    private int ssh;
 
-    @SerializedName("vm_id")
-    private String id;
+    private String name;
 
-    public DeploymentResponse(String host, int sshPort, String id, OrkaError[] errors, String message) {
-        super(message, errors);
-        this.host = host;
-        this.sshPort = sshPort;
-        this.id = id;
+    public DeploymentResponse(String ip, int ssh, String name, String message) {
+        super(message);
+        this.ip = ip;
+        this.ssh = ssh;
+        this.name = name;
     }
 
-    public String getHost() {
-        return this.host;
+    public String getIP() {
+        return this.ip;
     }
 
-    public int getSSHPort() {
-        return this.sshPort;
+    public int getSSH() {
+        return this.ssh;
     }
 
-    public String getId() {
-        return this.id;
+    public String getName() {
+        return this.name;
     }
 
     @Override
     public String toString() {
-        return "DeploymentResponse [errors=" + Arrays.toString(this.getErrors()) + ", host=" + host + ", id=" + id
-                + ", message=" + this.getMessage() + ", sshPort=" + sshPort + "]";
+        return "DeploymentResponse [Name=" + name + ", IP=" + ip + ", SSH=" + ssh + "]";
     }
 }

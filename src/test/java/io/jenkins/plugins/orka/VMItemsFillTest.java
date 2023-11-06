@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -18,30 +17,29 @@ import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.util.ListBoxModel;
-import io.jenkins.plugins.orka.client.OrkaVM;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxy;
-import io.jenkins.plugins.orka.helpers.OrkaClientProxyFactory;
+import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.client.OrkaVMConfig;
+import io.jenkins.plugins.orka.client.VMConfigResponse;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 
 @RunWith(Parameterized.class)
 public class VMItemsFillTest {
     @ClassRule
     public static JenkinsRule r = new JenkinsRule();
 
-    @Parameterized.Parameters(name = "{index}: Test with createNewConfig={0}, endpoint={1}, credentials={2}")
+    @Parameterized.Parameters(name = "{index}: Test with endpoint={0}, credentials={1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-                new Object[][] { { false, "endpoint", "credentials", 2 }, { true, "endpoint", "credentials", 0 },
-                        { false, null, "credentials", 0 }, { false, "endpoint", null, 0 }, });
+                new Object[][] { { "endpoint", "credentials", 2 }, { "endpoint", "credentials", 2 },
+                        { null, "credentials", 0 }, { "endpoint", null, 0 }, });
     }
 
-    private OrkaClientProxyFactory clientProxyFactory;
-    private final boolean createNewConfig;
+    private OrkaClientFactory clientFactory;
     private final String endpoint;
     private final String credentials;
     private final int resultSize;
 
-    public VMItemsFillTest(boolean createNewConfig, String endpoint, String credentials, int resultSize) {
-        this.createNewConfig = createNewConfig;
+    public VMItemsFillTest(String endpoint, String credentials, int resultSize) {
         this.endpoint = endpoint;
         this.credentials = credentials;
         this.resultSize = resultSize;
@@ -49,36 +47,24 @@ public class VMItemsFillTest {
 
     @Before
     public void initialize() throws IOException {
-        OrkaVM firstVM = new OrkaVM("first", "deployed", 12, "Mojave.img", "firstImage", "default");
-        OrkaVM secondVM = new OrkaVM("second", "not deployed", 24, "Mojave.img", "secondImage", "default");
-        List<OrkaVM> response = Arrays.asList(firstVM, secondVM);
+        OrkaVMConfig firstVM = new OrkaVMConfig("first", 12, "Mojave.img", 12);
+        OrkaVMConfig secondVM = new OrkaVMConfig("second", 24, "Mojave.img", 15);
+        VMConfigResponse configResponse = new VMConfigResponse(Arrays.asList(firstVM, secondVM), null);
 
-        OrkaClientProxy client = mock(OrkaClientProxy.class);
+        OrkaClient client = mock(OrkaClient.class);
 
-        this.clientProxyFactory = mock(OrkaClientProxyFactory.class);
-        when(clientProxyFactory.getOrkaClientProxy(anyString(), anyString(), anyBoolean(), anyBoolean()))
+        this.clientFactory = mock(OrkaClientFactory.class);
+        when(clientFactory.getOrkaClient(anyString(), anyString(), anyBoolean(), anyBoolean()))
                 .thenReturn(client);
-        when(client.getVMs()).thenReturn(response);
-    }
-
-    @Test
-    public void when_fill_vm_items_in_orka_agent_should_return_correct_vm_size() throws IOException {
-        OrkaAgent.DescriptorImpl descriptor = new OrkaAgent.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
-
-        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
-                this.createNewConfig);
-
-        assertEquals(this.resultSize, vms.size());
+        when(client.getVMConfigs()).thenReturn(configResponse);
     }
 
     @Test
     public void when_fill_vm_items_in_agent_template_should_return_correct_vm_size() throws IOException {
         AgentTemplate.DescriptorImpl descriptor = new AgentTemplate.DescriptorImpl();
-        descriptor.setClientProxyFactory(this.clientProxyFactory);
+        descriptor.setclientFactory(this.clientFactory);
 
-        ListBoxModel vms = descriptor.doFillVmItems(this.endpoint, this.credentials, false, false,
-                this.createNewConfig);
+        ListBoxModel vms = descriptor.doFillConfigItems(this.endpoint, this.credentials, false, false);
 
         assertEquals(this.resultSize, vms.size());
     }

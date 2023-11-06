@@ -1,35 +1,28 @@
 package io.jenkins.plugins.orka.client;
 
-public class OrkaVMConfig {
+public class Image {
     private String name;
 
-    private int cpu;
+    private String description;
 
-    private String image;
+    private String type;
 
-    private float memory;
-
-    public OrkaVMConfig(String name, int cpu, String image, float memory) {
+    public Image(String name, String description, String type) {
         this.name = name;
-        this.cpu = cpu;
-        this.image = image;
-        this.memory = memory;
+        this.description = description;
+        this.type = type;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public int getCPU() {
-        return this.cpu;
+    public String getDescription() {
+        return this.description;
     }
 
-    public String getImage() {
-        return this.image;
-    }
-
-    public float getMemory() {
-        return this.memory;
+    public String getType() {
+        return this.type;
     }
 
     @Override
@@ -37,9 +30,8 @@ public class OrkaVMConfig {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + cpu;
-        result = prime * result + ((image == null) ? 0 : image.hashCode());
-        result = prime * result + Float.floatToIntBits(memory);
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
     }
 
@@ -54,7 +46,7 @@ public class OrkaVMConfig {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        OrkaVMConfig other = (OrkaVMConfig) obj;
+        Image other = (Image) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -62,17 +54,18 @@ public class OrkaVMConfig {
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (cpu != other.cpu) {
-            return false;
-        }
-        if (image == null) {
-            if (other.image != null) {
+        if (description == null) {
+            if (other.description != null) {
                 return false;
             }
-        } else if (!image.equals(other.image)) {
+        } else if (!description.equals(other.description)) {
             return false;
         }
-        if (Float.floatToIntBits(memory) != Float.floatToIntBits(other.memory)) {
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
             return false;
         }
         return true;

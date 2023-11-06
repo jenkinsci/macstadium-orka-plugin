@@ -1,18 +1,13 @@
 package io.jenkins.plugins.orka.client;
 
-import com.google.gson.annotations.SerializedName;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.apache.commons.lang.StringUtils;
 
 public class DeploymentRequest {
-
-    @SerializedName("orka_vm_name")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private String vmName;
+    private String vmConfig;
 
-    @SerializedName("orka_node_name")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String node;
 
@@ -22,24 +17,48 @@ public class DeploymentRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String tag;
 
-    @SerializedName("tag_required")
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private Boolean tagRequired;
 
-    public DeploymentRequest(String vmName, String node) {
-        this(vmName, node, null);
-    }
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private String name;
 
-    public DeploymentRequest(String vmName, String node, String scheduler) {
-        this(vmName, node, scheduler, null, null);
-    }
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private boolean shouldGenerateName;
 
-    public DeploymentRequest(String vmName, String node, String scheduler,
-        String tag, Boolean tagRequired) {
-        this.vmName = vmName;
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private String image;
+
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private Integer cpu;
+
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private float memory;
+
+    public DeploymentRequest(String vmConfig, String name, String node, String scheduler,
+            String tag, Boolean tagRequired) {
+        this.vmConfig = vmConfig;
         this.node = node;
         this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
         this.tag = StringUtils.isNotBlank(tag) && tag != null ? tag : null;
         this.tagRequired = tagRequired != null ? tagRequired : null;
+        this.name = name;
+        this.shouldGenerateName = StringUtils.isNotBlank(this.name);
+    }
+
+    public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
+            String scheduler, String tag, Boolean tagRequired) {
+        this.vmConfig = vmConfig;
+        this.node = node;
+        this.image = image;
+        this.cpu = cpu;
+        if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Float.parseFloat(memory) > 0) {
+            this.memory = Float.parseFloat(memory);
+        }
+        this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
+        this.tag = StringUtils.isNotBlank(tag) && tag != null ? tag : null;
+        this.tagRequired = tagRequired != null ? tagRequired : null;
+        this.name = name;
+        this.shouldGenerateName = StringUtils.isNotBlank(this.name);
     }
 }

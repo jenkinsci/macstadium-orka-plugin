@@ -15,30 +15,18 @@ public final class WaitSSHLauncher extends ComputerLauncher {
     private static final Logger logger = Logger.getLogger(WaitSSHLauncher.class.getName());
 
     private SSHLauncher launcher;
-    private OrkaVerificationStrategy verificationStrategy;
 
-    public WaitSSHLauncher(String host, int sshPort, String vmCredentialsId,
-            OrkaVerificationStrategy verificationStrategy, String jvmOptions) {
+    public WaitSSHLauncher(String host, int sshPort, String vmCredentialsId, String jvmOptions) {
         String javaPath = null;
         String prefixStartSlaveCmd = null;
         String suffixStartSlaveCmd = null;
         int launchTimeoutSeconds = 300;
         int maxNumRetries = 3;
         int retryWaitTime = 30;
-        this.verificationStrategy = verificationStrategy;
 
         this.launcher = new SSHLauncher(host, sshPort, vmCredentialsId, jvmOptions, javaPath, prefixStartSlaveCmd,
                 suffixStartSlaveCmd, launchTimeoutSeconds, maxNumRetries, retryWaitTime,
                 new NonVerifyingKeyVerificationStrategy());
-
-        readResolve();
-    }
-
-    protected Object readResolve() {
-        if (this.verificationStrategy == null) {
-            this.verificationStrategy = new DefaultVerificationStrategy();
-        }
-        return this;
     }
 
     @Override
@@ -61,15 +49,7 @@ public final class WaitSSHLauncher extends ComputerLauncher {
         listener.getLogger().println("SSH enabled");
         logger.fine("SSH enabled on host " + host + " on port " + port);
 
-        if (this.verificationStrategy.verify(host, port, this.launcher.getCredentials(), listener)) {
-            listener.getLogger().println("Verification successful");
-            logger.fine("Verification successful for host " + host + " on port " + port);
-            this.launcher.launch(slaveComputer, listener);
-        } else {
-            listener.getLogger().println("Verification failed. Deleting node.");
-            logger.fine("Verification failed for host " + host + " on port " + port);
-            this.deleteAgent(slaveComputer);
-        }
+        this.launcher.launch(slaveComputer, listener);
     }
 
     private void deleteAgent(SlaveComputer slaveComputer) throws InterruptedException, IOException {
