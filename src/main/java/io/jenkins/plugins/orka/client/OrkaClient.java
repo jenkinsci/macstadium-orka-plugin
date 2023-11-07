@@ -19,6 +19,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import org.apache.commons.lang.StringUtils;
+
 public class OrkaClient {
     private static final OkHttpClient clientBase = new OkHttpClient();
     private static final Logger logger = Logger.getLogger(OrkaClient.class.getName());
@@ -104,7 +106,14 @@ public class OrkaClient {
     public DeletionResponse deleteVM(String vmName, String namespace) throws IOException {
         HttpResponse httpResponse = this
                 .delete(String.format("%s/%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, VM_PATH, vmName));
-        DeletionResponse response = JsonHelper.fromJson(httpResponse.getBody(), DeletionResponse.class);
+
+        String body = httpResponse.getBody();
+        DeletionResponse response;
+        if (StringUtils.isNotBlank(body)) {
+            response = JsonHelper.fromJson(httpResponse.getBody(), DeletionResponse.class);
+        } else {
+            response = new DeletionResponse(null);
+        }
         response.setHttpResponse(httpResponse);
 
         return response;
