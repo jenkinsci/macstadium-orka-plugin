@@ -25,8 +25,8 @@ public class OrkaClientFactory {
     public OrkaClient getOrkaClient(String endpoint, String credentialsId, int httpClientTimeout,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors) throws IOException {
 
-        PasswordCredentials credentials = CredentialsHelper.lookupSystemCredentials(credentialsId);
-        return new OrkaClient(endpoint, Secret.toString(credentials.getPassword()), httpClientTimeout,
+        Secret secret = CredentialsHelper.lookupTokenSecret(credentialsId);
+        return new OrkaClient(endpoint, Secret.toString(secret), httpClientTimeout,
                 this.getProxy(endpoint, useJenkinsProxySettings), ignoreSSLErrors);
     }
 
