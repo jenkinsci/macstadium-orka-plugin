@@ -35,6 +35,10 @@ public class DeploymentRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private float memory;
 
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private int timeout;
+
+    @Deprecated
     public DeploymentRequest(String vmConfig, String name, String node, String scheduler,
             String tag, Boolean tagRequired) {
         this.vmConfig = vmConfig;
@@ -60,5 +64,6 @@ public class DeploymentRequest {
         this.tagRequired = tagRequired != null ? tagRequired : null;
         this.name = name;
         this.shouldGenerateName = StringUtils.isNotBlank(this.name);
+        this.timeout = 60 * 24; // Set the server timeout to a day
     }
 }
