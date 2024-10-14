@@ -1,20 +1,5 @@
 package io.jenkins.plugins.orka;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.verb.POST;
-
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -34,6 +19,7 @@ import hudson.slaves.RetentionStrategy;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
@@ -41,7 +27,23 @@ import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 import io.jenkins.plugins.orka.helpers.Utils;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jenkins.model.Jenkins;
+
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 public class AgentTemplate implements Describable<AgentTemplate> {
     private static final Logger logger = Logger.getLogger(AgentTemplate.class.getName());
@@ -255,7 +257,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         DeploymentResponse response = this.deployVM(vmDeployID);
 
         try {
-            logger.log(Level.FINE, "Result deploying VM with label {0}{1}:", new Object[]{this.labelString, vmDeployID});
+            logger.log(Level.FINE, "Result deploying VM with label {0}{1}:", 
+                new Object[]{this.labelString, vmDeployID});
             logger.fine(response.toString());
 
             if (!response.isSuccessful()) {

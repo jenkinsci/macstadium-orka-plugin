@@ -1,11 +1,11 @@
 package io.jenkins.plugins.orka;
 
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
+
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class AddressMapper implements Describable<AddressMapper> {
     private String defaultHost;

@@ -161,7 +161,8 @@ public class OrkaClient {
 
     private HttpResponse executeCallImpl(Request request) throws IOException {
         //logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
-        logger.log(Level.FINE, "Executing request to Orka API: /{0} {1}", new Object[]{request.method(), request.url()});
+        logger.log(Level.FINE, "Executing request to Orka API: /{0} {1}", 
+            new Object[]{request.method(), request.url()});
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody body = response.body();

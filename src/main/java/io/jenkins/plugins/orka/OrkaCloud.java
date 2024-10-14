@@ -1,5 +1,26 @@
 package io.jenkins.plugins.orka;
 
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+
+import hudson.Extension;
+import hudson.model.Computer;
+import hudson.model.Descriptor;
+import hudson.model.Label;
+import hudson.model.Node;
+import hudson.slaves.Cloud;
+import hudson.slaves.NodeProvisioner.PlannedNode;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+
+import io.jenkins.plugins.orka.client.DeletionResponse;
+import io.jenkins.plugins.orka.client.DeploymentResponse;
+import io.jenkins.plugins.orka.client.OrkaVMConfig;
+import io.jenkins.plugins.orka.helpers.CapacityHandler;
+import io.jenkins.plugins.orka.helpers.CredentialsHelper;
+import io.jenkins.plugins.orka.helpers.FormValidator;
+import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
+import io.jenkins.plugins.orka.helpers.Utils;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,31 +33,15 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jenkins.model.Jenkins;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
-import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
-import hudson.Extension;
-import hudson.model.Computer;
-import hudson.model.Descriptor;
-import hudson.model.Label;
-import hudson.model.Node;
-import hudson.slaves.Cloud;
-import hudson.slaves.NodeProvisioner.PlannedNode;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
-import io.jenkins.plugins.orka.client.DeletionResponse;
-import io.jenkins.plugins.orka.client.DeploymentResponse;
-import io.jenkins.plugins.orka.client.OrkaVMConfig;
-import io.jenkins.plugins.orka.helpers.CapacityHandler;
-import io.jenkins.plugins.orka.helpers.CredentialsHelper;
-import io.jenkins.plugins.orka.helpers.FormValidator;
-import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
-import io.jenkins.plugins.orka.helpers.Utils;
-import jenkins.model.Jenkins;
+
 
 public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
@@ -195,7 +200,8 @@ public class OrkaCloud extends Cloud {
                 logger.log(Level.INFO, "VM {0} is successfully deleted.", name);
                 this.capacityHandler.removeRunningInstance();
             } else {
-                logger.log(Level.WARNING, "Deleting VM {0} failed with: {1}", new Object[]{name, Utils.getErrorMessage(deletionResponse)});
+                logger.log(Level.WARNING, "Deleting VM {0} failed with: {1}", 
+                    new Object[]{name, Utils.getErrorMessage(deletionResponse)});
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Failed to delete a VM with name:" + name, ex);
@@ -213,12 +219,14 @@ public class OrkaCloud extends Cloud {
 
         try {
             String labelName = label != null ? label.getName() : "";
-            logger.log(Level.INFO, "{0}Provisioning for label {1}. Workload: {2}", new Object[]{provisionIdString, labelName, excessWorkload});
+            logger.log(Level.INFO, "{0}Provisioning for label {1}. Workload: {2}", 
+                new Object[]{provisionIdString, labelName, excessWorkload});
 
             AgentTemplate template = this.getTemplate(label);
 
             if (template == null) {
-                logger.log(Level.FINE, "{0}Couldn''t find template for label {1}. Stopping provisioning.", new Object[]{provisionIdString, labelName});
+                logger.log(Level.FINE, "{0}Couldn''t find template for label {1}. Stopping provisioning.",
+                    new Object[]{provisionIdString, labelName});
                 return Collections.emptyList();
             }
 
