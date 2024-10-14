@@ -46,7 +46,7 @@ public class GetTemplateTest {
 
     @Test
     public void when_get_template_should_find_template_with_label() throws IOException, IllegalArgumentException {
-        AgentTemplate AgentTemplate = this.getAgentTemplate(this.mode, this.label);
+        AgentTemplate AgentTemplate = this.getAgentTemplate();
         OrkaCloud cloud = new OrkaCloud("cloud", "credentialsId", "endpoint", null, 0, false, null,
                 Arrays.asList(AgentTemplate));
 
@@ -61,7 +61,7 @@ public class GetTemplateTest {
     }
 
     @SuppressWarnings("deprecation")
-    private AgentTemplate getAgentTemplate(Mode mode, String label) {
+    private AgentTemplate getAgentTemplate() {
         return new AgentTemplate("vmCredentialsId", "name", false, "configName", "baseImage", 12, true,
                 false, 1,
                 "remoteFS",
