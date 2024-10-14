@@ -1,15 +1,14 @@
 package io.jenkins.plugins.orka;
 
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import hudson.Extension;
 import hudson.model.Label;
 import hudson.model.LoadStatistics;
 import hudson.slaves.Cloud;
 import hudson.slaves.NodeProvisioner;
-
-import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import jenkins.model.Jenkins;
 
 @Extension(ordinal = 200)

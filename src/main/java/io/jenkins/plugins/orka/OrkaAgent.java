@@ -1,5 +1,11 @@
 package io.jenkins.plugins.orka;
 
+import java.io.IOException;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
+
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -11,19 +17,11 @@ import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
-
-import java.io.IOException;
-
 import jenkins.model.Jenkins;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.verb.POST;
 
 public class OrkaAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = 6363583313270146174L;
@@ -137,6 +135,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         return this.jvmOptions;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public AbstractCloudComputer createComputer() {
         return new OrkaComputer(this);
@@ -163,6 +162,7 @@ public class OrkaAgent extends AbstractCloudSlave {
             this.infoHelper = new OrkaInfoHelper(this.clientFactory);
         }
 
+        @Override
         public String getDisplayName() {
             return "Agent running under Orka by MacStadium";
         }

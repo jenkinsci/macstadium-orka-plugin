@@ -1,18 +1,16 @@
 package io.jenkins.plugins.orka;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import antlr.ANTLRException;
 import hudson.model.Label;
 import hudson.model.Node.Mode;
 
@@ -47,7 +45,7 @@ public class GetTemplateTest {
     }
 
     @Test
-    public void when_get_template_should_find_template_with_label() throws IOException, ANTLRException {
+    public void when_get_template_should_find_template_with_label() throws IOException, IllegalArgumentException {
         AgentTemplate AgentTemplate = this.getAgentTemplate(this.mode, this.label);
         OrkaCloud cloud = new OrkaCloud("cloud", "credentialsId", "endpoint", null, 0, false, null,
                 Arrays.asList(AgentTemplate));
@@ -62,6 +60,7 @@ public class GetTemplateTest {
         assertEquals(this.expectedCanProvision, canProvisionResult);
     }
 
+    @SuppressWarnings("deprecation")
     private AgentTemplate getAgentTemplate(Mode mode, String label) {
         return new AgentTemplate("vmCredentialsId", "name", false, "configName", "baseImage", 12, true,
                 false, 1,

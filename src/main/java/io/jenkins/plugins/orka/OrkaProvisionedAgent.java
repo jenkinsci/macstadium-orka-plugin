@@ -1,5 +1,13 @@
 package io.jenkins.plugins.orka;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
 import hudson.Extension;
@@ -12,15 +20,7 @@ import hudson.slaves.RetentionStrategy;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Logger;
-
 import jenkins.model.Jenkins;
-
-import org.kohsuke.stapler.DataBoundConstructor;
 
 public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = -2841785002270403074L;
@@ -104,11 +104,12 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     @Override
     protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
-        logger.info("Terminating agent. VM id: " + this.vmId);
+        logger.log(Level.INFO, "Terminating agent. VM id: {0}", this.vmId);
 
         this.getCloud().deleteVM(this.vmId, this.namespace);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public AbstractCloudComputer createComputer() {
         return new AbstractCloudComputer(this);

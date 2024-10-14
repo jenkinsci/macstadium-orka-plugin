@@ -1,18 +1,16 @@
 package io.jenkins.plugins.orka;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.util.Collections;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import hudson.model.Descriptor.FormException;
 import hudson.model.Node.Mode;
@@ -48,6 +46,7 @@ public class AgentTemplateTest {
         assertEquals(id, provisionedAgent.getVmId());
     }
 
+    @SuppressWarnings("deprecation")
     private AgentTemplate getAgentTemplate() {
         return new AgentTemplate("vmCredentialsId", "my-vm", false, "configName", "baseImage", 12, true,
                 false, 1,
