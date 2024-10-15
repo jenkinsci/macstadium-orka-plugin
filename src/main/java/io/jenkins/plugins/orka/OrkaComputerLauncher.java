@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 
 public final class OrkaComputerLauncher extends ComputerLauncher {
     private static String deploymentErrorFormat = "%s: Deploying vm with name: %s, and node: %s"
-            + "failed with an error: %s. Stopping creation.";
+            + " failed with an error: %s. Stopping creation.";
 
     private static String deploymentSuccessFormat = "%s: Deploying vm returned result: %s";
 
