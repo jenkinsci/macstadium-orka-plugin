@@ -52,7 +52,7 @@ To run the plugin locally with a Jenkins controller running the minimum supporte
 mvn hpi:run
 ```
 
-Access the Jenkins controller at http://localhost:8080.
+Access the Jenkins controller at http://localhost:8080/jenkins.
 
 ## Entry Points
 
