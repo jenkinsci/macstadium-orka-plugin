@@ -183,11 +183,12 @@ public class OrkaCloud extends Cloud {
     public DeploymentResponse deployVM(String namespace, String namePrefix, String vmConfig, String image, Integer cpu,
             String memory, String scheduler,
             String tag,
-            Boolean tagRequired, boolean legacyIO) throws IOException {
+            Boolean tagRequired, Boolean legacyIO) throws IOException {
         return new OrkaClientFactory()
                 .getOrkaClient(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .deployVM(vmConfig, namespace, namePrefix, image, cpu, memory, null, scheduler, tag, tagRequired, legacyIO);
+                .deployVM(vmConfig, namespace, namePrefix, image, cpu, memory, null, scheduler, tag, 
+                        tagRequired, legacyIO);
     }
 
     public void deleteVM(String name, String namespace) throws IOException {

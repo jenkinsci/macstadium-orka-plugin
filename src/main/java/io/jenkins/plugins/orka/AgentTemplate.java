@@ -89,11 +89,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, int numExecutors,
-            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
-            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
-            String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
-            Boolean tagRequired) {
+            String baseImage, int numCPUs, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+            int numExecutors, String remoteFS, Mode mode, String labelString, String namePrefix, 
+            RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy, 
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory, 
+            boolean overwriteTag, String tag, Boolean tagRequired) {
 
         this(vmCredentialsId, createNewVMConfig ? orka3xOption : orka2xOption, namePrefix, baseImage, numCPUs, memory,
                 Constants.DEFAULT_NAMESPACE, useNetBoost,useLegacyIO,
@@ -112,8 +112,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image, int cpu,
             String memory,
-            String namespace, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, String scheduler, String tag,
-            Boolean tagRequired, String config, String legacyConfigScheduler,
+            String namespace, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, String scheduler, 
+            String tag, Boolean tagRequired, String config, String legacyConfigScheduler,
             String legacyConfigTag, boolean legacyConfigTagRequired, int numExecutors, Mode mode,
             String remoteFS,
             String labelString, RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,

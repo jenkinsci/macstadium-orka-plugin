@@ -48,9 +48,9 @@ public class OrkaAgent extends AbstractCloudSlave {
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
             String node, String namespace, String namePrefix, String redirectHost, String image,
-            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, int numExecutors, String host,
-            int port, String remoteFS, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions,
-            String memory, String tag, Boolean tagRequired)
+            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, int numExecutors, 
+            String host, int port, String remoteFS, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, 
+            String jvmOptions, String memory, String tag, Boolean tagRequired)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 

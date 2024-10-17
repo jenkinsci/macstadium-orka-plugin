@@ -114,7 +114,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         DeploymentResponse deploymentResponse = client.deployVM(null,
                 agent.getNamespace(), agent.getNamePrefix(), agent.getImage(), agent.getCpu(), agent.getMemory(),
                 agent.getNode(),
-                null, agent.getTag(), agent.getTagRequired() , agent.getUseLegacyIO());
+                null, agent.getTag(), agent.getTagRequired(), agent.getUseLegacyIO());
 
         if (!deploymentResponse.isSuccessful()) {
             logger.println(

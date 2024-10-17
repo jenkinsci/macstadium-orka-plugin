@@ -90,7 +90,7 @@ public class OrkaClient {
     public DeploymentResponse deployVM(String vmConfig, String namespace, String namePrefix, String image, Integer cpu,
             String memory, String node,
             String scheduler,
-            String tag, Boolean tagRequired, boolean legacyIO) throws IOException {
+            String tag, Boolean tagRequired, Boolean legacyIO) throws IOException {
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, namePrefix, image, cpu, memory, node,
                 scheduler, tag,
                 tagRequired, legacyIO);

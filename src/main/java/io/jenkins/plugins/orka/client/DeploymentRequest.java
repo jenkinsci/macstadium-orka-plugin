@@ -36,7 +36,7 @@ public class DeploymentRequest {
     private float memory;
 
     @SuppressFBWarnings("URF_UNREAD_FIELD")
-    private boolean legacyIO;
+    private Boolean legacyIO;
 
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private int timeout;
@@ -54,7 +54,7 @@ public class DeploymentRequest {
     }
 
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
-            String scheduler, String tag, Boolean tagRequired, boolean legacyIO) {
+            String scheduler, String tag, Boolean tagRequired, Boolean legacyIO) {
         this.vmConfig = vmConfig;
         this.node = node;
         this.image = image;
