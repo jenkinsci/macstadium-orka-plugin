@@ -90,10 +90,10 @@ public class OrkaClient {
     public DeploymentResponse deployVM(String vmConfig, String namespace, String namePrefix, String image, Integer cpu,
             String memory, String node,
             String scheduler,
-            String tag, Boolean tagRequired) throws IOException {
+            String tag, Boolean tagRequired, boolean legacyIO) throws IOException {
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, namePrefix, image, cpu, memory, node,
                 scheduler, tag,
-                tagRequired);
+                tagRequired, legacyIO);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(

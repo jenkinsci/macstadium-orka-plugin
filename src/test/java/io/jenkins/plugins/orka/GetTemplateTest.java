@@ -63,7 +63,7 @@ public class GetTemplateTest {
     @SuppressWarnings("deprecation")
     private AgentTemplate getAgentTemplate() {
         return new AgentTemplate("vmCredentialsId", "name", false, "configName", "baseImage", 12, true,
-                false, 1,
+                false, false,1,
                 "remoteFS",
                 this.mode, this.label, "prefix", new IdleTimeCloudRetentionStrategy(5),
                 null,

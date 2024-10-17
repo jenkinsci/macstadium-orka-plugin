@@ -9,6 +9,7 @@ import hudson.slaves.SlaveComputer;
 import io.jenkins.plugins.orka.helpers.SSHUtil;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class WaitSSHLauncher extends ComputerLauncher {
@@ -35,13 +36,13 @@ public final class WaitSSHLauncher extends ComputerLauncher {
         int port = launcher.getPort();
 
         listener.getLogger().println("Waiting for SSH to be enabled");
-        logger.fine("Waiting for SSH to be enabled on host  " + host + " on port " + port);
+        logger.log(Level.FINE, "Waiting for SSH to be enabled on host  {0} on port {1}", new Object[]{host, port});
 
         try {
             SSHUtil.waitForSSH(host, port);
         } catch (IOException ex) {
             listener.getLogger().println("SSH coonection failed with: " + ex);
-            logger.fine("SSH coonection failed for host " + host + " on port " + port + "with: " + ex);
+            logger.log(Level.FINE, "SSH coonection failed for host {0} on port {1}with: {2}", new Object[]{host, port, ex});
             this.deleteAgent(slaveComputer);
             throw ex;
         }

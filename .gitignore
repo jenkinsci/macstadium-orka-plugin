@@ -14,4 +14,6 @@ work
 .vscode
 .factorypath
 
+build-output.log
+
 node_modules
