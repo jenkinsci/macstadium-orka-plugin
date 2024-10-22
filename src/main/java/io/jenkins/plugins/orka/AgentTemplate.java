@@ -140,6 +140,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.cpu = cpu;
         this.memory = memory;
         this.useNetBoost = useNetBoost;
+        this.useLegacyIO = useLegacyIO;
         this.useGpuPassthrough = useGpuPassthrough;
         this.scheduler = scheduler;
         this.tag = tag;
@@ -291,11 +292,13 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         if (StringUtils.equals(deploymentOption, orka2xOption)) {
             logger.log(Level.FINE, "Using Orka 2x deployment for ID:{0}", vmDeployID);
             return this.parent.deployVM(this.namespace, this.namePrefix, this.config, null, null, null,
-                    this.legacyConfigScheduler, this.legacyConfigTag, this.legacyConfigTagRequired, this.useLegacyIO);
+                    this.legacyConfigScheduler, this.legacyConfigTag, this.legacyConfigTagRequired, 
+                    this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
         }
         logger.fine("Using Orka 3x deployment");
         return this.parent.deployVM(this.namespace, this.namePrefix, null, this.image,
-                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired, this.useLegacyIO);
+                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired, 
+                this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
     }
 
     void setParent(OrkaCloud parent) {
@@ -428,13 +431,26 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @Override
     public String toString() {
-        return "AgentTemplate [namePrefix=" + namePrefix + ", image=" + image + ", cpu=" + cpu + ", memory=" + memory
-                + ", namespace=" + namespace + ", useNetBoost=" + useNetBoost + ", useGpuPassthrough="
-                + useGpuPassthrough + ", scheduler=" + scheduler + ", config=" + config + ", tag=" + tag
-                + ", tagRequired=" + tagRequired + ", legacyConfigScheduler=" + legacyConfigScheduler
-                + ", legacyConfigTag=" + legacyConfigTag + ", legacyConfigTagRequired=" + legacyConfigTagRequired
-                + ", deploymentOption=" + deploymentOption + ", numExecutors="
-                + numExecutors + ", mode=" + mode + ", remoteFS=" + remoteFS + ", labelString=" + labelString
+        return "AgentTemplate [namePrefix=" + namePrefix 
+                + ", image=" + image 
+                + ", cpu=" + cpu 
+                + ", memory=" + memory
+                + ", namespace=" + namespace  
+                + ", useNetBoost=" + useNetBoost 
+                + ", useLegacyIO=" + useLegacyIO 
+                + ", useGpuPassthrough=" + useGpuPassthrough 
+                + ", scheduler=" + scheduler 
+                + ", config=" + config 
+                + ", tag=" + tag
+                + ", tagRequired=" + tagRequired 
+                + ", legacyConfigScheduler=" + legacyConfigScheduler
+                + ", legacyConfigTag=" + legacyConfigTag 
+                + ", legacyConfigTagRequired=" + legacyConfigTagRequired
+                + ", deploymentOption=" + deploymentOption 
+                + ", numExecutors=" + numExecutors 
+                + ", mode=" + mode 
+                + ", remoteFS=" + remoteFS 
+                + ", labelString=" + labelString
                 + ", retentionStrategy=" + retentionStrategy + "]";
     }
 }

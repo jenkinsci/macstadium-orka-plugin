@@ -58,7 +58,8 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
     @Override
     public void launch(SlaveComputer slaveComputer, TaskListener listener) throws IOException, InterruptedException {
-
+        listener.getLogger().println("Launching slave computer");
+        
         OrkaAgent agent = (OrkaAgent) slaveComputer.getNode();
 
         if (this.vmExists()) {
@@ -114,7 +115,8 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         DeploymentResponse deploymentResponse = client.deployVM(null,
                 agent.getNamespace(), agent.getNamePrefix(), agent.getImage(), agent.getCpu(), agent.getMemory(),
                 agent.getNode(),
-                null, agent.getTag(), agent.getTagRequired(), agent.getUseLegacyIO());
+                null, agent.getTag(), agent.getTagRequired(),
+                agent.getUseNetBoost(), agent.getUseLegacyIO(), agent.getUseGpuPassthrough());
 
         if (!deploymentResponse.isSuccessful()) {
             logger.println(

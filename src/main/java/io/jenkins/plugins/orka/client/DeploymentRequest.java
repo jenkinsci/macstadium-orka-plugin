@@ -39,6 +39,12 @@ public class DeploymentRequest {
     private Boolean legacyIO;
 
     @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private Boolean gpuPassthrough;
+
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private Boolean netBoost;
+
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
     private int timeout;
 
     @Deprecated
@@ -54,7 +60,8 @@ public class DeploymentRequest {
     }
 
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
-            String scheduler, String tag, Boolean tagRequired, Boolean legacyIO) {
+            String scheduler, String tag, Boolean tagRequired, Boolean netBoost, 
+            Boolean legacyIO, Boolean gpuPassthrough) {
         this.vmConfig = vmConfig;
         this.node = node;
         this.image = image;
@@ -66,7 +73,14 @@ public class DeploymentRequest {
         this.tag = StringUtils.isNotBlank(tag) && tag != null ? tag : null;
         this.tagRequired = tagRequired != null ? tagRequired : null;
         this.name = name;
+        this.netBoost = netBoost;
         this.legacyIO = legacyIO;
+        this.gpuPassthrough = gpuPassthrough;
+
+        if (this.legacyIO) {
+            this.netBoost = false;
+        }
+
         this.shouldGenerateName = StringUtils.isNotBlank(this.name);
         this.timeout = 60 * 24; // Set the server timeout to a day
     }

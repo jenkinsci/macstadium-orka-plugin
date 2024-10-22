@@ -63,6 +63,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.image = image;
         this.cpu = cpu;
         this.useNetBoost = useNetBoost;
+        this.useLegacyIO = useLegacyIO;
         this.useGpuPassthrough = useGpuPassthrough;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
         this.ignoreSSLErrors = ignoreSSLErrors;
