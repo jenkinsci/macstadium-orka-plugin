@@ -22,7 +22,7 @@ The tests can be started with various config options. All of them have default v
 
 | Option          | Descriptipion                                            | Default Value                     |
 | --------------- | -------------------------------------------------------- | --------------------------------- |
-| JENKINS_URL     | The URL to access Jenkins UI                             | http://localhost:8080             |
+| JENKINS_URL     | The URL to access Jenkins UI                             | http://localhost:8080/jenkins     |
 | JENKINS_API_URL | The URL to access Jenkins API along with its credentials | http://admin:admin@localhost:8080 |
 | RUN_HEADLESS    | Set if the tests should run using headless browser       | true                              |
 | API_URL         | Orka API URL                                             | http://10.221.188.100             |
