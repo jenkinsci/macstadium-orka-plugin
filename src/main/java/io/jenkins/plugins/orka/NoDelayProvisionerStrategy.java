@@ -57,5 +57,4 @@ public class NoDelayProvisionerStrategy extends NodeProvisioner.Strategy {
             return NodeProvisioner.StrategyDecision.CONSULT_REMAINING_STRATEGIES;
         }
     }
-
 }

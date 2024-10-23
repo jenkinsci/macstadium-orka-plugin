@@ -19,6 +19,7 @@ import hudson.slaves.RetentionStrategy;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
@@ -34,6 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
@@ -55,6 +57,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String memory;
     private String namespace;
     private boolean useNetBoost;
+    private boolean useLegacyIO;
     private boolean useGpuPassthrough;
     private String scheduler;
     private String config;
@@ -86,14 +89,14 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors,
-            String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
-            OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
-            String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
-            Boolean tagRequired) {
+            String baseImage, int numCPUs, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+            int numExecutors, String remoteFS, Mode mode, String labelString, String namePrefix, 
+            RetentionStrategy<?> retentionStrategy, OrkaVerificationStrategy verificationStrategy, 
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions, String scheduler, String memory, 
+            boolean overwriteTag, String tag, Boolean tagRequired) {
 
         this(vmCredentialsId, createNewVMConfig ? orka3xOption : orka2xOption, namePrefix, baseImage, numCPUs, memory,
-                Constants.DEFAULT_NAMESPACE, useNetBoost,
+                Constants.DEFAULT_NAMESPACE, useNetBoost,useLegacyIO,
                 useGpuPassthrough,
                 scheduler,
                 tag,
@@ -109,8 +112,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image, int cpu,
             String memory,
-            String namespace, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String tag,
-            Boolean tagRequired, String config, String legacyConfigScheduler,
+            String namespace, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, String scheduler, 
+            String tag, Boolean tagRequired, String config, String legacyConfigScheduler,
             String legacyConfigTag, boolean legacyConfigTagRequired, int numExecutors, Mode mode,
             String remoteFS,
             String labelString, RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,
@@ -137,6 +140,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.cpu = cpu;
         this.memory = memory;
         this.useNetBoost = useNetBoost;
+        this.useLegacyIO = useLegacyIO;
         this.useGpuPassthrough = useGpuPassthrough;
         this.scheduler = scheduler;
         this.tag = tag;
@@ -173,6 +177,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public boolean isUseNetBoost() {
         return this.useNetBoost;
+    }
+
+    public boolean isUseLegacyIO() {
+        return this.useLegacyIO;
     }
 
     public boolean isUseGpuPassthrough() {
@@ -243,21 +251,24 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return Objects.requireNonNull(this.nodeProperties);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public Descriptor<AgentTemplate> getDescriptor() {
         return Jenkins.get().getDescriptor(getClass());
     }
 
     public OrkaProvisionedAgent provision() throws IOException, FormException {
         String vmDeployID = "[deployID=" + UUID.randomUUID().toString() + "] ";
-        logger.fine("Deploying VM for label " + this.labelString + vmDeployID);
+        logger.log(Level.FINE, "Deploying VM for label {0}{1}", new Object[]{this.labelString, vmDeployID});
         DeploymentResponse response = this.deployVM(vmDeployID);
 
         try {
-            logger.fine("Result deploying VM with label " + this.labelString + vmDeployID + ":");
+            logger.log(Level.FINE, "Result deploying VM with label {0}{1}:", 
+                new Object[]{this.labelString, vmDeployID});
             logger.fine(response.toString());
 
             if (!response.isSuccessful()) {
-                logger.warning("Deploying VM failed with: " + Utils.getErrorMessage(response));
+                logger.log(Level.WARNING, "Deploying VM failed with: {0}", Utils.getErrorMessage(response));
                 return null;
             }
 
@@ -279,13 +290,15 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     private DeploymentResponse deployVM(String vmDeployID) throws IOException {
         if (StringUtils.equals(deploymentOption, orka2xOption)) {
-            logger.fine("Using Orka 2x deployment for ID:" + vmDeployID);
+            logger.log(Level.FINE, "Using Orka 2x deployment for ID:{0}", vmDeployID);
             return this.parent.deployVM(this.namespace, this.namePrefix, this.config, null, null, null,
-                    this.legacyConfigScheduler, this.legacyConfigTag, this.legacyConfigTagRequired);
+                    this.legacyConfigScheduler, this.legacyConfigTag, this.legacyConfigTagRequired, 
+                    this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
         }
         logger.fine("Using Orka 3x deployment");
         return this.parent.deployVM(this.namespace, this.namePrefix, null, this.image,
-                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired);
+                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired, 
+                this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
     }
 
     void setParent(OrkaCloud parent) {
@@ -418,13 +431,26 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @Override
     public String toString() {
-        return "AgentTemplate [namePrefix=" + namePrefix + ", image=" + image + ", cpu=" + cpu + ", memory=" + memory
-                + ", namespace=" + namespace + ", useNetBoost=" + useNetBoost + ", useGpuPassthrough="
-                + useGpuPassthrough + ", scheduler=" + scheduler + ", config=" + config + ", tag=" + tag
-                + ", tagRequired=" + tagRequired + ", legacyConfigScheduler=" + legacyConfigScheduler
-                + ", legacyConfigTag=" + legacyConfigTag + ", legacyConfigTagRequired=" + legacyConfigTagRequired
-                + ", deploymentOption=" + deploymentOption + ", numExecutors="
-                + numExecutors + ", mode=" + mode + ", remoteFS=" + remoteFS + ", labelString=" + labelString
+        return "AgentTemplate [namePrefix=" + namePrefix 
+                + ", image=" + image 
+                + ", cpu=" + cpu 
+                + ", memory=" + memory
+                + ", namespace=" + namespace  
+                + ", useNetBoost=" + useNetBoost 
+                + ", useLegacyIO=" + useLegacyIO 
+                + ", useGpuPassthrough=" + useGpuPassthrough 
+                + ", scheduler=" + scheduler 
+                + ", config=" + config 
+                + ", tag=" + tag
+                + ", tagRequired=" + tagRequired 
+                + ", legacyConfigScheduler=" + legacyConfigScheduler
+                + ", legacyConfigTag=" + legacyConfigTag 
+                + ", legacyConfigTagRequired=" + legacyConfigTagRequired
+                + ", deploymentOption=" + deploymentOption 
+                + ", numExecutors=" + numExecutors 
+                + ", mode=" + mode 
+                + ", remoteFS=" + remoteFS 
+                + ", labelString=" + labelString
                 + ", retentionStrategy=" + retentionStrategy + "]";
     }
 }

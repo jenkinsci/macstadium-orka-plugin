@@ -40,6 +40,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
+
+
+
 public class OrkaCloud extends Cloud {
     private static final Logger logger = Logger.getLogger(OrkaCloud.class.getName());
     private static final int recommendedMinTimeout = 30;
@@ -180,11 +183,13 @@ public class OrkaCloud extends Cloud {
     public DeploymentResponse deployVM(String namespace, String namePrefix, String vmConfig, String image, Integer cpu,
             String memory, String scheduler,
             String tag,
-            Boolean tagRequired) throws IOException {
+            Boolean tagRequired, Boolean netBoost, Boolean legacyIO, 
+            Boolean gpuPassThrough) throws IOException {
         return new OrkaClientFactory()
                 .getOrkaClient(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .deployVM(vmConfig, namespace, namePrefix, image, cpu, memory, null, scheduler, tag, tagRequired);
+                .deployVM(vmConfig, namespace, namePrefix, image, cpu, memory, null, scheduler, tag, 
+                        tagRequired, netBoost, legacyIO, gpuPassThrough);
     }
 
     public void deleteVM(String name, String namespace) throws IOException {
@@ -194,10 +199,11 @@ public class OrkaCloud extends Cloud {
                     .deleteVM(name, namespace);
 
             if (deletionResponse.isSuccessful()) {
-                logger.info("VM " + name + " is successfully deleted.");
+                logger.log(Level.INFO, "VM {0} is successfully deleted.", name);
                 this.capacityHandler.removeRunningInstance();
             } else {
-                logger.warning("Deleting VM " + name + " failed with: " + Utils.getErrorMessage(deletionResponse));
+                logger.log(Level.WARNING, "Deleting VM {0} failed with: {1}", 
+                    new Object[]{name, Utils.getErrorMessage(deletionResponse)});
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Failed to delete a VM with name:" + name, ex);
@@ -215,13 +221,14 @@ public class OrkaCloud extends Cloud {
 
         try {
             String labelName = label != null ? label.getName() : "";
-            logger.info(provisionIdString + "Provisioning for label " + labelName + ". Workload: " + excessWorkload);
+            logger.log(Level.INFO, "{0}Provisioning for label {1}. Workload: {2}", 
+                new Object[]{provisionIdString, labelName, excessWorkload});
 
             AgentTemplate template = this.getTemplate(label);
 
             if (template == null) {
-                logger.fine(provisionIdString + "Couldn't find template for label " + labelName
-                        + ". Stopping provisioning.");
+                logger.log(Level.FINE, "{0}Couldn''t find template for label {1}. Stopping provisioning.",
+                    new Object[]{provisionIdString, labelName});
                 return Collections.emptyList();
             }
 
@@ -251,7 +258,7 @@ public class OrkaCloud extends Cloud {
             @Override
             public Node call() throws Exception {
 
-                logger.fine(provisionIdString + "Provisioning Node with template:");
+                logger.log(Level.FINE, "{0}Provisioning Node with template:", provisionIdString);
                 logger.fine(template.toString());
                 OrkaProvisionedAgent agent = null;
 
@@ -264,7 +271,7 @@ public class OrkaCloud extends Cloud {
                 }
 
                 if (agent != null) {
-                    logger.fine(provisionIdString + "Adding Node to Jenkins:");
+                    logger.log(Level.FINE, "{0}Adding Node to Jenkins:", provisionIdString);
                     logger.fine(agent.toString());
                     capacityHandler.addRunningInstance();
                 } else {

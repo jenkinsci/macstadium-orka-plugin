@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 
 public final class OrkaComputerLauncher extends ComputerLauncher {
     private static String deploymentErrorFormat = "%s: Deploying vm with name: %s, and node: %s"
-            + "failed with an error: %s. Stopping creation.";
+            + " failed with an error: %s. Stopping creation.";
 
     private static String deploymentSuccessFormat = "%s: Deploying vm returned result: %s";
 
@@ -58,7 +58,8 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
     @Override
     public void launch(SlaveComputer slaveComputer, TaskListener listener) throws IOException, InterruptedException {
-
+        listener.getLogger().println("Launching slave computer");
+        
         OrkaAgent agent = (OrkaAgent) slaveComputer.getNode();
 
         if (this.vmExists()) {
@@ -114,7 +115,8 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         DeploymentResponse deploymentResponse = client.deployVM(null,
                 agent.getNamespace(), agent.getNamePrefix(), agent.getImage(), agent.getCpu(), agent.getMemory(),
                 agent.getNode(),
-                null, agent.getTag(), agent.getTagRequired());
+                null, agent.getTag(), agent.getTagRequired(),
+                agent.getUseNetBoost(), agent.getUseLegacyIO(), agent.getUseGpuPassthrough());
 
         if (!deploymentResponse.isSuccessful()) {
             logger.println(

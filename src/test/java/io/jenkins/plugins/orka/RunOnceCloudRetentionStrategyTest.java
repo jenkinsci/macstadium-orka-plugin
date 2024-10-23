@@ -1,17 +1,14 @@
 package io.jenkins.plugins.orka;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.jvnet.hudson.test.JenkinsRule;
-
-import antlr.ANTLRException;
 
 @RunWith(Parameterized.class)
 public class RunOnceCloudRetentionStrategyTest {
@@ -35,7 +32,7 @@ public class RunOnceCloudRetentionStrategyTest {
     }
 
     @Test
-    public void when_passing_input_value_should_get_positive_integer() throws IOException, ANTLRException {
+    public void when_passing_input_value_should_get_positive_integer() throws IOException, IllegalArgumentException {
         RunOnceCloudRetentionStrategy strat = new RunOnceCloudRetentionStrategy(this.inputValue);
 
         assertEquals(this.expected, strat.getIdleMinutes());

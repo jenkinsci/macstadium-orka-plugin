@@ -33,6 +33,7 @@ public class AddressMapper implements Describable<AddressMapper> {
         this.redirectHost = redirectHost;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Descriptor<AddressMapper> getDescriptor() {
         return Jenkins.get().getDescriptor(getClass());

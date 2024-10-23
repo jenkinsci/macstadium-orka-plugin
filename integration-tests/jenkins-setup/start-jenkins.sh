@@ -2,7 +2,7 @@
 
 set -ux
 
-JENKINS_HOST=localhost:8080
+JENKINS_HOST=localhost:8080/jenkins
 JENKINS_URL=http://$JENKINS_HOST
 JENKINS_HOME_VOLUME=~/docker/it/jenkins_home
 JENKINS_HOME=/var/jenkins_home

@@ -11,7 +11,6 @@ import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
@@ -38,6 +37,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String image;
     private Integer cpu;
     private boolean useNetBoost;
+    private boolean useLegacyIO;
     private boolean useGpuPassthrough;
     private String memory;
     private String tag;
@@ -48,9 +48,9 @@ public class OrkaAgent extends AbstractCloudSlave {
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
             String node, String namespace, String namePrefix, String redirectHost, String image,
-            Integer cpu, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors, String host,
-            int port, String remoteFS, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String jvmOptions,
-            String memory, String tag, Boolean tagRequired)
+            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, int numExecutors, 
+            String host, int port, String remoteFS, boolean useJenkinsProxySettings, boolean ignoreSSLErrors, 
+            String jvmOptions, String memory, String tag, Boolean tagRequired)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
@@ -63,6 +63,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.image = image;
         this.cpu = cpu;
         this.useNetBoost = useNetBoost;
+        this.useLegacyIO = useLegacyIO;
         this.useGpuPassthrough = useGpuPassthrough;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
         this.ignoreSSLErrors = ignoreSSLErrors;
@@ -117,6 +118,10 @@ public class OrkaAgent extends AbstractCloudSlave {
         return this.useNetBoost;
     }
 
+    public boolean getUseLegacyIO() {
+        return this.useLegacyIO;
+    }
+
     public boolean getUseGpuPassthrough() {
         return this.useGpuPassthrough;
     }
@@ -137,6 +142,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         return this.jvmOptions;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public AbstractCloudComputer createComputer() {
         return new OrkaComputer(this);
@@ -163,6 +169,7 @@ public class OrkaAgent extends AbstractCloudSlave {
             this.infoHelper = new OrkaInfoHelper(this.clientFactory);
         }
 
+        @Override
         public String getDisplayName() {
             return "Agent running under Orka by MacStadium";
         }

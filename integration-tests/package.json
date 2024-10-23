@@ -12,7 +12,7 @@
     "jest": "26.5.2",
     "playwright": "1.4.2",
     "playwright-cli": "0.5.2",
-    "axios": "0.21.2",
+    "axios": "1.7.7",
     "envalid": "6.0.2",
     "wait-for-expect": "3.0.2"
   },

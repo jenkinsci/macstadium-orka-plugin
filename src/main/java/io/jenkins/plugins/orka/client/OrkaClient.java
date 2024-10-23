@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Proxy;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
 
@@ -86,18 +87,31 @@ public class OrkaClient {
         return response;
     }
 
+    @SuppressWarnings("RedundantStringToString")
     public DeploymentResponse deployVM(String vmConfig, String namespace, String namePrefix, String image, Integer cpu,
             String memory, String node,
             String scheduler,
-            String tag, Boolean tagRequired) throws IOException {
+            String tag, Boolean tagRequired, Boolean netBoost, Boolean legacyIO, 
+            Boolean gpuPassThrough) throws IOException {
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, namePrefix, image, cpu, memory, node,
                 scheduler, tag,
-                tagRequired);
+                tagRequired, netBoost, legacyIO, gpuPassThrough);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
+        logger.log(Level.INFO, "Deployment request {0}", deploymentRequestJson);
+    
 
         HttpResponse httpResponse = this.post(
                 String.format("%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, VM_PATH), deploymentRequestJson);
+        
+        logger.log(Level.INFO,"endpoint: {0}", new Object[]{this.endpoint});
+        logger.log(Level.INFO,"rosource path: {0}", new Object[]{RESOURCE_PATH});
+        logger.log(Level.INFO,"namespace: {0}", new Object[]{namespace});
+        logger.log(Level.INFO,"VM_PATH: {0}", new Object[]{VM_PATH});
+
+        logger.log(Level.INFO, "HTTP response: {0}", httpResponse);
         DeploymentResponse response = JsonHelper.fromJson(httpResponse.getBody(), DeploymentResponse.class);
+        logger.log(Level.INFO, "Deployment response: {0}", response);
+
         response.setHttpResponse(httpResponse);
 
         return response;
@@ -159,7 +173,8 @@ public class OrkaClient {
     }
 
     private HttpResponse executeCallImpl(Request request) throws IOException {
-        logger.fine("Executing request to Orka API: " + '/' + request.method() + ' ' + request.url());
+        logger.log(Level.FINE, "Executing request to Orka API: /{0} {1}", 
+            new Object[]{request.method(), request.url()});
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody body = response.body();
