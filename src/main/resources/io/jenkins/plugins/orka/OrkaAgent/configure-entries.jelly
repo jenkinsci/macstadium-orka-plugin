@@ -64,6 +64,10 @@
       <f:checkbox default="true" />
     </f:entry>
 
+    <f:entry title="${%Use Legacy IO}" field="useLegacyIO" description="When checked, uses legacy IO network stack. Only enable for VMs before macOS 10.14.5">
+      <f:checkbox default="false" />
+    </f:entry>
+    
     <f:entry title="${%Use GPU Passthrough}" field="useGpuPassthrough" description="When checked, enables the VM to use the GPU available on the node. 
         NOTE: GPU Passthrough must be enabled for the cluster.">
         <f:checkbox default="false" />

@@ -15,7 +15,7 @@ This guide provides information about how to build, package, and run the plugin 
 
 ## Build Requirements
 
-- [Maven 3][maven]
+- [Maven 3.9.9](https://maven.apache.org/docs/3.9.9/release-notes.html)
 - JDK 8 (the minimum Jenkins LTS we currently support requires JDK 11)
 
 ## Building, Packaging, and Testing

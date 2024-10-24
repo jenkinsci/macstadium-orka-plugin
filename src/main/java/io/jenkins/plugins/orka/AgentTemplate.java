@@ -55,6 +55,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String memory;
     private String namespace;
     private boolean useNetBoost;
+    private boolean useLegacyIO;
     private boolean useGpuPassthrough;
     private String scheduler;
     private String config;
@@ -86,7 +87,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     @Deprecated
     public AgentTemplate(String vmCredentialsId, String vm, boolean createNewVMConfig, String configName,
-            String baseImage, int numCPUs, boolean useNetBoost, boolean useGpuPassthrough, int numExecutors,
+            String baseImage, int numCPUs, boolean useNetBoost, boolean useLegacyIO,boolean useGpuPassthrough, int numExecutors,
             String remoteFS, Mode mode, String labelString, String namePrefix, RetentionStrategy<?> retentionStrategy,
             OrkaVerificationStrategy verificationStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions, String scheduler, String memory, boolean overwriteTag, String tag,
@@ -94,6 +95,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
         this(vmCredentialsId, createNewVMConfig ? orka3xOption : orka2xOption, namePrefix, baseImage, numCPUs, memory,
                 Constants.DEFAULT_NAMESPACE, useNetBoost,
+                useLegacyIO,
                 useGpuPassthrough,
                 scheduler,
                 tag,
@@ -109,7 +111,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     @DataBoundConstructor
     public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image, int cpu,
             String memory,
-            String namespace, boolean useNetBoost, boolean useGpuPassthrough, String scheduler, String tag,
+            String namespace, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, String scheduler, String tag,
             Boolean tagRequired, String config, String legacyConfigScheduler,
             String legacyConfigTag, boolean legacyConfigTagRequired, int numExecutors, Mode mode,
             String remoteFS,
@@ -137,6 +139,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.cpu = cpu;
         this.memory = memory;
         this.useNetBoost = useNetBoost;
+        this.useLegacyIO = useLegacyIO;
         this.useGpuPassthrough = useGpuPassthrough;
         this.scheduler = scheduler;
         this.tag = tag;
@@ -173,6 +176,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public boolean isUseNetBoost() {
         return this.useNetBoost;
+    }
+
+    public boolean isUseLegacyIO() {
+        return this.useLegacyIO;
     }
 
     public boolean isUseGpuPassthrough() {
@@ -281,11 +288,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         if (StringUtils.equals(deploymentOption, orka2xOption)) {
             logger.fine("Using Orka 2x deployment for ID:" + vmDeployID);
             return this.parent.deployVM(this.namespace, this.namePrefix, this.config, null, null, null,
-                    this.legacyConfigScheduler, this.legacyConfigTag, this.legacyConfigTagRequired);
+                    this.legacyConfigScheduler, this.legacyConfigTag, this.legacyConfigTagRequired,this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
         }
         logger.fine("Using Orka 3x deployment");
         return this.parent.deployVM(this.namespace, this.namePrefix, null, this.image,
-                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired);
+                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired,this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
     }
 
     void setParent(OrkaCloud parent) {
