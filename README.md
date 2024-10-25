@@ -43,6 +43,7 @@ To create a permanent agent:
   - Tag (Optional) - When specified, the VM is preferred to be deployed to a node marked with this tag
   - Tag Required (Optiona) - When set to true, the VM is required to be deployed to a node marked with this tag
   - Use Net Boost (Optional) - When checked, improves the network performance of Intel-based VMs. Required for macOS Ventura Intel-based VMs. NOTE: Applicable only to macOS BigSur and later
+  - Use Legacy IO (Optional) - When checked, uses the legacy IO network stack. Only available on intel VMs, only enable for VMs running macOS 10.14.5 or below.
   - Use GPU Passthrough - When checked, enables the VM to use the GPU available on the node. NOTE: GPU Passthrough must be enabled for the cluster
   - VM Credentials - The credentials used to SSH to the deployed VM
   - Name Prefix (Optional) - The deployed VM name starts with the specified prefix
@@ -80,6 +81,7 @@ To configure:
   - Tag (Optional) - When specified, the VM is preferred to be deployed to a node marked with this tag
   - Tag Required (Optiona) - When set to true, the VM is required to be deployed to a node marked with this tag
   - Use Net Boost (Optional) - When checked, improves the network performance of Intel-based VMs. Required for macOS Ventura Intel-based VMs. NOTE: Applicable only to macOS BigSur and later
+  - Use Legacy IO (Optional) - When checked, uses the legacy IO network stack. Only available on intel VMs, only enable for VMs running macOS 10.14.5 or below.
   - Use GPU Passthrough - When checked, enables the VM to use the GPU available on the node. NOTE: GPU Passthrough must be enabled for the cluster
   - Scheduler - The scheduler used to deploy the VM
   - Namespace - The namespace used to deploy VMs to
