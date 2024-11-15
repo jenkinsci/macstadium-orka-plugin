@@ -18,6 +18,9 @@ import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import jenkins.model.Jenkins;
 
@@ -46,12 +49,15 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String namePrefix;
     private String jvmOptions;
 
+    private final List<PortMapping> portMapping;
+
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
             String node, String namespace, String namePrefix, String redirectHost, String image,
             Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
             int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
-            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired)
+            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired, 
+            List<PortMapping> portMapping)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
@@ -73,6 +79,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.tag = tag;
         this.tagRequired = tagRequired;
         this.setNumExecutors(numExecutors);
+        this.portMapping = portMapping != null ? portMapping : new ArrayList<>();
     }
 
     public String getOrkaCredentialsId() {
@@ -142,6 +149,67 @@ public class OrkaAgent extends AbstractCloudSlave {
     public String getJvmOptions() {
         return this.jvmOptions;
     }
+
+    public List<PortMapping> getPortMapping() {
+        return portMapping;
+    }
+
+    // Method to process the port mappings
+    public void processPortMappings() {
+        for (PortMapping mapping : portMapping) {
+            int fromPort = mapping.getFrom();
+            int toPort = mapping.getTo();
+
+            // Example logic for processing
+            if (isValidPortRange(fromPort, toPort)) {
+                System.out.println("Mapping from port " + fromPort + " to port " + toPort);
+            } else {
+                System.out.println("Invalid port mapping: from " + fromPort + " to " + toPort);
+            }
+        }
+    }
+
+    private boolean isValidPortRange(int from, int to) {
+        return from >= 1024 && from <= 65535 && to >= 1024 && to <= 65535;
+    }
+
+    public String getPortMappingAsString() {
+        if (portMapping == null || portMapping.isEmpty()) {
+            return "";
+        }
+    
+        StringBuilder sb = new StringBuilder();
+        for (PortMapping mapping : portMapping) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(mapping.getFrom()).append(":").append(mapping.getTo());
+        }
+        return sb.toString();
+    }
+    
+    // Inner class for PortMapping
+    public static class PortMapping implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final int from;
+        private final int to;
+
+        @DataBoundConstructor
+        public PortMapping(int from, int to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        public int getFrom() {
+            return from;
+        }
+
+        public int getTo() {
+            return to;
+        }
+    }
+
 
     @Override
     public AbstractCloudComputer createComputer() {

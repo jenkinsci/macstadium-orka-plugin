@@ -78,12 +78,12 @@ public class OrkaClientTest {
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), any())).thenReturn(response);
         when(client.deployVM(any(), anyString(), any(), any(), any(), any(), any(), any(),
-                any(), any(), any(), any(), any()))
+                any(), any(), any(), any(), any(), any()))
                 .thenCallRealMethod();
 
         DeploymentResponse actualResponse = client.deployVM("newVm", "orka-default", null, "foo.img", 6, "12", null,
                 null,
-                null, false,false, false, false);
+                null, false,false, false, false, null);
 
         assertEquals(ip, actualResponse.getIP());
         assertEquals(sshPort, actualResponse.getSSH());

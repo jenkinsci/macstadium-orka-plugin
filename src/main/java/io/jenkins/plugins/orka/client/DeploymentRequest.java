@@ -47,6 +47,9 @@ public class DeploymentRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private int timeout;
 
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private String reservedPorts;
+
     @Deprecated
     public DeploymentRequest(String vmConfig, String name, String node, String scheduler,
             String tag, Boolean tagRequired) {
@@ -61,7 +64,7 @@ public class DeploymentRequest {
 
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
             String scheduler, String tag, Boolean tagRequired, Boolean netBoost, 
-            Boolean legacyIO, Boolean gpuPassthrough) {
+            Boolean legacyIO, Boolean gpuPassthrough, String portMappingString) {
         this.vmConfig = vmConfig;
         this.node = node;
         this.image = image;
@@ -82,5 +85,7 @@ public class DeploymentRequest {
         }
         this.shouldGenerateName = StringUtils.isNotBlank(this.name);
         this.timeout = 60 * 24; // Set the server timeout to a day
+
+        this.reservedPorts = portMappingString;
     }
 }
