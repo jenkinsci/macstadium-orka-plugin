@@ -91,9 +91,10 @@ public class OrkaClient {
             String memory, String node,
             String scheduler,
             String tag, Boolean tagRequired,Boolean netBoost, Boolean legacyIO, 
-            Boolean gpuPassThrough, String portMappingString) throws IOException {
+            Boolean gpuPassThrough, String portMappingsString) throws IOException {
+
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, namePrefix, image, cpu, memory, node,
-                scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingString);
+                scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingsString);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(

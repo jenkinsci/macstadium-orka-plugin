@@ -64,7 +64,7 @@ public class DeploymentRequest {
 
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
             String scheduler, String tag, Boolean tagRequired, Boolean netBoost, 
-            Boolean legacyIO, Boolean gpuPassthrough, String portMappingString) {
+            Boolean legacyIO, Boolean gpuPassthrough, String portMappingsString) {
         this.vmConfig = vmConfig;
         this.node = node;
         this.image = image;
@@ -86,6 +86,6 @@ public class DeploymentRequest {
         this.shouldGenerateName = StringUtils.isNotBlank(this.name);
         this.timeout = 60 * 24; // Set the server timeout to a day
 
-        this.reservedPorts = portMappingString;
+        this.reservedPorts = portMappingsString;
     }
 }

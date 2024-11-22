@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import jenkins.model.Jenkins;
 
@@ -30,6 +32,8 @@ import org.kohsuke.stapler.verb.POST;
 
 public class OrkaAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = 6363583313270146174L;
+    private static final Logger logger = Logger.getLogger(OrkaAgent.class.getName());
+
 
     public String orkaCredentialsId;
     public String orkaEndpoint;
@@ -49,7 +53,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String namePrefix;
     private String jvmOptions;
 
-    private final List<PortMapping> portMapping;
+    private final List<PortMapping> portMappings;
 
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
@@ -57,7 +61,7 @@ public class OrkaAgent extends AbstractCloudSlave {
             Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
             int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
             boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired, 
-            List<PortMapping> portMapping)
+            List<PortMapping> portMappings)
             throws Descriptor.FormException, IOException {
         super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
 
@@ -79,7 +83,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.tag = tag;
         this.tagRequired = tagRequired;
         this.setNumExecutors(numExecutors);
-        this.portMapping = portMapping != null ? portMapping : new ArrayList<>();
+        this.portMappings = portMappings != null ? portMappings : new ArrayList<>();        
     }
 
     public String getOrkaCredentialsId() {
@@ -150,36 +154,34 @@ public class OrkaAgent extends AbstractCloudSlave {
         return this.jvmOptions;
     }
 
-    public List<PortMapping> getPortMapping() {
-        return portMapping;
+    public List<PortMapping> getPortMappins() {
+        return portMappings;
     }
 
-    // Method to process the port mappings
     public void processPortMappings() {
-        for (PortMapping mapping : portMapping) {
+        for (PortMapping mapping : portMappings) {
             int fromPort = mapping.getFrom();
             int toPort = mapping.getTo();
 
-            // Example logic for processing
-            if (isValidPortRange(fromPort, toPort)) {
-                System.out.println("Mapping from port " + fromPort + " to port " + toPort);
+            if (isValidPortRange(fromPort)) {
+                logger.info("Mapping from port " + fromPort + " to port " + toPort);
             } else {
-                System.out.println("Invalid port mapping: from " + fromPort + " to " + toPort);
+                logger.info("Invalid port mapping: from " + fromPort + " to " + toPort);
             }
         }
     }
 
-    private boolean isValidPortRange(int from, int to) {
-        return from >= 1024 && from <= 65535 && to >= 1024 && to <= 65535;
+    private boolean isValidPortRange(int from) {
+        return from >= 1024 && from <= 65535;
     }
 
-    public String getPortMappingAsString() {
-        if (portMapping == null || portMapping.isEmpty()) {
+    public String getPortMappingsAsString() {
+        if (portMappings == null || portMappings.isEmpty()) {
             return "";
         }
     
         StringBuilder sb = new StringBuilder();
-        for (PortMapping mapping : portMapping) {
+        for (PortMapping mapping : portMappings) {
             if (sb.length() > 0) {
                 sb.append(",");
             }
@@ -188,7 +190,6 @@ public class OrkaAgent extends AbstractCloudSlave {
         return sb.toString();
     }
     
-    // Inner class for PortMapping
     public static class PortMapping implements Serializable {
         private static final long serialVersionUID = 1L;
 

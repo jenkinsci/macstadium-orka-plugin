@@ -116,7 +116,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
                 agent.getNode(),
                 null, agent.getTag(), agent.getTagRequired(),
                 agent.getUseNetBoost(), agent.getUseLegacyIO(), agent.getUseGpuPassthrough(), 
-                agent.getPortMappingAsString());
+                agent.getPortMappingsAsString());
 
         if (!deploymentResponse.isSuccessful()) {
             logger.println(

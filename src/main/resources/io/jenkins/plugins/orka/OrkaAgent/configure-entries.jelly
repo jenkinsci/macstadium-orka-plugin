@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:s="/io/jenkins/temp/jelly" xmlns:orka="/lib/orka">
 
   <f:section title="${%ORKA Config}">
 
@@ -81,16 +81,27 @@
       <f:textbox/>
     </f:entry>
 
-    <f:entry title="Port Mapping" field="portMapping" description="Please enter the 'from' and 'to' ports for port mapping. Only ports between 1024 and 65535 are allowed.">
-      <f:repeatable var="entry" name="portMapping">
-          <f:entry title="From Port" field="from">
-              <f:number min="1024" max="65535" />
-          </f:entry>
-          <f:entry title="To Port" field="to">
-              <f:number min="1024" max="65535" />
-          </f:entry>
-      </f:repeatable>
-    </f:entry>
+    <orka:blockWrapper>
+      <f:entry title="Port Mapping" field="portMappings" description="Please enter the NODE and VM ports for port mapping. Only NODE ports between 1024 and 65535 are allowed.">
+        <f:repeatable var="entry" name="portMappings">
+            <f:entry title="Node Port" field="from">
+                <f:number />
+            </f:entry>
+            
+            <f:entry title="VM Port" field="to">
+                <f:number min="1024" max="65535"/>
+            </f:entry>
+          
+            <f:entry title="">
+              <div align="right">
+                <f:repeatableDeleteButton value="${%Delete Mapping}"/>
+              </div>
+            </f:entry>
+        </f:repeatable>
+      </f:entry>
+
+      
+    </orka:blockWrapper>
 
   </f:section>
 

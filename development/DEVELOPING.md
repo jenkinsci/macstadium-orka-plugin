@@ -12,6 +12,7 @@ This guide provides information about how to build, package, and run the plugin 
   - [UI Bindings](#ui-bindings)
 - [Persisting State](#persisting-state)
 - [Changing the Supported Jenkins Version](#changing-the-supported-jenkins-version)
+- [Changing Plugin Version](#changing-the-plugin-version)
 
 ## Build Requirements
 
@@ -99,3 +100,6 @@ We only support [Jenkins LTS versions][lts]. The minimum supported version is sp
 ```
 
 [lts]: https://www.jenkins.io/changelog-stable/
+
+## Changing Plugin Version
+The plugin version is set in the Github runner when the plugin is released (see [Releasing Guide](RELEASING.md) for details)
