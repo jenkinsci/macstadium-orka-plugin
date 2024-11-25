@@ -89,7 +89,7 @@
             </f:entry>
             
             <f:entry title="VM Port" field="to">
-                <f:number/>
+                <f:number min="1024" max="65535"/>
             </f:entry>
           
             <f:entry title="">

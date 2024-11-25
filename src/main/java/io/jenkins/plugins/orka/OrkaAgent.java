@@ -186,26 +186,6 @@ public class OrkaAgent extends AbstractCloudSlave {
         return portMappings;
     }
 
-    /* 
-    public void processPortMappings() {
-        for (PortMapping mapping : portMappings) {
-            int fromPort = mapping.getFrom();
-            int toPort = mapping.getTo();
-
-            if (isValidPortRange(fromPort)) {
-                logger.fine("Mapping from port " + fromPort + " to port " + toPort);
-            } else {
-                logger.fine("Invalid port mapping: from " + fromPort + " to " + toPort);
-            }
-        }
-    }
-
-    */
-    
-    private boolean isValidPortRange(int from) {
-        return from >= 1024 && from <= 65535;
-    }
-
     public String getPortMappingsAsString() {
         if (portMappings == null || portMappings.isEmpty()) {
             return "";
