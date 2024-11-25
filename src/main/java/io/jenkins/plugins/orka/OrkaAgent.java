@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import jenkins.model.Jenkins;
 
@@ -84,6 +83,35 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.tagRequired = tagRequired;
         this.setNumExecutors(numExecutors);
         this.portMappings = portMappings != null ? portMappings : new ArrayList<>();        
+    }
+
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
+            String node, String namespace, String namePrefix, String redirectHost, String image,
+            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+            int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
+            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired)
+            throws Descriptor.FormException, IOException {
+        super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
+
+        this.orkaCredentialsId = orkaCredentialsId;
+        this.orkaEndpoint = orkaEndpoint;
+        this.vmCredentialsId = vmCredentialsId;
+        this.namespace = namespace;
+        this.namePrefix = namePrefix;
+        this.node = node;
+        this.image = image;
+        this.cpu = cpu;
+        this.useNetBoost = useNetBoost;
+        this.useLegacyIO = useLegacyIO;
+        this.useGpuPassthrough = useGpuPassthrough;
+        this.useJenkinsProxySettings = useJenkinsProxySettings;
+        this.ignoreSSLErrors = ignoreSSLErrors;
+        this.jvmOptions = jvmOptions;
+        this.memory = memory;
+        this.tag = tag;
+        this.tagRequired = tagRequired;
+        this.setNumExecutors(numExecutors);
+        this.portMappings = null;
     }
 
     public String getOrkaCredentialsId() {
@@ -158,19 +186,22 @@ public class OrkaAgent extends AbstractCloudSlave {
         return portMappings;
     }
 
+    /* 
     public void processPortMappings() {
         for (PortMapping mapping : portMappings) {
             int fromPort = mapping.getFrom();
             int toPort = mapping.getTo();
 
             if (isValidPortRange(fromPort)) {
-                logger.info("Mapping from port " + fromPort + " to port " + toPort);
+                logger.fine("Mapping from port " + fromPort + " to port " + toPort);
             } else {
-                logger.info("Invalid port mapping: from " + fromPort + " to " + toPort);
+                logger.fine("Invalid port mapping: from " + fromPort + " to " + toPort);
             }
         }
     }
 
+    */
+    
     private boolean isValidPortRange(int from) {
         return from >= 1024 && from <= 65535;
     }
