@@ -186,7 +186,7 @@ public class OrkaCloud extends Cloud {
                 .getOrkaClient(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
                 .deployVM(vmConfig, namespace, namePrefix, image, cpu, memory, null, 
-                          scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough);
+                          scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, null);
     }
 
     public void deleteVM(String name, String namespace) throws IOException {

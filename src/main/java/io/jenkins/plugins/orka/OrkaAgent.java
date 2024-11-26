@@ -18,6 +18,10 @@ import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
@@ -27,6 +31,8 @@ import org.kohsuke.stapler.verb.POST;
 
 public class OrkaAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = 6363583313270146174L;
+    private static final Logger logger = Logger.getLogger(OrkaAgent.class.getName());
+
 
     public String orkaCredentialsId;
     public String orkaEndpoint;
@@ -46,7 +52,39 @@ public class OrkaAgent extends AbstractCloudSlave {
     private String namePrefix;
     private String jvmOptions;
 
+    private final List<PortMapping> portMappings;
+
     @DataBoundConstructor
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
+            String node, String namespace, String namePrefix, String redirectHost, String image,
+            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+            int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
+            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired, 
+            List<PortMapping> portMappings)
+            throws Descriptor.FormException, IOException {
+        super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
+
+        this.orkaCredentialsId = orkaCredentialsId;
+        this.orkaEndpoint = orkaEndpoint;
+        this.vmCredentialsId = vmCredentialsId;
+        this.namespace = namespace;
+        this.namePrefix = namePrefix;
+        this.node = node;
+        this.image = image;
+        this.cpu = cpu;
+        this.useNetBoost = useNetBoost;
+        this.useLegacyIO = useLegacyIO;
+        this.useGpuPassthrough = useGpuPassthrough;
+        this.useJenkinsProxySettings = useJenkinsProxySettings;
+        this.ignoreSSLErrors = ignoreSSLErrors;
+        this.jvmOptions = jvmOptions;
+        this.memory = memory;
+        this.tag = tag;
+        this.tagRequired = tagRequired;
+        this.setNumExecutors(numExecutors);
+        this.portMappings = portMappings != null ? portMappings : new ArrayList<>();        
+    }
+
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
             String node, String namespace, String namePrefix, String redirectHost, String image,
             Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
@@ -73,6 +111,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.tag = tag;
         this.tagRequired = tagRequired;
         this.setNumExecutors(numExecutors);
+        this.portMappings = null;
     }
 
     public String getOrkaCredentialsId() {
@@ -142,6 +181,47 @@ public class OrkaAgent extends AbstractCloudSlave {
     public String getJvmOptions() {
         return this.jvmOptions;
     }
+
+    public List<PortMapping> getPortMappins() {
+        return portMappings;
+    }
+
+    public String getPortMappingsAsString() {
+        if (portMappings == null || portMappings.isEmpty()) {
+            return "";
+        }
+    
+        StringBuilder sb = new StringBuilder();
+        for (PortMapping mapping : portMappings) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(mapping.getFrom()).append(":").append(mapping.getTo());
+        }
+        return sb.toString();
+    }
+    
+    public static class PortMapping implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final int from;
+        private final int to;
+
+        @DataBoundConstructor
+        public PortMapping(int from, int to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        public int getFrom() {
+            return from;
+        }
+
+        public int getTo() {
+            return to;
+        }
+    }
+
 
     @Override
     public AbstractCloudComputer createComputer() {

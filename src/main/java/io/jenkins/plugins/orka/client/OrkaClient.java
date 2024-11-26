@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.Proxy;
 import java.util.Arrays;
+
 import java.util.concurrent.TimeUnit;
 
 import java.util.logging.Logger;
@@ -90,10 +91,10 @@ public class OrkaClient {
             String memory, String node,
             String scheduler,
             String tag, Boolean tagRequired,Boolean netBoost, Boolean legacyIO, 
-            Boolean gpuPassThrough) throws IOException {
+            Boolean gpuPassThrough, String portMappingsString) throws IOException {
+
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, namePrefix, image, cpu, memory, node,
-                scheduler, tag,
-                tagRequired, netBoost, legacyIO, gpuPassThrough);
+                scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingsString);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(
