@@ -39,7 +39,7 @@ public class SSLHelper {
                 }
             };
 
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            final SSLContext sslContext = SSLContext.getInstance("TLSv1.3");
             sslContext.init(null, trustAllCerts, new SecureRandom());
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
