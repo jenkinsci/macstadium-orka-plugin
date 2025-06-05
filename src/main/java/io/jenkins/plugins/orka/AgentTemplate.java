@@ -26,6 +26,7 @@ import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
 import io.jenkins.plugins.orka.helpers.OrkaInfoHelper;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 import io.jenkins.plugins.orka.helpers.Utils;
+import io.jenkins.plugins.orka.helpers.VMNameGenerator;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -254,12 +255,20 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     }
 
     public OrkaProvisionedAgent provision() throws IOException, FormException {
-        String vmDeployID = "[deployID=" + UUID.randomUUID().toString() + "] ";
-        logger.fine("Deploying VM for label " + this.labelString + vmDeployID);
-        DeploymentResponse response = this.deployVM(vmDeployID);
+        String name = VMNameGenerator.generateName(this.namePrefix);
+        logger.fine("Deploying VM for label " + this.labelString + " with name " + name);
+
+        DeploymentResponse response;
+        try {
+            response = this.deployVM(name);
+        } catch (Exception e) {
+            logger.warning("Exception while deploying VM with name " + name + ". Deleting VM.");
+            this.parent.deleteVM(name, this.namespace);
+            throw e;
+        }
 
         try {
-            logger.fine("Result deploying VM with label " + this.labelString + vmDeployID + ":");
+            logger.fine("Result deploying VM with label " + this.labelString + " with name " + name + ":");
             logger.fine(response.toString());
 
             if (!response.isSuccessful()) {
@@ -283,15 +292,15 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }
     }
 
-    private DeploymentResponse deployVM(String vmDeployID) throws IOException {
+    private DeploymentResponse deployVM(String name) throws IOException {
         if (StringUtils.equals(deploymentOption, orka2xOption)) {
-            logger.fine("Using Orka 2x deployment for ID:" + vmDeployID);
+            logger.fine("Using Orka 2x deployment");
             return this.parent.deployVM(this.namespace, this.namePrefix, this.config, null, null, 
                     null, this.legacyConfigScheduler, this.legacyConfigTag, 
                     this.legacyConfigTagRequired, this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
         }
-        logger.fine("Using Orka 3x deployment");
-        return this.parent.deployVM(this.namespace, this.namePrefix, null, this.image,
+        logger.fine("Using Orka 3x deployment for name " + name);
+        return this.parent.deployVMWithName(this.namespace, name, null, this.image,
                 this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired,this.useNetBoost, 
                 this.useLegacyIO, this.useGpuPassthrough);
     }

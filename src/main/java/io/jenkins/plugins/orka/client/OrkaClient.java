@@ -87,6 +87,7 @@ public class OrkaClient {
         return response;
     }
 
+    @Deprecated
     public DeploymentResponse deployVM(String vmConfig, String namespace, String namePrefix, String image, Integer cpu,
             String memory, String node,
             String scheduler,
@@ -95,6 +96,23 @@ public class OrkaClient {
 
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, namePrefix, image, cpu, memory, node,
                 scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingsString);
+        String deploymentRequestJson = new Gson().toJson(deploymentRequest);
+
+        HttpResponse httpResponse = this.post(
+                String.format("%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, VM_PATH), deploymentRequestJson);
+        DeploymentResponse response = JsonHelper.fromJson(httpResponse.getBody(), DeploymentResponse.class);
+        response.setHttpResponse(httpResponse);
+
+        return response;
+    }
+
+    public DeploymentResponse deployVMWithName(String vmConfig, String namespace, String name, 
+            String image, Integer cpu, String memory, String node, String scheduler, String tag, 
+            Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassThrough, 
+            String portMappingsString) throws IOException {
+
+        DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, name, image, cpu, memory, node,
+                scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingsString, false);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(

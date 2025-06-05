@@ -62,6 +62,7 @@ public class DeploymentRequest {
         this.shouldGenerateName = StringUtils.isNotBlank(this.name);
     }
 
+    @Deprecated
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
         String scheduler, String tag, Boolean tagRequired, Boolean netBoost, 
         Boolean legacyIO, Boolean gpuPassthrough) {
@@ -88,9 +89,17 @@ public class DeploymentRequest {
         this.timeout = 60 * 24; // Set the server timeout to a day
     }
 
+    @Deprecated
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
             String scheduler, String tag, Boolean tagRequired, Boolean netBoost, 
             Boolean legacyIO, Boolean gpuPassthrough, String portMappingsString) {
+        this(vmConfig, name, image, cpu, memory, node, scheduler, tag, tagRequired, netBoost, 
+            legacyIO, gpuPassthrough, portMappingsString, StringUtils.isNotBlank(name));
+    }
+
+    public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
+        String scheduler, String tag, Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassthrough, 
+        String portMappingsString, Boolean shouldGenerateName) {
         this.vmConfig = vmConfig;
         this.node = node;
         this.image = image;
@@ -109,7 +118,7 @@ public class DeploymentRequest {
         if (this.legacyIO) {
             this.netBoost = false;
         }
-        this.shouldGenerateName = StringUtils.isNotBlank(this.name);
+        this.shouldGenerateName = shouldGenerateName;
         this.timeout = 60 * 24; // Set the server timeout to a day
 
         this.reservedPorts = portMappingsString;

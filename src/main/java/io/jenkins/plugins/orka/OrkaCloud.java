@@ -177,6 +177,7 @@ public class OrkaCloud extends Cloud {
                 .getVMConfigs().getConfigs();
     }
 
+    @Deprecated
     public DeploymentResponse deployVM(String namespace, String namePrefix, String vmConfig, String image, Integer cpu,
             String memory, String scheduler,
             String tag,
@@ -187,6 +188,17 @@ public class OrkaCloud extends Cloud {
                         this.ignoreSSLErrors)
                 .deployVM(vmConfig, namespace, namePrefix, image, cpu, memory, null, 
                           scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, null);
+    }
+
+    public DeploymentResponse deployVMWithName(String namespace, String name, String vmConfig, String image, 
+            Integer cpu, String memory, String scheduler, String tag,
+            Boolean tagRequired, Boolean netBoost, Boolean legacyIO, 
+            Boolean gpuPassThrough) throws IOException {
+        return new OrkaClientFactory()
+                .getOrkaClient(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
+                        this.ignoreSSLErrors)
+                .deployVMWithName(vmConfig, namespace, name, image, cpu, memory, null, 
+                        scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, null);
     }
 
     public void deleteVM(String name, String namespace) throws IOException {
