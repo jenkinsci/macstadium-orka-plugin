@@ -50,6 +50,15 @@ public class DeploymentRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private String reservedPorts;
 
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private Integer displayWidth;
+
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private Integer displayHeight;
+
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private Integer displayDpi;
+
     @Deprecated
     public DeploymentRequest(String vmConfig, String name, String node, String scheduler,
             String tag, Boolean tagRequired) {
@@ -97,9 +106,18 @@ public class DeploymentRequest {
             legacyIO, gpuPassthrough, portMappingsString, StringUtils.isNotBlank(name));
     }
 
+    @Deprecated
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
         String scheduler, String tag, Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassthrough, 
         String portMappingsString, Boolean shouldGenerateName) {
+        this(vmConfig, name, image, cpu, memory, node, scheduler, tag, tagRequired, netBoost, 
+            legacyIO, gpuPassthrough, portMappingsString, shouldGenerateName, null, null, null);
+    }
+
+    public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
+        String scheduler, String tag, Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassthrough, 
+        String portMappingsString, Boolean shouldGenerateName, 
+        Integer displayWidth, Integer displayHeight, Integer displayDpi) {
         this.vmConfig = vmConfig;
         this.node = node;
         this.image = image;
@@ -114,6 +132,9 @@ public class DeploymentRequest {
         this.netBoost = netBoost;
         this.legacyIO = legacyIO;
         this.gpuPassthrough = gpuPassthrough;
+        this.displayWidth = displayWidth;
+        this.displayHeight = displayHeight;
+        this.displayDpi = displayDpi;
 
         if (this.legacyIO) {
             this.netBoost = false;

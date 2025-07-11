@@ -2,13 +2,11 @@ package io.jenkins.plugins.orka;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,8 +28,8 @@ public class AgentTemplateTest {
         String id = "vm-machine";
 
         OrkaCloud cloud = mock(OrkaCloud.class);
-        when(cloud.deployVMWithName(any(), any(), any(), any(), any(), any(), any(), any(),
-                any(), any(), any(), any()))
+        when(cloud.deployVM(any(), any(), any(), any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(new DeploymentResponse(ip, sshPort, id, null));
         when(cloud.getRealHost(anyString())).thenReturn(ip);
         agentTemplate.setParent(cloud);
@@ -49,6 +47,6 @@ public class AgentTemplateTest {
     }
 
     private AgentTemplate getAgentTemplate() {  
-        return new AgentTemplate("vmCredentialsId", "orka3xOption", null, "baseImage", 12, null, Constants.DEFAULT_NAMESPACE, true, false, false, "default", null, null, null, null, null, false, 1, Mode.NORMAL, "remoteFS", "label", new IdleTimeCloudRetentionStrategy(5), null, null);
+        return new AgentTemplate("vmCredentialsId", "orka3xOption", null, "baseImage", 12, null, Constants.DEFAULT_NAMESPACE, true, false, false, "default", null, null, null, null, null, false, 1500, 2000, 100, 1, Mode.NORMAL, "remoteFS", "label", new IdleTimeCloudRetentionStrategy(5), null, null);
     }
 }
