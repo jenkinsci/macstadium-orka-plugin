@@ -62,6 +62,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private String config;
     private String tag;
     private Boolean tagRequired;
+    private Integer displayWidth;
+    private Integer displayHeight;
+    private Integer displayDpi;
 
     private String legacyConfigScheduler;
     private String legacyConfigTag;
@@ -109,12 +112,28 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 nodeProperties, jvmOptions);
     }
 
-    @DataBoundConstructor
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image, 
             int cpu, String memory, String namespace, boolean useNetBoost, boolean useLegacyIO, 
             boolean useGpuPassthrough, String scheduler, String tag, Boolean tagRequired, 
             String config, String legacyConfigScheduler, String legacyConfigTag, 
             boolean legacyConfigTagRequired, int numExecutors, Mode mode, String remoteFS,
+            String labelString, RetentionStrategy<?> retentionStrategy, 
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
+
+        this(vmCredentialsId, deploymentOption, namePrefix, image, cpu, memory, namespace, useNetBoost, useLegacyIO, 
+            useGpuPassthrough, scheduler, tag, tagRequired, config, legacyConfigScheduler, legacyConfigTag, 
+            legacyConfigTagRequired, null, null, null, numExecutors, mode, remoteFS, labelString, retentionStrategy, 
+            nodeProperties, jvmOptions);
+    }
+
+    @DataBoundConstructor
+    public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image, 
+            int cpu, String memory, String namespace, boolean useNetBoost, boolean useLegacyIO, 
+            boolean useGpuPassthrough, String scheduler, String tag, Boolean tagRequired, 
+            String config, String legacyConfigScheduler, String legacyConfigTag, 
+            boolean legacyConfigTagRequired, Integer displayWidth, Integer displayHeight, Integer displayDpi, 
+            int numExecutors, Mode mode, String remoteFS,
             String labelString, RetentionStrategy<?> retentionStrategy, 
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
 
@@ -144,6 +163,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.scheduler = scheduler;
         this.tag = tag;
         this.tagRequired = tagRequired;
+        this.displayWidth = displayWidth;
+        this.displayHeight = displayHeight;
+        this.displayDpi = displayDpi;
     }
 
     public String getOrkaCredentialsId() {
@@ -188,6 +210,18 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     public String getScheduler() {
         return this.scheduler;
+    }
+
+    public Integer getDisplayWidth() {
+        return this.displayWidth;
+    }
+
+    public Integer getDisplayHeight() {
+        return this.displayHeight;
+    }
+
+    public Integer getDisplayDpi() {
+        return this.displayDpi;
     }
 
     public String getTag() {
@@ -300,9 +334,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                     this.legacyConfigTagRequired, this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
         }
         logger.fine("Using Orka 3x deployment for name " + name);
-        return this.parent.deployVMWithName(this.namespace, name, null, this.image,
+        return this.parent.deployVM(this.namespace, name, null, this.image,
                 this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired,this.useNetBoost, 
-                this.useLegacyIO, this.useGpuPassthrough);
+                this.useLegacyIO, this.useGpuPassthrough, this.displayWidth, this.displayHeight, this.displayDpi);
     }
 
     void setParent(OrkaCloud parent) {
@@ -352,6 +386,22 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return this.formValidator.doCheckMemory(value);
         }
 
+        @POST
+        public FormValidation doCheckDisplayWidth(@QueryParameter String value) {
+            return this.formValidator.doCheckDisplayWidth(value);
+        }
+
+        @POST
+        public FormValidation doCheckDisplayHeight(@QueryParameter String value) {
+            return this.formValidator.doCheckDisplayHeight(value);
+        }
+
+        @POST
+        public FormValidation doCheckDisplayDpi(@QueryParameter String value) {
+            return this.formValidator.doCheckDisplayDpi(value);
+        }   
+
+        @POST
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
             return FormValidation.validatePositiveInteger(value);
         }
@@ -438,10 +488,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return "AgentTemplate [namePrefix=" + namePrefix + ", image=" + image + ", cpu=" + cpu + ", memory=" + memory
                 + ", namespace=" + namespace + ", useNetBoost=" + useNetBoost + ", useGpuPassthrough="
                 + useGpuPassthrough + ", scheduler=" + scheduler + ", config=" + config + ", tag=" + tag
-                + ", tagRequired=" + tagRequired + ", legacyConfigScheduler=" + legacyConfigScheduler
+                + ", tagRequired=" + tagRequired + ", displayWidth=" + displayWidth + ", displayHeight=" + displayHeight
+                + ", displayDpi=" + displayDpi + ", legacyConfigScheduler=" + legacyConfigScheduler
                 + ", legacyConfigTag=" + legacyConfigTag + ", legacyConfigTagRequired=" + legacyConfigTagRequired
-                + ", deploymentOption=" + deploymentOption + ", numExecutors="
-                + numExecutors + ", mode=" + mode + ", remoteFS=" + remoteFS + ", labelString=" + labelString
-                + ", retentionStrategy=" + retentionStrategy + "]";
+                + ", deploymentOption=" + deploymentOption + ", numExecutors=" + numExecutors + ", mode=" + mode
+                + ", remoteFS=" + remoteFS + ", labelString=" + labelString + ", retentionStrategy=" + retentionStrategy
+                + "]";
     }
 }

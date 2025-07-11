@@ -63,6 +63,66 @@ public class FormValidator {
         return FormValidation.error("Memory should be greater than 0");
     }
 
+    public FormValidation doCheckDisplayWidth(String displayWidth) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(displayWidth)) {
+                return FormValidation.ok();
+            }
+            Integer width = Integer.parseInt(displayWidth);
+
+            if (width != 0 && (width < 320 || width > 3840)) {
+                return FormValidation.error("Display width shoud be 0 or between 320 and 3840");
+            }
+            return FormValidation.ok();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doCheckDisplayWidth", e);
+        }
+
+        return FormValidation.ok();
+    }
+
+    public FormValidation doCheckDisplayHeight(String displayHeight) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(displayHeight)) {
+                return FormValidation.ok();
+            }
+            Integer height = Integer.parseInt(displayHeight);
+
+            if (height != 0 && (height < 480 || height > 2160)) {
+                return FormValidation.error("Display height shoud be 0 or between 480 and 2160");
+            }
+            return FormValidation.ok();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doCheckDisplayHeight", e);
+        }
+
+        return FormValidation.ok();
+    }
+
+    public FormValidation doCheckDisplayDpi(String displayDpi) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(displayDpi)) {
+                return FormValidation.ok();
+            }
+            Integer dpi = Integer.parseInt(displayDpi);
+
+            if (dpi != 0 && (dpi < 60 || dpi > 320)) {
+                return FormValidation.error("Display dpi shoud be 0 or between 60 and 320");
+            }
+            return FormValidation.ok();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doCheckDisplayDpi", e);
+        }
+
+        return FormValidation.ok();
+    }
+
     public FormValidation doCheckNamespace(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors, String namespace) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
