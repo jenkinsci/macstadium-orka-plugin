@@ -15,6 +15,12 @@ import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
+    private static final int minDisplayWidth = 320;
+    private static final int maxDisplayWidth = 3840;
+    private static final int minDisplayHeight = 480;
+    private static final int maxDisplayHeight = 2160;
+    private static final int minDisplayDpi = 60;
+    private static final int maxDisplayDpi = 320;
 
     private OrkaClientFactory clientFactory;
 
@@ -72,8 +78,9 @@ public class FormValidator {
             }
             Integer width = Integer.parseInt(displayWidth);
 
-            if (width != 0 && (width < 320 || width > 3840)) {
-                return FormValidation.error("Display width shoud be 0 or between 320 and 3840");
+            if (width != 0 && (width < minDisplayWidth || width > maxDisplayWidth)) {
+                return FormValidation.error(String.format(
+                    "Display width shoud be 0 or between %d and %d", minDisplayWidth, maxDisplayWidth));
             }
             return FormValidation.ok();
         } catch (Exception e) {
@@ -92,8 +99,9 @@ public class FormValidator {
             }
             Integer height = Integer.parseInt(displayHeight);
 
-            if (height != 0 && (height < 480 || height > 2160)) {
-                return FormValidation.error("Display height shoud be 0 or between 480 and 2160");
+            if (height != 0 && (height < minDisplayHeight || height > maxDisplayHeight)) {
+                return FormValidation.error(String.format(
+                    "Display height shoud be 0 or between %d and %d", minDisplayHeight, maxDisplayHeight));
             }
             return FormValidation.ok();
         } catch (Exception e) {
@@ -112,8 +120,9 @@ public class FormValidator {
             }
             Integer dpi = Integer.parseInt(displayDpi);
 
-            if (dpi != 0 && (dpi < 60 || dpi > 320)) {
-                return FormValidation.error("Display dpi shoud be 0 or between 60 and 320");
+            if (dpi != 0 && (dpi < minDisplayDpi || dpi > maxDisplayDpi)) {
+                return FormValidation.error(String.format(
+                    "Display dpi shoud be 0 or between %d and %d", minDisplayDpi, maxDisplayDpi));
             }
             return FormValidation.ok();
         } catch (Exception e) {
