@@ -46,6 +46,9 @@ public class OrkaAgent extends AbstractCloudSlave {
     private boolean useNetBoost;
     private boolean useLegacyIO;
     private boolean useGpuPassthrough;
+    private Integer displayWidth;
+    private Integer displayHeight;
+    private Integer displayDpi;
     private String memory;
     private String tag;
     private Boolean tagRequired;
@@ -54,10 +57,38 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     private final List<PortMapping> portMappings;
 
+    @Deprecated
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
+        String node, String namespace, String namePrefix, String redirectHost, String image,
+        Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+        int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
+        boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired)
+        throws Descriptor.FormException, IOException {
+        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, node, namespace, namePrefix, 
+            redirectHost, image, cpu, useNetBoost, useLegacyIO, useGpuPassthrough, numExecutors, 
+            host, port, remoteFS, useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, memory, 
+            tag, tagRequired, null);
+    }
+
+    @Deprecated
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
+            String node, String namespace, String namePrefix, String redirectHost, String image,
+            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+            int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
+            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired, 
+            List<PortMapping> portMappings)
+            throws Descriptor.FormException, IOException {
+        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, node, namespace, namePrefix, 
+            redirectHost, image, cpu, useNetBoost, useLegacyIO, useGpuPassthrough, null, null, null, numExecutors, 
+            host, port, remoteFS, useJenkinsProxySettings, ignoreSSLErrors, jvmOptions, memory, 
+            tag, tagRequired, portMappings);
+    }
+
     @DataBoundConstructor
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
             String node, String namespace, String namePrefix, String redirectHost, String image,
             Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+            Integer displayWidth, Integer displayHeight, Integer displayDpi,
             int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
             boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired, 
             List<PortMapping> portMappings)
@@ -76,6 +107,9 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.useLegacyIO = useLegacyIO;
         this.useGpuPassthrough = useGpuPassthrough;
         this.useJenkinsProxySettings = useJenkinsProxySettings;
+        this.displayWidth = displayWidth;
+        this.displayHeight = displayHeight;
+        this.displayDpi = displayDpi;
         this.ignoreSSLErrors = ignoreSSLErrors;
         this.jvmOptions = jvmOptions;
         this.memory = memory;
@@ -83,35 +117,6 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.tagRequired = tagRequired;
         this.setNumExecutors(numExecutors);
         this.portMappings = portMappings != null ? portMappings : new ArrayList<>();        
-    }
-
-    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
-            String node, String namespace, String namePrefix, String redirectHost, String image,
-            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
-            int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
-            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired)
-            throws Descriptor.FormException, IOException {
-        super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
-
-        this.orkaCredentialsId = orkaCredentialsId;
-        this.orkaEndpoint = orkaEndpoint;
-        this.vmCredentialsId = vmCredentialsId;
-        this.namespace = namespace;
-        this.namePrefix = namePrefix;
-        this.node = node;
-        this.image = image;
-        this.cpu = cpu;
-        this.useNetBoost = useNetBoost;
-        this.useLegacyIO = useLegacyIO;
-        this.useGpuPassthrough = useGpuPassthrough;
-        this.useJenkinsProxySettings = useJenkinsProxySettings;
-        this.ignoreSSLErrors = ignoreSSLErrors;
-        this.jvmOptions = jvmOptions;
-        this.memory = memory;
-        this.tag = tag;
-        this.tagRequired = tagRequired;
-        this.setNumExecutors(numExecutors);
-        this.portMappings = null;
     }
 
     public String getOrkaCredentialsId() {
@@ -164,6 +169,18 @@ public class OrkaAgent extends AbstractCloudSlave {
 
     public boolean getUseGpuPassthrough() {
         return this.useGpuPassthrough;
+    }
+
+    public Integer getDisplayWidth() {
+        return this.displayWidth;
+    }
+
+    public Integer getDisplayHeight() {
+        return this.displayHeight;
+    }
+
+    public Integer getDisplayDpi() {
+        return this.displayDpi;
     }
 
     public String getMemory() {
@@ -271,6 +288,21 @@ public class OrkaAgent extends AbstractCloudSlave {
         public ListBoxModel doFillVmCredentialsIdItems() {
             Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             return CredentialsHelper.getCredentials(StandardCredentials.class);
+        }
+
+        @POST
+        public FormValidation doCheckDisplayWidth(@QueryParameter String displayWidth) {
+            return this.formValidator.doCheckDisplayWidth(displayWidth);
+        }
+
+        @POST
+        public FormValidation doCheckDisplayHeight(@QueryParameter String displayHeight) {  
+            return this.formValidator.doCheckDisplayHeight(displayHeight);
+        }
+
+        @POST
+        public FormValidation doCheckDisplayDpi(@QueryParameter String displayDpi) {
+            return this.formValidator.doCheckDisplayDpi(displayDpi);
         }
 
         @POST

@@ -59,19 +59,35 @@
       <f:checkbox/>
     </f:entry>
 
-    <f:entry title="${%Use Net Boost}" field="useNetBoost" description="When checked, improves the network performance of Intel-based VMs. Required for macOS Ventura Intel-based VMs. 
-      NOTE: Applicable only to macOS BigSur and later. ">
-      <f:checkbox default="true" />
-    </f:entry>
+    <f:advanced>
+      <f:entry title="${%Use Net Boost}" field="useNetBoost" description="When checked, improves the network performance of Intel-based VMs. Required for macOS Ventura Intel-based VMs. 
+        NOTE: Applicable only to macOS BigSur and later. ">
+        <f:checkbox default="true" />
+      </f:entry>
 
-    <f:entry title="${%Use Legacy IO}" field="useLegacyIO" description="When checked, uses legacy IO network stack. Only enable for VMs before macOS 10.14.5">
-      <f:checkbox default="false" />
-    </f:entry>
-    
-    <f:entry title="${%Use GPU Passthrough}" field="useGpuPassthrough" description="When checked, enables the VM to use the GPU available on the node. 
-        NOTE: GPU Passthrough must be enabled for the cluster.">
+      <f:entry title="${%Use Legacy IO}" field="useLegacyIO" description="When checked, uses legacy IO network stack. Only enable for VMs before macOS 10.14.5">
         <f:checkbox default="false" />
-    </f:entry>
+      </f:entry>
+      
+      <f:entry title="${%Use GPU Passthrough}" field="useGpuPassthrough" description="When checked, enables the VM to use the GPU available on the node. 
+          NOTE: GPU Passthrough must be enabled for the cluster.">
+          <f:checkbox default="false" />
+      </f:entry>
+
+      <f:section title="${%Display Settings}">
+        <f:entry title="${%Width}" field="displayWidth">
+          <f:number />
+        </f:entry>
+
+        <f:entry title="${%Height}" field="displayHeight">
+          <f:number />
+        </f:entry>
+
+        <f:entry title="${%DPI}" field="displayDpi">
+          <f:number />
+        </f:entry>
+      </f:section>
+    </f:advanced>
 
     <f:entry field="vmCredentialsId" title="${%VM Credentials}" description="Credentials used to connect to the VM">
       <c:select />
