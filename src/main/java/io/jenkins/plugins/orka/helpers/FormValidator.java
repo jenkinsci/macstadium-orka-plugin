@@ -15,6 +15,12 @@ import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
+    private static final int minDisplayWidth = 320;
+    private static final int maxDisplayWidth = 3840;
+    private static final int minDisplayHeight = 480;
+    private static final int maxDisplayHeight = 2160;
+    private static final int minDisplayDpi = 60;
+    private static final int maxDisplayDpi = 320;
 
     private OrkaClientFactory clientFactory;
 
@@ -61,6 +67,69 @@ public class FormValidator {
         }
 
         return FormValidation.error("Memory should be greater than 0");
+    }
+
+    public FormValidation doCheckDisplayWidth(String displayWidth) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(displayWidth)) {
+                return FormValidation.ok();
+            }
+            Integer width = Integer.parseInt(displayWidth);
+
+            if (width != 0 && (width < minDisplayWidth || width > maxDisplayWidth)) {
+                return FormValidation.error(String.format(
+                    "Display width shoud be 0 or between %d and %d", minDisplayWidth, maxDisplayWidth));
+            }
+            return FormValidation.ok();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doCheckDisplayWidth", e);
+        }
+
+        return FormValidation.ok();
+    }
+
+    public FormValidation doCheckDisplayHeight(String displayHeight) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(displayHeight)) {
+                return FormValidation.ok();
+            }
+            Integer height = Integer.parseInt(displayHeight);
+
+            if (height != 0 && (height < minDisplayHeight || height > maxDisplayHeight)) {
+                return FormValidation.error(String.format(
+                    "Display height shoud be 0 or between %d and %d", minDisplayHeight, maxDisplayHeight));
+            }
+            return FormValidation.ok();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doCheckDisplayHeight", e);
+        }
+
+        return FormValidation.ok();
+    }
+
+    public FormValidation doCheckDisplayDpi(String displayDpi) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(displayDpi)) {
+                return FormValidation.ok();
+            }
+            Integer dpi = Integer.parseInt(displayDpi);
+
+            if (dpi != 0 && (dpi < minDisplayDpi || dpi > maxDisplayDpi)) {
+                return FormValidation.error(String.format(
+                    "Display dpi shoud be 0 or between %d and %d", minDisplayDpi, maxDisplayDpi));
+            }
+            return FormValidation.ok();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doCheckDisplayDpi", e);
+        }
+
+        return FormValidation.ok();
     }
 
     public FormValidation doCheckNamespace(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
