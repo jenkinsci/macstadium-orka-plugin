@@ -53,7 +53,29 @@ To run the plugin locally with a Jenkins controller running the minimum supporte
 mvn hpi:run
 ```
 
+or with Docker:
+
+```
+docker run --name jenkins-lts -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts
+```
+
+**Note**: If you are using Docker, you need the initial password. You can extract it from the container logs. Set up Jenkins following the default settings.
+
 Access the Jenkins controller at http://localhost:8080.
+
+## Installing the plugin
+
+Skip this section if you are not using Docker to run Jenkins.
+To install the plugin on a Jenkins in a Docker container:
+
+1. Build the plugin:
+```
+mvn package
+```
+1. Go to `Manage Jenkins` -> `Plugins` -> `Advanced Settings`
+1. Choose (or drag&drop) the `hpi` file from the `target` folder (created during the build step)
+1. Click `Deploy`
+1. **Note** If you upgrade the plugin you need to restart Jenkins. To do this navigate to `http://localhost:8080/restart`. This stops the container, so run it after that `docker start jenkins-lts`
 
 ## Entry Points
 
