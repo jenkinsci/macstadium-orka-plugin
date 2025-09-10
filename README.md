@@ -70,10 +70,11 @@ To configure:
   - Click `Advanced` to configure also:
     - Max Jenkins Agents Limit - The maximum number of Orka VMs that can be created by that cloud instance. This allows you to better manage your Orka resources.
     - Deployment Timeout (sec) - The time after which the request for new Orka VM will timeout. Defaults to 600 seconds (10 minutes).
+    - Display Settings - Used to manually configure display height, display width, and display DPI. Defaults to 1920x1080px and 96 DPI.
   - Node Mappings (Optional) - Overwrite the default host address used to connect to an Orka VM. By default, the plugin uses the private node address. Provide a mapping to a public host address if you wish to change this behavior. This option is available by clicking `Advanced`
     **Note** The public node addresses are provided by MacStadium.
 - Click Add Orka Template. An Orka template is the agent template, Jenkins will use to create a new agent.
-- Fill the following values:
+- Fill in the following values:
 
   - Image - The image used to deploy a VM from
   - \# of CPUs - The number of CPUs of the VM
@@ -92,17 +93,17 @@ To configure:
 
 #### For both permananet and cloud (ephemeral) agents
 
-If you are migrating from Orka 2.x and Jenkins 1.xx, you need to replace the Orka Credentials with Orka token. You can obtain one by:
+If you are migrating from Orka 2.x and Jenkins 1.xx, you will need to replace your existing Orka credentials with an Orka service account token. You can obtain one by:
 
-- Creating a service account
+- Creating a [service account]
 - Getting a JWT token for that account
 
 #### For cloud (ephemeral) agents
 
-If you previously used existing VM config to deploy VMs, you will see a radio group with two options in your agent template:
+If you previously used an existing VM config to deploy VMs, you will see a radio group with two options in your agent template:
 
-- Orka 3.x Deployment - The new way of deploying VMs. Does not require a VM config. If you previously has `Create a new VM config` enabled, your settings have been automatically migrated to this option
-- Orka 2.x Deployment - The legacy way of deploying VMs. If you previously used an existing. If you previously used an existing config, your settings have been automatically migrated to this option. All settings are `read-only`. If you need to make changes, you need to migrate to the `Orka 3.x Deployment` option
+- Orka 3.x Deployment - The new way of deploying VMs. Does not require a VM config. If you previously had `Create a new VM config` enabled, your settings have been automatically migrated to this option
+- Orka 2.x Deployment - The legacy way of deploying VMs. If you previously used an existing VM config, your settings have been automatically migrated to this option. All settings are `read-only`. If you need to make changes, you will need to migrate to the `Orka 3.x Deployment` option.
 
 ## Changelog
 
@@ -113,3 +114,4 @@ Prior to version `1.4` [here][old-changelog].
 [orka]: https://www.macstadium.com/orka
 [changelog]: https://github.com/jenkinsci/macstadium-orka-plugin/releases
 [old-changelog]: https://wiki.jenkins.io/display/JENKINS/Orka+Change+Log
+[service account]: https://support.macstadium.com/hc/en-us/articles/28333065069211-Orka-Cluster-Manage-Service-Accounts
