@@ -1,6 +1,6 @@
 # Troubleshooting
 
-To troubleshoot any Jenkins problem, it is important to enable verbose logging for the plugin. To do that:
+When troubleshooting Jenkins issues, start by enabling verbose logging for the plugin by following these steps: 
 
 1. Go to `Manage Jenkins` -> `System Log`
 1. Click `Add recorder` and provide a name
@@ -8,17 +8,16 @@ To troubleshoot any Jenkins problem, it is important to enable verbose logging f
 1. Add the main Orka namespace `io.jenkins.plugins.orka`
 1. Set Log Level to `All`
 
-The logs will provide any relevant information for the plugin. Note, that enabling verbose logs may impact the Jenkins controller performance, so it should be disabled if not needed.
+The logs will provide any relevant information. Note that enabling verbose logs may impact the Jenkins controller performance, so this should be disabled if not needed.
 
 ## Common Issues
 
-# There are jobs waiting, but no agent is created
+### There are jobs waiting, but no agent is created
 
-Agent scheduling is not our responsibility. The plugin is not responsible for agent creation. It is reponsbile for VM deployment/deletion.  
-Jenkins decides when to spin up/down agents based on the current load. It ensures that agents are not overprovisioned.
+The plugin handles VM deployment and deletion, but agent scheduling remains under Jenkins control. Jenkins manages the provisioning or termination of agents based on current workload demands and prevents over-provisioning based on load analysis.
 
-However, there is a functionality in the plugin people can enable called `No Delay Provisioning`. Using it we are skipping Jenkins scheduling logic, which could lead to unexpected behavior, but spins up agents the moment a job requests them.
+The plugin offers an optional `No Delay Provisioning` feature that bypasses Jenkins standard scheduling logic. While this feature immediately spins up agents when a job requests them, it may result in unexpected behavior as it circumvents Jenkins built-in load management.
 
-# The plugin cannot connect to the cluster
+### The plugin cannot connect to the cluster
 
-Ensure the host where the controller runs can connect to the cluster
+Ensure the host the controller is running on can connect to the cluster
