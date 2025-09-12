@@ -1,6 +1,6 @@
 # Tips & Tricks
 
-- **Avoid Removing Public Methods**: Customers may configure the plugin programmatically. Removing a public method is a breaking change and can cause issues. Instead, deprecate the method and create an overload if necessary.
+- **Avoid Removing Public Methods**: Users may configure the plugin programmatically. Removing a public method is a breaking change and can cause issues. Instead, deprecate the method and create an overload if necessary.
 
 - **Use `readResolve` for Defaults**: Utilize the `readResolve` method to handle meaningful defaults when deserializing objects.
 
