@@ -21,4 +21,4 @@ mvn test
 
 **Note**: These tests are currently deprecated.
 
-Please refer to the [integration tests README](https://github.com/jenkinsci/macstadium-orka-plugin/blob/main/integration-tests/README.md) for more information.
+Please refer to the [integration tests README](../integration-tests/README.md) for more information.
