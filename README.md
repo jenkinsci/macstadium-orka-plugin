@@ -67,7 +67,7 @@ To configure:
   - Name of this Cloud - The name of the cloud
   - Orka Token - The service account token used to connect to the Orka environment. Created by running orka3 sa <name> token
   - Orka Endpoint - The endpoint used by the plugin to connect to the Orka environment
-  - Click `Advanced` to configure also:
+  - Click `Advanced` to also configure:
     - Max Jenkins Agents Limit - The maximum number of Orka VMs that can be created by that cloud instance. This allows you to better manage your Orka resources.
     - Deployment Timeout (sec) - The time after which the request for new Orka VM will timeout. Defaults to 600 seconds (10 minutes).
     - Display Settings - Used to manually configure display height, display width, and display DPI. Defaults to 1920x1080px and 96 DPI.
@@ -88,15 +88,6 @@ To configure:
   - Namespace - The namespace used to deploy VMs to
   - Name Prefix (Optional) - The deployed VM name starts with the specified prefix
   - VM Credentials - The credentials used to SSH to the deployed VM
-
-### Migrating from Orka 2.x and Jenkins 1.xx
-
-#### For both permananet and cloud (ephemeral) agents
-
-If you are migrating from Orka 2.x and Jenkins 1.xx, you will need to replace your existing Orka credentials with an Orka service account token. You can obtain one by:
-
-- Creating a [service account]
-- Getting a JWT token for that account
 
 #### For cloud (ephemeral) agents
 
