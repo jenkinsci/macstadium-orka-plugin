@@ -1,6 +1,6 @@
 # Release guide
 
-This guide explains how to release the Orka Jenkins plugin.
+This guide explains how to release the plugin.
 
 ## Table of Contents
 
