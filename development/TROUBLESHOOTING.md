@@ -16,7 +16,7 @@ The logs will provide any relevant information. Note that enabling verbose logs 
 
 The plugin handles VM deployment and deletion, but agent scheduling remains under Jenkins control. Jenkins manages the provisioning or termination of agents based on current workload demands and prevents over-provisioning based on load analysis.
 
-The plugin offers an optional `No Delay Provisioning` feature that bypasses Jenkins standard scheduling logic. While this feature immediately spins up agents when a job requests them, it may result in unexpected behavior as it circumvents Jenkins built-in load management.
+The plugin offers an optional `No Delay Provisioning` feature that bypasses Jenkins standard scheduling logic. While this feature immediately spins up agents when a job requests them, enabling this feature may result in unexpected behavior.
 
 ### The plugin cannot connect to the cluster
 
