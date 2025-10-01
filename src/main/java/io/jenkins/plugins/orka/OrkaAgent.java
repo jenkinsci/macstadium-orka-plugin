@@ -331,16 +331,6 @@ public class OrkaAgent extends AbstractCloudSlave {
         }
 
         @POST
-        public ListBoxModel doFillImageItems(@QueryParameter String orkaEndpoint,
-                @QueryParameter String orkaCredentialsId, @QueryParameter boolean useJenkinsProxySettings,
-                @QueryParameter boolean ignoreSSLErrors) {
-
-            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            return this.infoHelper.doFillBaseImageItems(orkaEndpoint, orkaCredentialsId, useJenkinsProxySettings,
-                    ignoreSSLErrors);
-        }
-
-        @POST
         public FormValidation doTestConnection(@QueryParameter String orkaCredentialsId,
                 @QueryParameter String orkaEndpoint, @QueryParameter boolean useJenkinsProxySettings,
                 @QueryParameter boolean ignoreSSLErrors)

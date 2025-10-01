@@ -434,34 +434,6 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, ignoreSSLErrors);
         }
 
-        @POST
-        public ListBoxModel doFillImageItems(@QueryParameter @RelativePath("..") String endpoint,
-                @QueryParameter @RelativePath("..") String credentialsId,
-                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
-                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors,
-                @QueryParameter String readonlyImage) {
-
-            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            ListBoxModel model = this.infoHelper.doFillBaseImageItems(endpoint, credentialsId, useJenkinsProxySettings,
-                    ignoreSSLErrors);
-
-            if (StringUtils.isNotBlank(readonlyImage)) {
-                if (!model.stream().filter(o -> readonlyImage.equals(o.value)).findAny().isPresent()) {
-                    String sanitizedName = Utils.sanitizeK8sName(readonlyImage);
-                    Optional<ListBoxModel.Option> existingImage = model.stream()
-                            .filter(o -> sanitizedName.equals(o.value))
-                            .findAny();
-                    if (existingImage.isPresent()) {
-                        existingImage.get().selected = true;
-                    } else {
-                        model.add(readonlyImage);
-                    }
-                }
-            }
-
-            return model;
-        }
-
         public static List<Descriptor<RetentionStrategy<?>>> getRetentionStrategyDescriptors() {
             return OrkaRetentionStrategy.getRetentionStrategyDescriptors();
         }
