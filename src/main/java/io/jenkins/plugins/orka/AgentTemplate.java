@@ -382,6 +382,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }
 
         @POST
+        public FormValidation doCheckImage(@QueryParameter String value) {
+            return this.formValidator.doCheckImage(value);
+        }
+
+        @POST
         public FormValidation doCheckMemory(@QueryParameter String value) {
             return this.formValidator.doCheckMemory(value);
         }

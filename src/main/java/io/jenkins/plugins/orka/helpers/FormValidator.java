@@ -8,6 +8,7 @@ import io.jenkins.plugins.orka.client.OrkaClient;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import jenkins.model.Jenkins;
 
@@ -49,6 +50,49 @@ public class FormValidator {
         }
 
         return FormValidation.ok();
+    }
+
+    public FormValidation doCheckImage(String image) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        // Regex from ReferenceRegexp below
+        // https://github.com/distribution/reference/blob/main/regexp.go#L34
+        private static final String ALPHANUMERIC = "[a-z0-9]+";
+        private static final String SEPARATOR = "(?:[._]|__|[-]+)";
+        private static final String PATH_COMPONENT = ALPHANUMERIC + "(?:" + SEPARATOR + ALPHANUMERIC + ")*";
+        private static final String REMOTE_NAME = PATH_COMPONENT + "(?:/" + PATH_COMPONENT + ")*";
+
+        private static final String DOMAIN_NAME_COMPONENT = "(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])";
+        private static final String DOMAIN_NAME = DOMAIN_NAME_COMPONENT + "(?:\\." + DOMAIN_NAME_COMPONENT + ")*";
+        private static final String IPV6_ADDRESS = "\\[(?:[a-fA-F0-9:]+)\\]";
+        private static final String HOST = "(?:" + DOMAIN_NAME + "|" + IPV6_ADDRESS + ")";
+        private static final String OPTIONAL_PORT = "(?::[0-9]+)?";
+        private static final String DOMAIN_AND_PORT = HOST + OPTIONAL_PORT;
+
+        private static final String TAG = "[\\w][\\w.-]{0,127}";
+        private static final String DIGEST = "[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*:[0-9A-Fa-f]{32,}";
+
+        private static final String NAME_PAT = "(?:(?:" + DOMAIN_AND_PORT + ")/)?" + REMOTE_NAME;
+
+        // Full reference pattern:
+        // ^(namePat)(?::(tag))?(?:@(digest))?$
+        private static final String REFERENCE_PAT =
+            "^(" + NAME_PAT + ")(?::(" + TAG + "))?(?:@(" + DIGEST + "))?$";
+
+        public static final Pattern REFERENCE_REGEXP = Pattern.compile(REFERENCE_PAT);
+
+        try {
+            if (StringUtils.isBlank(image)) {
+                return formValidator.ok()
+            }
+            
+            if (REFERENCE_REGEXP.matcher(image).matches()) {
+                return formValidator.ok()
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exeption in doCheckImage", e)
+        }
+        return formValidator.error("Not a valid image name")
     }
 
     public FormValidation doCheckMemory(String memory) {
