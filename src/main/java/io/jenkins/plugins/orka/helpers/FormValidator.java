@@ -83,16 +83,16 @@ public class FormValidator {
 
         try {
             if (StringUtils.isBlank(image)) {
-                return formValidator.ok()
+                return formValidator.ok();
             }
             
             if (REFERENCE_REGEXP.matcher(image).matches()) {
-                return formValidator.ok()
+                return formValidator.ok();
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Exeption in doCheckImage", e)
+            logger.log(Level.WARNING, "Exeption in doCheckImage", e);
         }
-        return formValidator.error("Not a valid image name")
+        return formValidator.error("Not a valid image name");
     }
 
     public FormValidation doCheckMemory(String memory) {
