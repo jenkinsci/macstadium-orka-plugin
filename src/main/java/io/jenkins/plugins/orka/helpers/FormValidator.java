@@ -76,23 +76,22 @@ public class FormValidator {
 
         // Full reference pattern:
         // ^(namePat)(?::(tag))?(?:@(digest))?$
-        final String REFERENCE_PAT =
-            "^(" + NAME_PAT + ")(?::(" + TAG + "))?(?:@(" + DIGEST + "))?$";
+        final String REFERENCE_PAT = "^(" + NAME_PAT + ")(?::(" + TAG + "))?(?:@(" + DIGEST + "))?$";
 
         final Pattern REFERENCE_REGEXP = Pattern.compile(REFERENCE_PAT);
 
         try {
             if (StringUtils.isBlank(image)) {
-                return formValidator.ok();
+                return formValidation.ok();
             }
             
             if (REFERENCE_REGEXP.matcher(image).matches()) {
-                return formValidator.ok();
+                return formValidation.ok();
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exeption in doCheckImage", e);
         }
-        return formValidator.error("Not a valid image name");
+        return formValidation.error("Not a valid image name");
     }
 
     public FormValidation doCheckMemory(String memory) {
