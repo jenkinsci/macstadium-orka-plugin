@@ -5,6 +5,8 @@ import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 
+import com.google.cloud.tools.jib.api.ImageReference;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,39 +57,17 @@ public class FormValidator {
     public FormValidation doCheckImage(String image) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
-        // Regex from ReferenceRegexp below
-        // https://github.com/distribution/reference/blob/main/regexp.go#L34
-        final String ALPHANUMERIC = "[a-z0-9]+";
-        final String SEPARATOR = "(?:[._]|__|[-]+)";
-        final String PATH_COMPONENT = ALPHANUMERIC + "(?:" + SEPARATOR + ALPHANUMERIC + ")*";
-        final String REMOTE_NAME = PATH_COMPONENT + "(?:/" + PATH_COMPONENT + ")*";
-
-        final String DOMAIN_NAME_COMPONENT = "(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])";
-        final String DOMAIN_NAME = DOMAIN_NAME_COMPONENT + "(?:\\." + DOMAIN_NAME_COMPONENT + ")*";
-        final String IPV6_ADDRESS = "\\[(?:[a-fA-F0-9:]+)\\]";
-        final String HOST = "(?:" + DOMAIN_NAME + "|" + IPV6_ADDRESS + ")";
-        final String OPTIONAL_PORT = "(?::[0-9]+)?";
-        final String DOMAIN_AND_PORT = HOST + OPTIONAL_PORT;
-
-        final String TAG = "[\\w][\\w.-]{0,127}";
-        final String DIGEST = "[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*:[0-9A-Fa-f]{32,}";
-
-        final String NAME_PAT = "(?:(?:" + DOMAIN_AND_PORT + ")/)?" + REMOTE_NAME;
-
-        // Full reference pattern:
-        // ^(namePat)(?::(tag))?(?:@(digest))?$
-        final String REFERENCE_PAT = "^(" + NAME_PAT + ")(?::(" + TAG + "))?(?:@(" + DIGEST + "))?$";
-
-        final Pattern REFERENCE_REGEXP = Pattern.compile(REFERENCE_PAT);
-
         try {
             if (StringUtils.isBlank(image)) {
                 return FormValidation.ok();
             }
-            
-            if (REFERENCE_REGEXP.matcher(image).matches()) {
-                return FormValidation.ok();
-            }
+
+            ImageReference imageReference = ImageReference.parse(image)
+
+            return FormValidation.ok()
+
+        } catch (InvalidImageReferenceException e) {
+            return FormValidation.error("Not a valid image name");
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exeption in doCheckImage", e);
         }
