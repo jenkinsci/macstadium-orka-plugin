@@ -1,11 +1,11 @@
 package io.jenkins.plugins.orka.helpers;
 
+import com.google.cloud.tools.jib.api.ImageReference;
+
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
-
-import com.google.cloud.tools.jib.api.ImageReference;
 
 import java.io.IOException;
 import java.util.logging.Level;
