@@ -62,9 +62,9 @@ public class FormValidator {
                 return FormValidation.ok();
             }
 
-            ImageReference imageReference = ImageReference.parse(image)
+            ImageReference imageReference = ImageReference.parse(image);
 
-            return FormValidation.ok()
+            return FormValidation.ok();
 
         } catch (InvalidImageReferenceException e) {
             return FormValidation.error("Not a valid image name");
