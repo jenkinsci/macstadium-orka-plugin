@@ -1,6 +1,7 @@
 package io.jenkins.plugins.orka.helpers;
 
 import com.google.cloud.tools.jib.api.ImageReference;
+import com.google.cloud.tools.jib.api.InvalidImageReferenceException;
 
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
