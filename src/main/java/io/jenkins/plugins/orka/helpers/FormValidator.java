@@ -58,6 +58,8 @@ public class FormValidator {
     public FormValidation doCheckImage(String image) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
+        String invalidImageError = "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
+
         try {
             if (StringUtils.isBlank(image)) {
                 return FormValidation.ok();
@@ -68,11 +70,11 @@ public class FormValidator {
             return FormValidation.ok();
 
         } catch (InvalidImageReferenceException e) {
-            return FormValidation.error("Not a valid image name");
+            return FormValidation.error(invalidImageError);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exeption in doCheckImage", e);
         }
-        return FormValidation.error("Not a valid image name");
+        return FormValidation.error(invalidImageError);
     }
 
     public FormValidation doCheckMemory(String memory) {
