@@ -18,6 +18,10 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
+
+    private static String InvalidImageError = 
+        "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
+
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
     private static final int minDisplayWidth = 320;
     private static final int maxDisplayWidth = 3840;
@@ -58,8 +62,6 @@ public class FormValidator {
     public FormValidation doCheckImage(String image) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
-        String invalidImageError = "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
-
         try {
             if (StringUtils.isBlank(image)) {
                 return FormValidation.ok();
@@ -70,11 +72,11 @@ public class FormValidator {
             return FormValidation.ok();
 
         } catch (InvalidImageReferenceException e) {
-            return FormValidation.error(invalidImageError);
+            return FormValidation.error(InvalidImageError);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exeption in doCheckImage", e);
         }
-        return FormValidation.error(invalidImageError);
+        return FormValidation.error(InvalidImageError);
     }
 
     public FormValidation doCheckMemory(String memory) {
