@@ -6,7 +6,6 @@ import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.helpers.ImageRegexOCI;
 
-
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
