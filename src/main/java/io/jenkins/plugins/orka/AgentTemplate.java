@@ -382,8 +382,13 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }
 
         @POST
-        public FormValidation doCheckImage(@QueryParameter String value) {
-            return this.formValidator.doCheckImage(value);
+        public FormValidation doCheckImage(@QueryParameter String value,
+                @QueryParameter @RelativePath("..") String endpoint,
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors) {
+            return this.formValidator.doCheckImage(endpoint, credentialsId, useJenkinsProxySettings,
+                    ignoreSSLErrors, value);
         }
 
         @POST

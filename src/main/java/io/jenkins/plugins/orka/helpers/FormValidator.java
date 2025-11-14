@@ -1,12 +1,11 @@
 package io.jenkins.plugins.orka.helpers;
 
-import com.google.cloud.tools.jib.api.ImageReference;
-import com.google.cloud.tools.jib.api.InvalidImageReferenceException;
-
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.helpers.ImageRegexOCI;
+
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -59,20 +58,29 @@ public class FormValidator {
         return FormValidation.ok();
     }
 
-    public FormValidation doCheckImage(String image) {
+    public FormValidation doCheckImage(String orkaEndpoint, String orkaCredentialsId,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String image) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
             if (StringUtils.isBlank(image)) {
                 return FormValidation.ok();
             }
+            
+            if (ImageRegexOCI.isValidOCI(image)) {
+                return FormValidation.ok();
+            }
 
-            ImageReference imageReference = ImageReference.parse(image);
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+                OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
+                            orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
 
-            return FormValidation.ok();
-
-        } catch (InvalidImageReferenceException e) {
-            return FormValidation.error(InvalidImageError);
+                boolean exists = client.getImages().getImages().stream()
+                            .anyMatch(i -> i.getName().equalsIgnoreCase(image));
+                if (exists) {
+                    return FormValidation.ok();
+                }
+            }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exeption in doCheckImage", e);
         }
