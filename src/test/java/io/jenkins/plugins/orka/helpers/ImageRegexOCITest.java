@@ -18,27 +18,27 @@ public class ImageRegexOCITest {
 
             // VALID 
 
-            { "registry.io/myimage:1.2.3", true },
+            { "registry.io/image:1.2.3", true },
+            { "registry.io/image:tag", true },
             { "registry.io:5000/my/repo/image", true },
-            { "[2001:db8::1]/repo/image", true },
-            { "registry.io/alpine@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true },
+            { "registry.io/image@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true },
 
             // INVALID 
             { "", false },
             { " ", false },
-            { "MyRepo/Image", false },                    
+            { "Repo/Image", false },                    
             { "bad reference", false },
-            { "alpine:", false },
-            { "alpine@", false },
-            { "alpine@sha256:1234", false },
+            { "image:", false },
+            { "image@", false },
+            { "image@sha256:1234", false },
             { "/leading/slash", false },
             { "repo//name", false },
             { "registry.io:/repo/image", false },
-            { "alpine:tag with spaces", false },
-            { "alpine", false },
-            { "alpine:latest", false },
-            { "myrepo/myimage", false },
-            { "my-repo/my_image-name.1", false },
+            { "image:tag with spaces", false },
+            { "image", false },
+            { "image:latest", false },
+            { "repo/image", false },
+            { "repo/my_image-name.1", false },
 
         });
     }

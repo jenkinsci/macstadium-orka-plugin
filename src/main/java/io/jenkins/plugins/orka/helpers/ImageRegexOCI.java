@@ -1,33 +1,73 @@
+/*
+ * Copyright 2018 Google LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package io.jenkins.plugins.orka.helpers;
 
+import com.google.common.base.Strings;
+
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ImageRegexOCI {
-    static final String ALPHANUMERIC = "[a-z0-9]+";
-    static final String SEPARATOR = "(?:[._]|__|[-]+)";
-    static final String PATH_COMPONENT = ALPHANUMERIC + "(?:" + SEPARATOR + ALPHANUMERIC + ")*";
-    static final String REMOTE_NAME = PATH_COMPONENT + "(?:/" + PATH_COMPONENT + ")*";
 
-    static final String DOMAIN_NAME_COMPONENT = "(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])";
-    static final String DOMAIN_NAME = DOMAIN_NAME_COMPONENT + "(?:\\." + DOMAIN_NAME_COMPONENT + ")*";
-    static final String IPV6_ADDRESS = "\\[(?:[a-fA-F0-9:]+)\\]";
-    static final String HOST = "(?:" + DOMAIN_NAME + "|" + IPV6_ADDRESS + ")";
-    static final String OPTIONAL_PORT = "(?::[0-9]+)?";
-    static final String DOMAIN_AND_PORT = HOST + OPTIONAL_PORT;
+    private static final String REGISTRY_COMPONENT_REGEX = "(?:[a-zA-Z\\d]|(?:[a-zA-Z\\d][a-zA-Z\\d-]*[a-zA-Z\\d]))";
 
-    static final String TAG = "[\\w][\\w.-]{0,127}";
-    static final String DIGEST = "[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*:[0-9A-Fa-f]{32,}";
+    private static final String REGISTRY_REGEX = String.format("%s(?:\\.%s)*(?::\\d+)?", REGISTRY_COMPONENT_REGEX,
+            REGISTRY_COMPONENT_REGEX);
 
-    static final String NAME_PAT = "(?:(?:" + DOMAIN_AND_PORT + ")/)?" + REMOTE_NAME;
+    private static final String REPOSITORY_COMPONENT_REGEX = "[a-z\\d]+(?:(?:[_.]|__|-+)[a-z\\d]+)*";
 
-    // Full reference pattern:
-    // ^(namePat)(?::(tag))?(?:@(digest))?$
-    static final String REFERENCE_PAT =
-        "^(" + NAME_PAT + ")(?::(" + TAG + "))?(?:@(" + DIGEST + "))?$";
+    private static final String REPOSITORY_REGEX = String.format("(?:%s/)*%s", REPOSITORY_COMPONENT_REGEX,
+            REPOSITORY_COMPONENT_REGEX);
 
-    static final Pattern REFERENCE_REGEXP = Pattern.compile(REFERENCE_PAT);
+    private static final String TAG_REGEX = "[\\w][\\w.-]{0,127}";
 
-    public static boolean isValidOCI(String image) {
-        return REFERENCE_REGEXP.matcher(image).matches();
+    private static final int HASH_LENGTH = 64;
+    private static final String HASH_REGEX = String.format("[a-f0-9]{%d}", HASH_LENGTH);
+    private static final String DIGEST_PREFIX = "sha256:";
+    static final String DIGEST_REGEX = DIGEST_PREFIX + HASH_REGEX;
+
+    private static final String REFERENCE_REGEX = String.format(
+            "^(?:(%s)/)?(%s)(?::(%s))?(?:@(%s))?$",
+            REGISTRY_REGEX, REPOSITORY_REGEX, TAG_REGEX, DIGEST_REGEX);
+
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile(REFERENCE_REGEX);
+
+    public static boolean isValidOCI(String reference) {
+        Matcher matcher = REFERENCE_PATTERN.matcher(reference);
+
+        if (!matcher.find() || matcher.groupCount() < 4) {
+            return false;
+        }
+
+        String registry = matcher.group(1);
+        String repository = matcher.group(2);
+
+        if (Strings.isNullOrEmpty(registry)) {
+            return false;
+        }
+
+        if (Strings.isNullOrEmpty(repository)) {
+            return false;
+        }
+
+        if (!registry.contains(".") && !registry.contains(":") && !"localhost".equals(registry)) {
+            return false;
+        }
+
+        return true;
     }
 }
