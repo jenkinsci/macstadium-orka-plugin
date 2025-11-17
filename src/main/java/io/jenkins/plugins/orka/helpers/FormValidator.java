@@ -9,7 +9,6 @@ import io.jenkins.plugins.orka.helpers.ImageRegexOCI;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import jenkins.model.Jenkins;
 
@@ -65,7 +64,7 @@ public class FormValidator {
             if (StringUtils.isBlank(image)) {
                 return FormValidation.ok();
             }
-            
+
             if (ImageRegexOCI.isValidOCI(image)) {
                 return FormValidation.ok();
             }

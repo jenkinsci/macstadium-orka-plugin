@@ -14,6 +14,7 @@
  * the License.
  */
 
+
 package io.jenkins.plugins.orka.helpers;
 
 import com.google.common.base.Strings;
@@ -23,6 +24,10 @@ import java.util.regex.Pattern;
 
 public class ImageRegexOCI {
 
+
+    // The below regex and function were adapted from Jib:
+    // https://github.com/GoogleContainerTools/jib/blob/master/jib-core/src/main/java/com/google/cloud/tools/jib/api/ImageReference.java
+    
     private static final String REGISTRY_COMPONENT_REGEX = "(?:[a-zA-Z\\d]|(?:[a-zA-Z\\d][a-zA-Z\\d-]*[a-zA-Z\\d]))";
 
     private static final String REGISTRY_REGEX = String.format("%s(?:\\.%s)*(?::\\d+)?", REGISTRY_COMPONENT_REGEX,
