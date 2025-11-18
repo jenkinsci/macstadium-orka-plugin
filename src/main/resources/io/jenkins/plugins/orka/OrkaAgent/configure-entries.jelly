@@ -39,7 +39,7 @@
       </f:entry>
     </f:advanced>
 
-    <f:entry title="${%Image}" field="image" help="${descriptor.getHelpFile('memory')}">
+    <f:entry title="${%Image}" field="image" help="${descriptor.getHelpFile('image')}">
       <f:textbox checkMethod="post"/>
     </f:entry>
     
