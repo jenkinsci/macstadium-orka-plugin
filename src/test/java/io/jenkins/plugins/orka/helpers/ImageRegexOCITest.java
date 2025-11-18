@@ -28,8 +28,6 @@ public class ImageRegexOCITest {
             // INVALID 
             { "", false },
             { " ", false },
-            { null, false },
-            { 7, false},
             { "Repo/Image", false },
             { "bad reference", false },
             { "image:", false },

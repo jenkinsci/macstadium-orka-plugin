@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.verb.POST;
 
 public class FormValidator {
 
