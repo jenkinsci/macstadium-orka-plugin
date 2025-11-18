@@ -22,11 +22,12 @@ public class ImageRegexOCITest {
             { "registry.io/image:tag", true },
             { "registry.io:5000/my/repo/image", true },
             { "registry.io/image@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true },
+            { "localhost/repo/image:tag", true },
 
             // INVALID 
             { "", false },
             { " ", false },
-            { "Repo/Image", false },                    
+            { "Repo/Image", false },
             { "bad reference", false },
             { "image:", false },
             { "image@", false },
@@ -39,6 +40,8 @@ public class ImageRegexOCITest {
             { "image:latest", false },
             { "repo/image", false },
             { "repo/my_image-name.1", false },
+            { "registry.io//:no-repository", false},
+            { "registry.io:nonnumberport/repo/image:tag", false },
 
         });
     }
