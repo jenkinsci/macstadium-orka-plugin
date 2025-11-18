@@ -33,6 +33,7 @@ public class FormValidator {
         this.clientFactory = clientFactory;
     }
 
+    @POST
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, boolean createNewVMConfig) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
@@ -56,6 +57,7 @@ public class FormValidator {
         return FormValidation.ok();
     }
 
+    @POST
     public FormValidation doCheckImage(String orkaEndpoint, String orkaCredentialsId,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String image) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
@@ -166,6 +168,7 @@ public class FormValidator {
         return FormValidation.ok();
     }
 
+    @POST
     public FormValidation doCheckNamespace(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors, String namespace) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
@@ -195,6 +198,7 @@ public class FormValidator {
         return FormValidation.error("Namespace must start with 'orka-'");
     }
 
+    @POST
     public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors)
             throws IOException {
