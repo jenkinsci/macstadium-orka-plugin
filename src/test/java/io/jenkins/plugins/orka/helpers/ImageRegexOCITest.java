@@ -43,6 +43,7 @@ public class ImageRegexOCITest {
             { "repo/my_image-name.1", false },
             { "registry.io:5403//image:tag", false},
             { "registry.io//:no-repository", false},
+            { "registry.io/:no-repository", false},
             { "registry.io:nonnumberport/repo/image:tag", false },
         });
     }
