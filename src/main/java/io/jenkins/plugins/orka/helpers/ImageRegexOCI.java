@@ -18,7 +18,6 @@ package io.jenkins.plugins.orka.helpers;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang.StringUtils;
 
 public class ImageRegexOCI {

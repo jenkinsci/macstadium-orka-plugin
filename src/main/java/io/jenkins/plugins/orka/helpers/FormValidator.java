@@ -16,7 +16,8 @@ import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
 
-    private static String InvalidImageError = "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
+    private static String InvalidImageError = 
+            "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
 
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
     private static final int minDisplayWidth = 320;
