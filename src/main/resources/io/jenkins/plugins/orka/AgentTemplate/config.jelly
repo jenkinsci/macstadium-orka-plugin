@@ -3,8 +3,8 @@
   <orka:blockWrapper>
     <f:section title="${%ORKA VM Details}">
       <orka:agentWrapper name="deploymentOption" value="${descriptor.getOrka3xOption()}" title="Orka 3.x Deployment" checked="${instance.deploymentOption != descriptor.getOrka2xOption()}">
-        <f:entry title="${%Image}" field="image">
-          <f:select checkMethod="post"/>
+        <f:entry title="${%Image}" field="image" help="${descriptor.getHelpFile('image')}">
+          <f:textbox checkMethod="post"/>
         </f:entry>
 
         <f:invisibleEntry>

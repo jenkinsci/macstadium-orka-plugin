@@ -4,6 +4,7 @@ import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.client.NodeResponse;
 import io.jenkins.plugins.orka.client.OrkaClient;
+import io.jenkins.plugins.orka.helpers.ImageRegexOCI;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -14,6 +15,10 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
+
+    private static String InvalidImageError = 
+            "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
+
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
     private static final int minDisplayWidth = 320;
     private static final int maxDisplayWidth = 3840;
@@ -51,6 +56,35 @@ public class FormValidator {
         return FormValidation.ok();
     }
 
+    public FormValidation doCheckImage(String orkaEndpoint, String orkaCredentialsId,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String image) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        try {
+            if (StringUtils.isBlank(image)) {
+                return FormValidation.ok();
+            }
+
+            if (ImageRegexOCI.isValidOCI(image)) {
+                return FormValidation.ok();
+            }
+
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+                OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
+                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
+
+                boolean exists = client.getImages().getImages().stream()
+                        .anyMatch(i -> i.getName().equalsIgnoreCase(image));
+                if (exists) {
+                    return FormValidation.ok();
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exeption in doCheckImage", e);
+        }
+        return FormValidation.error(InvalidImageError);
+    }
+
     public FormValidation doCheckMemory(String memory) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
@@ -80,7 +114,7 @@ public class FormValidator {
 
             if (width != 0 && (width < minDisplayWidth || width > maxDisplayWidth)) {
                 return FormValidation.error(String.format(
-                    "Display width shoud be 0 or between %d and %d", minDisplayWidth, maxDisplayWidth));
+                        "Display width shoud be 0 or between %d and %d", minDisplayWidth, maxDisplayWidth));
             }
             return FormValidation.ok();
         } catch (Exception e) {
@@ -101,7 +135,7 @@ public class FormValidator {
 
             if (height != 0 && (height < minDisplayHeight || height > maxDisplayHeight)) {
                 return FormValidation.error(String.format(
-                    "Display height shoud be 0 or between %d and %d", minDisplayHeight, maxDisplayHeight));
+                        "Display height shoud be 0 or between %d and %d", minDisplayHeight, maxDisplayHeight));
             }
             return FormValidation.ok();
         } catch (Exception e) {
@@ -122,7 +156,7 @@ public class FormValidator {
 
             if (dpi != 0 && (dpi < minDisplayDpi || dpi > maxDisplayDpi)) {
                 return FormValidation.error(String.format(
-                    "Display dpi shoud be 0 or between %d and %d", minDisplayDpi, maxDisplayDpi));
+                        "Display dpi shoud be 0 or between %d and %d", minDisplayDpi, maxDisplayDpi));
             }
             return FormValidation.ok();
         } catch (Exception e) {
