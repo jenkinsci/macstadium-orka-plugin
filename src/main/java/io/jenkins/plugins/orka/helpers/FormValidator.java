@@ -13,12 +13,10 @@ import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.verb.POST;
 
 public class FormValidator {
 
-    private static String InvalidImageError = 
-        "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
+    private static String InvalidImageError = "Invalid image name. Image must be an OCI reference or present on Orka SAN Storage.";
 
     private static final Logger logger = Logger.getLogger(FormValidator.class.getName());
     private static final int minDisplayWidth = 320;
@@ -34,7 +32,6 @@ public class FormValidator {
         this.clientFactory = clientFactory;
     }
 
-    @POST
     public FormValidation doCheckConfigName(String configName, String orkaEndpoint, String orkaCredentialsId,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, boolean createNewVMConfig) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
@@ -58,7 +55,6 @@ public class FormValidator {
         return FormValidation.ok();
     }
 
-    @POST
     public FormValidation doCheckImage(String orkaEndpoint, String orkaCredentialsId,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors, String image) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
@@ -74,10 +70,10 @@ public class FormValidator {
 
             if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
-                            orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
+                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
 
                 boolean exists = client.getImages().getImages().stream()
-                            .anyMatch(i -> i.getName().equalsIgnoreCase(image));
+                        .anyMatch(i -> i.getName().equalsIgnoreCase(image));
                 if (exists) {
                     return FormValidation.ok();
                 }
@@ -117,7 +113,7 @@ public class FormValidator {
 
             if (width != 0 && (width < minDisplayWidth || width > maxDisplayWidth)) {
                 return FormValidation.error(String.format(
-                    "Display width shoud be 0 or between %d and %d", minDisplayWidth, maxDisplayWidth));
+                        "Display width shoud be 0 or between %d and %d", minDisplayWidth, maxDisplayWidth));
             }
             return FormValidation.ok();
         } catch (Exception e) {
@@ -138,7 +134,7 @@ public class FormValidator {
 
             if (height != 0 && (height < minDisplayHeight || height > maxDisplayHeight)) {
                 return FormValidation.error(String.format(
-                    "Display height shoud be 0 or between %d and %d", minDisplayHeight, maxDisplayHeight));
+                        "Display height shoud be 0 or between %d and %d", minDisplayHeight, maxDisplayHeight));
             }
             return FormValidation.ok();
         } catch (Exception e) {
@@ -159,7 +155,7 @@ public class FormValidator {
 
             if (dpi != 0 && (dpi < minDisplayDpi || dpi > maxDisplayDpi)) {
                 return FormValidation.error(String.format(
-                    "Display dpi shoud be 0 or between %d and %d", minDisplayDpi, maxDisplayDpi));
+                        "Display dpi shoud be 0 or between %d and %d", minDisplayDpi, maxDisplayDpi));
             }
             return FormValidation.ok();
         } catch (Exception e) {
@@ -169,7 +165,6 @@ public class FormValidator {
         return FormValidation.ok();
     }
 
-    @POST
     public FormValidation doCheckNamespace(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors, String namespace) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
@@ -199,7 +194,6 @@ public class FormValidator {
         return FormValidation.error("Namespace must start with 'orka-'");
     }
 
-    @POST
     public FormValidation doTestConnection(String credentialsId, String endpoint, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors)
             throws IOException {

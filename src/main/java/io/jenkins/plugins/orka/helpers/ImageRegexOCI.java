@@ -14,27 +14,21 @@
  * the License.
  */
 
-
 package io.jenkins.plugins.orka.helpers;
-
-import com.google.common.base.Strings;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 public class ImageRegexOCI {
-
-
     // The below regex and function were adapted from Jib:
     // https://github.com/GoogleContainerTools/jib/blob/master/jib-core/src/main/java/com/google/cloud/tools/jib/api/ImageReference.java
-    
     private static final String REGISTRY_COMPONENT_REGEX = "(?:[a-zA-Z\\d]|(?:[a-zA-Z\\d][a-zA-Z\\d-]*[a-zA-Z\\d]))";
-
     private static final String REGISTRY_REGEX = String.format("%s(?:\\.%s)*(?::\\d+)?", REGISTRY_COMPONENT_REGEX,
             REGISTRY_COMPONENT_REGEX);
 
     private static final String REPOSITORY_COMPONENT_REGEX = "[a-z\\d]+(?:(?:[_.]|__|-+)[a-z\\d]+)*";
-
     private static final String REPOSITORY_REGEX = String.format("(?:%s/)*%s", REPOSITORY_COMPONENT_REGEX,
             REPOSITORY_COMPONENT_REGEX);
 
@@ -61,11 +55,11 @@ public class ImageRegexOCI {
         String registry = matcher.group(1);
         String repository = matcher.group(2);
 
-        if (Strings.isNullOrEmpty(registry)) {
+        if (StringUtils.isEmpty(registry)) {
             return false;
         }
 
-        if (Strings.isNullOrEmpty(repository)) {
+        if (StringUtils.isEmpty(repository)) {
             return false;
         }
 
