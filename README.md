@@ -111,11 +111,7 @@ The Orka plugin uses [Jenkins built-in logging framework]. To capture plugin log
 Set the log level to **All** and click **Save**.
 
 - Logs will appear under **Manage Jenkins -> System Log ->** *(your recorder name).*
-- Reducing log volume: The ```All``` level can slow down Jenkins on busy instances. To collect the most useful logs with less overhead, scope the logger to the core cloud class:
-
-```io.jenkins.plugins.orka.OrkaCloud```
-
-Keep the log level set to **All**.
+- The `io.jenkins.plugins.orka` scope is recommended, as narrowing to a specific class may omit relevant logs. Note that the `All` level can increase overhead on busy instances.
 
 ## Changelog
 
