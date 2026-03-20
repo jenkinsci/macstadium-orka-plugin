@@ -31,7 +31,7 @@ To create a permanent agent:
 
   Provide values for the following Orka properties:
 
-  - Orka Token - The service account token used to connect to the Orka environment. Created by running orka3 sa <name> token
+  - Orka Token - The [service account][service-account] token used to connect to the Orka environment. Created by running ```orka3 sa <name> token```
   - Orka Endpoint - The endpoint used by the plugin to connect to the Orka environment
   - Namespace - The namespace used to deploy VMs to
   - Node - The Orka node which the agent will be deployed on
@@ -65,7 +65,7 @@ To configure:
 - Select `Orka Cloud`
 - Configure the cloud by providing values for:
   - Name of this Cloud - The name of the cloud
-  - Orka Token - The service account token used to connect to the Orka environment. Created by running orka3 sa <name> token
+  - Orka Token - The [service account][service-account] token used to connect to the Orka environment. Created by running orka3 sa &lt;name&gt; token
   - Orka Endpoint - The endpoint used by the plugin to connect to the Orka environment
   - Click `Advanced` to also configure:
     - Max Jenkins Agents Limit - The maximum number of Orka VMs that can be created by that cloud instance. This allows you to better manage your Orka resources.
@@ -96,6 +96,23 @@ If you previously used an existing VM config to deploy VMs, you will see a radio
 - Orka 3.x Deployment - The new way of deploying VMs. Does not require a VM config. If you previously had `Create a new VM config` enabled, your settings have been automatically migrated to this option
 - Orka 2.x Deployment - The legacy way of deploying VMs. If you previously used an existing VM config, your settings have been automatically migrated to this option. All settings are `read-only`. If you need to make changes, you will need to migrate to the `Orka 3.x Deployment` option.
 
+#### Troubleshooting
+
+##### Enabling Plugin Logs
+
+The Orka plugin uses [Jenkins built-in logging framework]. To capture plugin logs for troubleshooting:
+
+1. Go to **Manage Jenkins -> System Log.**
+2. Click **Add new log recorder** and give it a name (e.g., ```Orka Plugin Logs```).
+3. Under **Loggers**, click **Add** and enter:
+
+   io.jenkins.plugins.orka
+
+Set the log level to **All** and click **Save**.
+
+- Logs will appear under **Manage Jenkins -> System Log ->** *(your recorder name).*
+- The `io.jenkins.plugins.orka` scope is recommended, as narrowing to a specific class may omit relevant logs. Note that the `All` level can increase overhead on busy instances.
+
 ## Changelog
 
 After version `1.4` [here][changelog].
@@ -105,4 +122,5 @@ Prior to version `1.4` [here][old-changelog].
 [orka]: https://www.macstadium.com/orka
 [changelog]: https://github.com/jenkinsci/macstadium-orka-plugin/releases
 [old-changelog]: https://wiki.jenkins.io/display/JENKINS/Orka+Change+Log
-[service account]: https://support.macstadium.com/hc/en-us/articles/28333065069211-Orka-Cluster-Manage-Service-Accounts
+[Jenkins built-in logging framework]: https://www.jenkins.io/doc/book/system-administration/viewing-logs/
+[service-account]: https://support.macstadium.com/hc/en-us/articles/28333065069211-Orka-Cluster-Manage-Service-Accounts
