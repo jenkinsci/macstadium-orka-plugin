@@ -48,6 +48,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private static final Logger logger = Logger.getLogger(AgentTemplate.class.getName());
     private static final String orka3xOption = "orka3xOption";
     private static final String orka2xOption = "orka2xOption";
+    private static final String orka3xDirectOption = "orka3xDirect";
+    private static final String orka3xVmConfigOption = "orka3xVmConfig";
     private String vmCredentialsId;
 
     private String namePrefix;
@@ -71,6 +73,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private Boolean legacyConfigTagRequired;
 
     private String deploymentOption;
+    private String orka3xInputMode;
+    private String orka3xVmConfig;
 
     private int numExecutors;
     private Mode mode;
@@ -127,14 +131,32 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             nodeProperties, jvmOptions);
     }
 
-    @DataBoundConstructor
-    public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image, 
-            int cpu, String memory, String namespace, boolean useNetBoost, boolean useLegacyIO, 
-            boolean useGpuPassthrough, String scheduler, String tag, Boolean tagRequired, 
-            String config, String legacyConfigScheduler, String legacyConfigTag, 
-            boolean legacyConfigTagRequired, Integer displayWidth, Integer displayHeight, Integer displayDpi, 
+    @Deprecated
+    public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image,
+            int cpu, String memory, String namespace, boolean useNetBoost, boolean useLegacyIO,
+            boolean useGpuPassthrough, String scheduler, String tag, Boolean tagRequired,
+            String config, String legacyConfigScheduler, String legacyConfigTag,
+            boolean legacyConfigTagRequired, Integer displayWidth, Integer displayHeight, Integer displayDpi,
             int numExecutors, Mode mode, String remoteFS,
-            String labelString, RetentionStrategy<?> retentionStrategy, 
+            String labelString, RetentionStrategy<?> retentionStrategy,
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
+
+        this(vmCredentialsId, deploymentOption, namePrefix, image, cpu, memory, namespace, useNetBoost,
+                useLegacyIO, useGpuPassthrough, scheduler, tag, tagRequired, config, legacyConfigScheduler,
+                legacyConfigTag, legacyConfigTagRequired, displayWidth, displayHeight, displayDpi,
+                null, null,
+                numExecutors, mode, remoteFS, labelString, retentionStrategy, nodeProperties, jvmOptions);
+    }
+
+    @DataBoundConstructor
+    public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image,
+            int cpu, String memory, String namespace, boolean useNetBoost, boolean useLegacyIO,
+            boolean useGpuPassthrough, String scheduler, String tag, Boolean tagRequired,
+            String config, String legacyConfigScheduler, String legacyConfigTag,
+            boolean legacyConfigTagRequired, Integer displayWidth, Integer displayHeight, Integer displayDpi,
+            String orka3xInputMode, String orka3xVmConfig,
+            int numExecutors, Mode mode, String remoteFS,
+            String labelString, RetentionStrategy<?> retentionStrategy,
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
 
         this.vmCredentialsId = vmCredentialsId;
@@ -166,6 +188,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.displayWidth = displayWidth;
         this.displayHeight = displayHeight;
         this.displayDpi = displayDpi;
+        this.orka3xInputMode = orka3xInputMode;
+        this.orka3xVmConfig = orka3xVmConfig;
     }
 
     public String getOrkaCredentialsId() {
@@ -264,6 +288,14 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.deploymentOption;
     }
 
+    public String getOrka3xInputMode() {
+        return this.orka3xInputMode;
+    }
+
+    public String getOrka3xVmConfig() {
+        return this.orka3xVmConfig;
+    }
+
     public String getLegacyConfigScheduler() {
         return this.legacyConfigScheduler;
     }
@@ -333,9 +365,16 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                     null, this.legacyConfigScheduler, this.legacyConfigTag, 
                     this.legacyConfigTagRequired, this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
         }
+        if (StringUtils.equals(orka3xInputMode, orka3xVmConfigOption)) {
+            logger.fine("Using Orka 3x deployment with VM config " + this.orka3xVmConfig);
+            return this.parent.deployVM(this.namespace, name, this.orka3xVmConfig, null,
+                    null, null, this.scheduler, this.tag, this.tagRequired,
+                    this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough,
+                    this.displayWidth, this.displayHeight, this.displayDpi);
+        }
         logger.fine("Using Orka 3x deployment for name " + name);
         return this.parent.deployVM(this.namespace, name, null, this.image,
-                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired,this.useNetBoost, 
+                this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired, this.useNetBoost,
                 this.useLegacyIO, this.useGpuPassthrough, this.displayWidth, this.displayHeight, this.displayDpi);
     }
 
@@ -363,6 +402,9 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             this.legacyConfigTag = tag;
             this.legacyConfigScheduler = scheduler;
             this.deploymentOption = orka2xOption;
+        }
+        if (StringUtils.isBlank(this.orka3xInputMode)) {
+            this.orka3xInputMode = orka3xDirectOption;
         }
 
         return this;
@@ -463,6 +505,24 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         public String getOrka3xOption() {
             return AgentTemplate.orka3xOption;
         }
+
+        public String getOrka3xDirectOption() {
+            return AgentTemplate.orka3xDirectOption;
+        }
+
+        public String getOrka3xVmConfigOption() {
+            return AgentTemplate.orka3xVmConfigOption;
+        }
+
+        @POST
+        public ListBoxModel doFillOrka3xVmConfigItems(
+                @QueryParameter @RelativePath("..") String endpoint,
+                @QueryParameter @RelativePath("..") String credentialsId,
+                @QueryParameter @RelativePath("..") Boolean useJenkinsProxySettings,
+                @QueryParameter @RelativePath("..") Boolean ignoreSSLErrors) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            return this.infoHelper.doFillVmItems(endpoint, credentialsId, useJenkinsProxySettings, ignoreSSLErrors);
+        }
     }
 
     @Override
@@ -473,7 +533,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 + ", tagRequired=" + tagRequired + ", displayWidth=" + displayWidth + ", displayHeight=" + displayHeight
                 + ", displayDpi=" + displayDpi + ", legacyConfigScheduler=" + legacyConfigScheduler
                 + ", legacyConfigTag=" + legacyConfigTag + ", legacyConfigTagRequired=" + legacyConfigTagRequired
-                + ", deploymentOption=" + deploymentOption + ", numExecutors=" + numExecutors + ", mode=" + mode
+                + ", deploymentOption=" + deploymentOption + ", orka3xInputMode=" + orka3xInputMode
+                + ", orka3xVmConfig=" + orka3xVmConfig + ", numExecutors=" + numExecutors + ", mode=" + mode
                 + ", remoteFS=" + remoteFS + ", labelString=" + labelString + ", retentionStrategy=" + retentionStrategy
                 + "]";
     }
