@@ -1,7 +1,6 @@
 
 package io.jenkins.plugins.orka.helpers;
 
-import com.cloudbees.plugins.credentials.common.PasswordCredentials;
 import hudson.ProxyConfiguration;
 import hudson.util.Secret;
 import io.jenkins.plugins.orka.client.OrkaClient;
