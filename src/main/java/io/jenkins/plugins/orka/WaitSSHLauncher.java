@@ -40,8 +40,8 @@ public final class WaitSSHLauncher extends ComputerLauncher {
         try {
             SSHUtil.waitForSSH(host, port);
         } catch (IOException ex) {
-            listener.getLogger().println("SSH coonection failed with: " + ex);
-            logger.fine("SSH coonection failed for host " + host + " on port " + port + "with: " + ex);
+            listener.getLogger().println("SSH connection failed with: " + ex);
+            logger.fine("SSH connection failed for host " + host + " on port " + port + "with: " + ex);
             this.deleteAgent(slaveComputer);
             throw ex;
         }
