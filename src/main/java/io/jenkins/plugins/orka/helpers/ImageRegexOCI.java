@@ -16,9 +16,9 @@
 
 package io.jenkins.plugins.orka.helpers;
 
+import hudson.Util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang.StringUtils;
 
 public class ImageRegexOCI {
     // The below regex and function were adapted from Jib:
@@ -54,11 +54,11 @@ public class ImageRegexOCI {
         String registry = matcher.group(1);
         String repository = matcher.group(2);
 
-        if (StringUtils.isEmpty(registry)) {
+        if (Util.fixEmpty(registry) == null) {
             return false;
         }
 
-        if (StringUtils.isEmpty(repository)) {
+        if (Util.fixEmpty(repository) == null) {
             return false;
         }
 

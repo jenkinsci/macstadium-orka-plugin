@@ -1,12 +1,12 @@
 package io.jenkins.plugins.orka.helpers;
 
+import hudson.Util;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.OrkaClient;
 
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang.StringUtils;
 
 public class OrkaInfoHelper {
     private static final Logger logger = Logger.getLogger(OrkaInfoHelper.class.getName());
@@ -25,8 +25,8 @@ public class OrkaInfoHelper {
         ListBoxModel model = new ListBoxModel();
 
         try {
-            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null
-                    && StringUtils.isNotBlank(namespace)) {
+            if (Util.fixEmptyAndTrim(orkaEndpoint) != null && orkaCredentialsId != null
+                    && Util.fixEmptyAndTrim(namespace) != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                         orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 client.getNodes(namespace).getNodes().forEach(n -> model.add(n.getName()));
@@ -44,7 +44,7 @@ public class OrkaInfoHelper {
         ListBoxModel model = new ListBoxModel();
 
         try {
-            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+            if (Util.fixEmptyAndTrim(orkaEndpoint) != null && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                         orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 client.getVMConfigs().getConfigs().forEach(vm -> model.add(vm.getName()));
@@ -61,7 +61,7 @@ public class OrkaInfoHelper {
 
         ListBoxModel model = new ListBoxModel();
         try {
-            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+            if (Util.fixEmptyAndTrim(orkaEndpoint) != null && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                         orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                 client.getImages().getImages().forEach(image -> model.add(image.getName()));

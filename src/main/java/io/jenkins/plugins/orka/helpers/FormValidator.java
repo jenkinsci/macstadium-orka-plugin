@@ -1,5 +1,6 @@
 package io.jenkins.plugins.orka.helpers;
 
+import hudson.Util;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.orka.client.HealthCheckResponse;
 import io.jenkins.plugins.orka.client.NodeResponse;
@@ -7,12 +8,11 @@ import io.jenkins.plugins.orka.client.OrkaClient;
 import io.jenkins.plugins.orka.helpers.ImageRegexOCI;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
-
-import org.apache.commons.lang.StringUtils;
 
 public class FormValidator {
 
@@ -39,7 +39,7 @@ public class FormValidator {
 
         if (createNewVMConfig) {
             try {
-                if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+                if (Util.fixEmptyAndTrim(orkaEndpoint) != null && orkaCredentialsId != null) {
                     OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                             orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                     boolean alreadyInUse = client.getVMConfigs().getConfigs().stream()
@@ -61,7 +61,7 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            if (StringUtils.isBlank(image)) {
+            if (Util.fixEmptyAndTrim(image) == null) {
                 return FormValidation.ok();
             }
 
@@ -69,7 +69,7 @@ public class FormValidator {
                 return FormValidation.ok();
             }
 
-            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+            if (Util.fixEmptyAndTrim(orkaEndpoint) != null && orkaCredentialsId != null) {
                 OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
                         orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
 
@@ -89,7 +89,7 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            if (StringUtils.isBlank(memory) || StringUtils.equals(memory, "auto")) {
+            if (Util.fixEmptyAndTrim(memory) == null || Objects.equals(memory, "auto")) {
                 return FormValidation.ok();
             }
             if (Float.parseFloat(memory) <= 0) {
@@ -107,7 +107,7 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            if (StringUtils.isBlank(displayWidth)) {
+            if (Util.fixEmptyAndTrim(displayWidth) == null) {
                 return FormValidation.ok();
             }
             Integer width = Integer.parseInt(displayWidth);
@@ -128,7 +128,7 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            if (StringUtils.isBlank(displayHeight)) {
+            if (Util.fixEmptyAndTrim(displayHeight) == null) {
                 return FormValidation.ok();
             }
             Integer height = Integer.parseInt(displayHeight);
@@ -149,7 +149,7 @@ public class FormValidator {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
         try {
-            if (StringUtils.isBlank(displayDpi)) {
+            if (Util.fixEmptyAndTrim(displayDpi) == null) {
                 return FormValidation.ok();
             }
             Integer dpi = Integer.parseInt(displayDpi);
@@ -170,9 +170,9 @@ public class FormValidator {
             boolean ignoreSSLErrors, String namespace) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
-        if (StringUtils.startsWith(namespace, "orka-")) {
+        if (namespace != null && namespace.startsWith("orka-")) {
             try {
-                if (StringUtils.isNotBlank(endpoint) && StringUtils.isNotBlank(credentialsId)) {
+                if (Util.fixEmptyAndTrim(endpoint) != null && Util.fixEmptyAndTrim(credentialsId) != null) {
                     OrkaClient client = this.clientFactory.getOrkaClient(endpoint,
                             credentialsId, useJenkinsProxySettings, ignoreSSLErrors);
                     NodeResponse response = client.getNodes(namespace);
