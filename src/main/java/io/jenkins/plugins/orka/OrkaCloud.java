@@ -3,6 +3,7 @@ package io.jenkins.plugins.orka;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Computer;
 import hudson.model.Descriptor;
 import hudson.model.Label;
@@ -35,7 +36,6 @@ import java.util.stream.IntStream;
 
 import jenkins.model.Jenkins;
 
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
@@ -106,7 +106,7 @@ public class OrkaCloud extends Cloud {
         this.templates.forEach(t -> t.setParent(this));
         this.mappings = this.mappings == null ? Collections.emptyList() : this.mappings;
 
-        if (StringUtils.isEmpty(this.instanceCapSetting)) {
+        if (Util.fixEmpty(this.instanceCapSetting) == null) {
             this.instanceCap = Integer.MAX_VALUE;
         } else {
             this.instanceCap = Integer.parseInt(this.instanceCapSetting);

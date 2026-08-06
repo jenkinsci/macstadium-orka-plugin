@@ -3,6 +3,7 @@ package io.jenkins.plugins.orka.client;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 
+import hudson.Util;
 import java.io.IOException;
 import java.net.Proxy;
 import java.util.Arrays;
@@ -19,8 +20,6 @@ import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-
-import org.apache.commons.lang.StringUtils;
 
 public class OrkaClient {
     private static final OkHttpClient clientBase = new OkHttpClient();
@@ -149,7 +148,7 @@ public class OrkaClient {
 
         String body = httpResponse.getBody();
         DeletionResponse response;
-        if (StringUtils.isNotBlank(body)) {
+        if (Util.fixEmptyAndTrim(body) != null) {
             response = JsonHelper.fromJson(httpResponse.getBody(), DeletionResponse.class);
         } else {
             response = new DeletionResponse(null);

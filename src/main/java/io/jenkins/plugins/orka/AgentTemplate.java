@@ -39,7 +39,6 @@ import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
@@ -359,13 +358,13 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     }
 
     private DeploymentResponse deployVM(String name) throws IOException {
-        if (StringUtils.equals(deploymentOption, orka2xOption)) {
+        if (Objects.equals(deploymentOption, orka2xOption)) {
             logger.fine("Using Orka 2x deployment");
             return this.parent.deployVM(this.namespace, this.namePrefix, this.config, null, null, 
                     null, this.legacyConfigScheduler, this.legacyConfigTag, 
                     this.legacyConfigTagRequired, this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough);
         }
-        if (StringUtils.equals(orka3xInputMode, orka3xVmConfigOption)) {
+        if (Objects.equals(orka3xInputMode, orka3xVmConfigOption)) {
             logger.fine("Using Orka 3x deployment with VM config " + this.orka3xVmConfig);
             return this.parent.deployVM(this.namespace, name, this.orka3xVmConfig, null,
                     null, null, this.scheduler, this.tag, this.tagRequired,
@@ -389,21 +388,21 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         if (this.nodeProperties == null) {
             this.nodeProperties = new DescribableList<>(Saveable.NOOP, Collections.emptyList());
         }
-        if (StringUtils.isBlank(this.namespace)) {
+        if (Util.fixEmptyAndTrim(this.namespace) == null) {
             this.namespace = Constants.DEFAULT_NAMESPACE;
         }
-        if (this.createNewVMConfig && StringUtils.isNotBlank(this.baseImage)) {
+        if (this.createNewVMConfig && Util.fixEmptyAndTrim(this.baseImage) != null) {
             this.image = this.baseImage;
             this.cpu = this.numCPUs;
         }
-        if (!this.createNewVMConfig && StringUtils.isNotBlank(vm)) {
+        if (!this.createNewVMConfig && Util.fixEmptyAndTrim(vm) != null) {
             this.config = this.vm;
             this.legacyConfigTagRequired = tagRequired;
             this.legacyConfigTag = tag;
             this.legacyConfigScheduler = scheduler;
             this.deploymentOption = orka2xOption;
         }
-        if (StringUtils.isBlank(this.orka3xInputMode)) {
+        if (Util.fixEmptyAndTrim(this.orka3xInputMode) == null) {
             this.orka3xInputMode = orka3xDirectOption;
         }
 

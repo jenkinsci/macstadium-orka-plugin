@@ -1,8 +1,8 @@
 package io.jenkins.plugins.orka.client;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import org.apache.commons.lang.StringUtils;
+import hudson.Util;
+import java.util.Objects;
 
 public class ConfigurationRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
@@ -40,11 +40,11 @@ public class ConfigurationRequest {
         this.cpu = cpu;
         this.netBoost = netBoost;
         this.gpuPassthrough = gpuPassthrough;
-        this.scheduler = StringUtils.isNotBlank(scheduler) ? scheduler : null;
-        if (!StringUtils.isBlank(memory) && !StringUtils.equals(memory, "auto") && Float.parseFloat(memory) > 0) {
+        this.scheduler = Util.fixEmptyAndTrim(scheduler) != null ? scheduler : null;
+        if (Util.fixEmptyAndTrim(memory) != null && !Objects.equals(memory, "auto") && Float.parseFloat(memory) > 0) {
             this.memory = Float.parseFloat(memory);
         }
-        this.tag = StringUtils.isNotBlank(tag) && tag != null ? tag : null;
+        this.tag = Util.fixEmptyAndTrim(tag) != null && tag != null ? tag : null;
         this.tagRequired = tagRequired != null ? tagRequired : null;
     }
 }

@@ -1,7 +1,7 @@
 package io.jenkins.plugins.orka.helpers;
 
+import hudson.Util;
 import java.security.SecureRandom;
-import org.apache.commons.lang.StringUtils;
 
 public class VMNameGenerator {
     
@@ -11,7 +11,7 @@ public class VMNameGenerator {
     private static final String defaultPrefix = "vm";
     
     public static String generateName(String prefix) {
-        if (StringUtils.isBlank(prefix)) {
+        if (Util.fixEmptyAndTrim(prefix) == null) {
             prefix = defaultPrefix;
         }
 

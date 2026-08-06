@@ -1,5 +1,6 @@
 package io.jenkins.plugins.orka;
 
+import hudson.Util;
 import hudson.model.TaskListener;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
@@ -14,8 +15,6 @@ import io.jenkins.plugins.orka.helpers.Utils;
 import java.io.IOException;
 import java.io.PrintStream;
 import jenkins.model.Jenkins;
-
-import org.apache.commons.lang.StringUtils;
 
 public final class OrkaComputerLauncher extends ComputerLauncher {
     private static String deploymentErrorFormat = "%s: Deploying vm with name: %s, and node: %s"
@@ -79,7 +78,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
             return;
         }
 
-        this.host = StringUtils.isNotBlank(this.redirectHost) ? redirectHost : deploymentResponse.getIP();
+        this.host = Util.fixEmptyAndTrim(this.redirectHost) != null ? redirectHost : deploymentResponse.getIP();
         this.port = deploymentResponse.getSSH();
         this.launcher = this.getLauncher(agent.getVmCredentialsId());
         Jenkins.get().updateNode(slaveComputer.getNode());
@@ -105,7 +104,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     }
 
     private boolean vmExists() {
-        return StringUtils.isNotBlank(this.host) && this.port != 0;
+        return Util.fixEmptyAndTrim(this.host) != null && this.port != 0;
     }
 
     private DeploymentResponse deployVM(OrkaAgent agent, OrkaClient client, PrintStream logger)
