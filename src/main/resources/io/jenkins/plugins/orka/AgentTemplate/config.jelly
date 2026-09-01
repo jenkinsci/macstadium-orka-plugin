@@ -77,6 +77,10 @@
             <f:select />
           </f:entry>
         </f:radioBlock>
+
+        <f:entry title="${%Userdata}" field="userdata" help="${descriptor.getHelpFile('userdata')}">
+          <f:secretTextarea />
+        </f:entry>
       </orka:agentWrapper>
       <j:if test="${instance.config != null and instance.config != ''}">
         <f:radioBlock name="deploymentOption" value="${descriptor.getOrka2xOption()}" title="Orka 2.x Deployment" checked="${instance.deploymentOption == descriptor.getOrka2xOption()}" inline="true" help="${descriptor.getHelpFile('oldDeployment')}">

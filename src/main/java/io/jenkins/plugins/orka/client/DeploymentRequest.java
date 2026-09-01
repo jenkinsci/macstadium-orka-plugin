@@ -2,6 +2,9 @@ package io.jenkins.plugins.orka.client;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import org.apache.commons.lang.StringUtils;
 
 public class DeploymentRequest {
@@ -59,6 +62,9 @@ public class DeploymentRequest {
     @SuppressFBWarnings("URF_UNREAD_FIELD")
     private Integer displayDpi;
 
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
+    private String userdata;
+
     @Deprecated
     public DeploymentRequest(String vmConfig, String name, String node, String scheduler,
             String tag, Boolean tagRequired) {
@@ -114,10 +120,20 @@ public class DeploymentRequest {
             legacyIO, gpuPassthrough, portMappingsString, shouldGenerateName, null, null, null);
     }
 
+    @Deprecated
     public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
-        String scheduler, String tag, Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassthrough, 
-        String portMappingsString, Boolean shouldGenerateName, 
+        String scheduler, String tag, Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassthrough,
+        String portMappingsString, Boolean shouldGenerateName,
         Integer displayWidth, Integer displayHeight, Integer displayDpi) {
+        this(vmConfig, name, image, cpu, memory, node, scheduler, tag, tagRequired, netBoost,
+            legacyIO, gpuPassthrough, portMappingsString, shouldGenerateName,
+            displayWidth, displayHeight, displayDpi, null);
+    }
+
+    public DeploymentRequest(String vmConfig, String name, String image, Integer cpu, String memory, String node,
+        String scheduler, String tag, Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassthrough,
+        String portMappingsString, Boolean shouldGenerateName,
+        Integer displayWidth, Integer displayHeight, Integer displayDpi, String userdata) {
         this.vmConfig = vmConfig;
         this.node = node;
         this.image = image;
@@ -143,5 +159,10 @@ public class DeploymentRequest {
         this.timeout = 60 * 24; // Set the server timeout to a day
 
         this.reservedPorts = portMappingsString;
+
+        // The Orka API expects userdata as base64 and treats it as write-only
+        this.userdata = StringUtils.isNotBlank(userdata)
+                ? Base64.getEncoder().encodeToString(userdata.getBytes(StandardCharsets.UTF_8))
+                : null;
     }
 }

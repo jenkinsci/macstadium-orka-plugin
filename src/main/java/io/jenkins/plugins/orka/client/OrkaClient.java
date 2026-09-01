@@ -106,15 +106,26 @@ public class OrkaClient {
         return response;
     }
 
-    public DeploymentResponse deployVM(String vmConfig, String namespace, String name, 
-            String image, Integer cpu, String memory, String node, String scheduler, String tag, 
-            Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassThrough, 
-            String portMappingsString, Integer displayWidth, 
+    @Deprecated
+    public DeploymentResponse deployVM(String vmConfig, String namespace, String name,
+            String image, Integer cpu, String memory, String node, String scheduler, String tag,
+            Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassThrough,
+            String portMappingsString, Integer displayWidth,
             Integer displayHeight, Integer displayDpi) throws IOException {
+        return this.deployVM(vmConfig, namespace, name, image, cpu, memory, node, scheduler, tag,
+                tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingsString,
+                displayWidth, displayHeight, displayDpi, null);
+    }
+
+    public DeploymentResponse deployVM(String vmConfig, String namespace, String name,
+            String image, Integer cpu, String memory, String node, String scheduler, String tag,
+            Boolean tagRequired, Boolean netBoost, Boolean legacyIO, Boolean gpuPassThrough,
+            String portMappingsString, Integer displayWidth,
+            Integer displayHeight, Integer displayDpi, String userdata) throws IOException {
 
         DeploymentRequest deploymentRequest = new DeploymentRequest(vmConfig, name, image, cpu, memory, node,
-                scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingsString, false, 
-                displayWidth, displayHeight, displayDpi);
+                scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, portMappingsString, false,
+                displayWidth, displayHeight, displayDpi, userdata);
         String deploymentRequestJson = new Gson().toJson(deploymentRequest);
 
         HttpResponse httpResponse = this.post(

@@ -85,6 +85,7 @@ To configure:
   - Use Legacy IO (Optional) - When checked, uses the legacy IO network stack. Only available on Intel VMs, only enable for VMs running macOS 10.14.5 or below.
   - Use GPU Passthrough - When checked, enables the VM to use the GPU available on the node. NOTE: GPU Passthrough must be enabled for the cluster
   - Scheduler - The scheduler used to deploy the VM
+  - Userdata (Optional) - A shell script executed as root inside the VM on its first boot, before the Jenkins agent connects. Use it to bootstrap the VM (install tools, enroll in MDM, register services) without baking the steps into the image. The plugin base64-encodes the script before sending it to Orka, stores it encrypted, and never writes its content to logs. The script runs in the background and does not delay or fail the VM boot; inside the VM its output is logged to `/var/log/orka/userdata.log`. Requires an Orka cluster with userdata support and an Apple Silicon VM
   - Namespace - The namespace used to deploy VMs to
   - Name Prefix (Optional) - The deployed VM name starts with the specified prefix
   - VM Credentials - The credentials used to SSH to the deployed VM

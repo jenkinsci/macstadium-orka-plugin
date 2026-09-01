@@ -19,6 +19,7 @@ import hudson.slaves.RetentionStrategy;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import hudson.util.Secret;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
@@ -41,6 +42,7 @@ import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
@@ -67,6 +69,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private Integer displayWidth;
     private Integer displayHeight;
     private Integer displayDpi;
+    private Secret userdata;
 
     private String legacyConfigScheduler;
     private String legacyConfigTag;
@@ -248,6 +251,15 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.displayDpi;
     }
 
+    public Secret getUserdata() {
+        return this.userdata;
+    }
+
+    @DataBoundSetter
+    public void setUserdata(Secret userdata) {
+        this.userdata = StringUtils.isNotBlank(Secret.toString(userdata)) ? userdata : null;
+    }
+
     public String getTag() {
         return this.tag;
     }
@@ -370,12 +382,18 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             return this.parent.deployVM(this.namespace, name, this.orka3xVmConfig, null,
                     null, null, this.scheduler, this.tag, this.tagRequired,
                     this.useNetBoost, this.useLegacyIO, this.useGpuPassthrough,
-                    this.displayWidth, this.displayHeight, this.displayDpi);
+                    this.displayWidth, this.displayHeight, this.displayDpi, this.getUserdataScript());
         }
         logger.fine("Using Orka 3x deployment for name " + name);
         return this.parent.deployVM(this.namespace, name, null, this.image,
                 this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired, this.useNetBoost,
-                this.useLegacyIO, this.useGpuPassthrough, this.displayWidth, this.displayHeight, this.displayDpi);
+                this.useLegacyIO, this.useGpuPassthrough, this.displayWidth, this.displayHeight, this.displayDpi,
+                this.getUserdataScript());
+    }
+
+    private String getUserdataScript() {
+        String script = Secret.toString(this.userdata);
+        return StringUtils.isNotBlank(script) ? script : null;
     }
 
     void setParent(OrkaCloud parent) {
@@ -531,7 +549,8 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 + ", namespace=" + namespace + ", useNetBoost=" + useNetBoost + ", useGpuPassthrough="
                 + useGpuPassthrough + ", scheduler=" + scheduler + ", config=" + config + ", tag=" + tag
                 + ", tagRequired=" + tagRequired + ", displayWidth=" + displayWidth + ", displayHeight=" + displayHeight
-                + ", displayDpi=" + displayDpi + ", legacyConfigScheduler=" + legacyConfigScheduler
+                + ", displayDpi=" + displayDpi + ", hasUserdata=" + (userdata != null)
+                + ", legacyConfigScheduler=" + legacyConfigScheduler
                 + ", legacyConfigTag=" + legacyConfigTag + ", legacyConfigTagRequired=" + legacyConfigTagRequired
                 + ", deploymentOption=" + deploymentOption + ", orka3xInputMode=" + orka3xInputMode
                 + ", orka3xVmConfig=" + orka3xVmConfig + ", numExecutors=" + numExecutors + ", mode=" + mode

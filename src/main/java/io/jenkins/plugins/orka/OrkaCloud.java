@@ -190,17 +190,27 @@ public class OrkaCloud extends Cloud {
                           scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, null);
     }
 
-    public DeploymentResponse deployVM(String namespace, String name, String vmConfig, String image, 
+    @Deprecated
+    public DeploymentResponse deployVM(String namespace, String name, String vmConfig, String image,
             Integer cpu, String memory, String scheduler, String tag,
-            Boolean tagRequired, Boolean netBoost, Boolean legacyIO, 
-            Boolean gpuPassThrough, Integer displayWidth, 
+            Boolean tagRequired, Boolean netBoost, Boolean legacyIO,
+            Boolean gpuPassThrough, Integer displayWidth,
             Integer displayHeight, Integer displayDpi) throws IOException {
+        return this.deployVM(namespace, name, vmConfig, image, cpu, memory, scheduler, tag, tagRequired,
+                netBoost, legacyIO, gpuPassThrough, displayWidth, displayHeight, displayDpi, null);
+    }
+
+    public DeploymentResponse deployVM(String namespace, String name, String vmConfig, String image,
+            Integer cpu, String memory, String scheduler, String tag,
+            Boolean tagRequired, Boolean netBoost, Boolean legacyIO,
+            Boolean gpuPassThrough, Integer displayWidth,
+            Integer displayHeight, Integer displayDpi, String userdata) throws IOException {
         return new OrkaClientFactory()
                 .getOrkaClient(this.endpoint, this.credentialsId, this.timeout, this.useJenkinsProxySettings,
                         this.ignoreSSLErrors)
-                .deployVM(vmConfig, namespace, name, image, cpu, memory, null, 
-                        scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, null, 
-                        displayWidth, displayHeight, displayDpi);
+                .deployVM(vmConfig, namespace, name, image, cpu, memory, null,
+                        scheduler, tag, tagRequired, netBoost, legacyIO, gpuPassThrough, null,
+                        displayWidth, displayHeight, displayDpi, userdata);
     }
 
     @Deprecated

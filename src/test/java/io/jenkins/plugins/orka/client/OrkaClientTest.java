@@ -3,16 +3,23 @@ package io.jenkins.plugins.orka.client;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class OrkaClientTest {
     @Test
@@ -78,14 +85,55 @@ public class OrkaClientTest {
         OrkaClient client = mock(OrkaClient.class);
         when(client.post(anyString(), any())).thenReturn(response);
         when(client.deployVM(any(), anyString(), any(), any(), any(), any(), any(), any(),
-                any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenCallRealMethod();
 
         DeploymentResponse actualResponse = client.deployVM("newVm", "orka-default", null, "foo.img", 6, "12", null,
                 null,
-                null, false,false, false, false, null, 1500, 2000, 100);
+                null, false,false, false, false, null, 1500, 2000, 100, null);
 
         assertEquals(ip, actualResponse.getIP());
         assertEquals(sshPort, actualResponse.getSSH());
+    }
+
+    @Test
+    public void when_calling_deploy_vm_with_userdata_should_send_base64_encoded_userdata() throws IOException {
+        HttpResponse response = new HttpResponse("{ \"ip\": \"199.92.12.1\", \"ssh\": \"9281\"}", 200, true);
+
+        OrkaClient client = mock(OrkaClient.class);
+        when(client.post(anyString(), any())).thenReturn(response);
+        when(client.deployVM(any(), anyString(), any(), any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenCallRealMethod();
+
+        client.deployVM("newVm", "orka-default", null, "foo.img", 6, "12", null, null,
+                null, false, false, false, false, null, null, null, null, "echo hello");
+
+        ArgumentCaptor<String> bodyCaptor = ArgumentCaptor.forClass(String.class);
+        verify(client).post(anyString(), bodyCaptor.capture());
+
+        String expectedUserdata = Base64.getEncoder()
+                .encodeToString("echo hello".getBytes(StandardCharsets.UTF_8));
+        JsonObject body = new JsonParser().parse(bodyCaptor.getValue()).getAsJsonObject();
+        assertEquals(expectedUserdata, body.get("userdata").getAsString());
+    }
+
+    @Test
+    public void when_calling_deploy_vm_without_userdata_should_not_send_userdata() throws IOException {
+        HttpResponse response = new HttpResponse("{ \"ip\": \"199.92.12.1\", \"ssh\": \"9281\"}", 200, true);
+
+        OrkaClient client = mock(OrkaClient.class);
+        when(client.post(anyString(), any())).thenReturn(response);
+        when(client.deployVM(any(), anyString(), any(), any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenCallRealMethod();
+
+        client.deployVM("newVm", "orka-default", null, "foo.img", 6, "12", null, null,
+                null, false, false, false, false, null, null, null, null, null);
+
+        ArgumentCaptor<String> bodyCaptor = ArgumentCaptor.forClass(String.class);
+        verify(client).post(anyString(), bodyCaptor.capture());
+
+        assertFalse(bodyCaptor.getValue().contains("userdata"));
     }
 }

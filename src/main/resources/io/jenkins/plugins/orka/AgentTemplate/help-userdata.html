@@ -1,0 +1,15 @@
+<div>
+  A shell script executed as root inside the VM on its first boot, before the Jenkins agent connects.
+  Use it to bootstrap the VM (install tools, enroll in MDM, register services) without baking the steps
+  into the image. The plugin base64-encodes the script before sending it to Orka, stores it encrypted,
+  and never writes its content to logs.
+  <p>
+  The script runs in the background and does not delay or fail the VM boot - Jenkins connects to the
+  agent on the normal timeline regardless of the script's outcome. Inside the VM, output is logged to
+  <code>/var/log/orka/userdata.log</code>.
+  </p>
+  <p>
+  Requires an Orka cluster with userdata support and an Apple Silicon VM. On older clusters the value
+  is ignored.
+  </p>
+</div>
