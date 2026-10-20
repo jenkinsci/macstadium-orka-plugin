@@ -85,6 +85,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
     private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
     private String jvmOptions;
+    private String javaPath;
 
     private transient OrkaCloud parent;
 
@@ -148,7 +149,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 numExecutors, mode, remoteFS, labelString, retentionStrategy, nodeProperties, jvmOptions);
     }
 
-    @DataBoundConstructor
+    @Deprecated
     public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image,
             int cpu, String memory, String namespace, boolean useNetBoost, boolean useLegacyIO,
             boolean useGpuPassthrough, String scheduler, String tag, Boolean tagRequired,
@@ -158,6 +159,25 @@ public class AgentTemplate implements Describable<AgentTemplate> {
             int numExecutors, Mode mode, String remoteFS,
             String labelString, RetentionStrategy<?> retentionStrategy,
             List<? extends NodeProperty<?>> nodeProperties, String jvmOptions) {
+
+        this(vmCredentialsId, deploymentOption, namePrefix, image, cpu, memory, namespace, useNetBoost,
+                useLegacyIO, useGpuPassthrough, scheduler, tag, tagRequired, config, legacyConfigScheduler,
+                legacyConfigTag, legacyConfigTagRequired, displayWidth, displayHeight, displayDpi,
+                orka3xInputMode, orka3xVmConfig,
+                numExecutors, mode, remoteFS, labelString, retentionStrategy, nodeProperties, jvmOptions, null);
+    }
+
+    @DataBoundConstructor
+    public AgentTemplate(String vmCredentialsId, String deploymentOption, String namePrefix, String image,
+            int cpu, String memory, String namespace, boolean useNetBoost, boolean useLegacyIO,
+            boolean useGpuPassthrough, String scheduler, String tag, Boolean tagRequired,
+            String config, String legacyConfigScheduler, String legacyConfigTag,
+            boolean legacyConfigTagRequired, Integer displayWidth, Integer displayHeight, Integer displayDpi,
+            String orka3xInputMode, String orka3xVmConfig,
+            int numExecutors, Mode mode, String remoteFS,
+            String labelString, RetentionStrategy<?> retentionStrategy,
+            List<? extends NodeProperty<?>> nodeProperties, String jvmOptions,
+            String javaPath) {
 
         this.vmCredentialsId = vmCredentialsId;
         this.namePrefix = namePrefix;
@@ -169,6 +189,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         this.retentionStrategy = retentionStrategy;
         this.nodeProperties = new DescribableList<>(Saveable.NOOP, Util.fixNull(nodeProperties));
         this.jvmOptions = jvmOptions;
+        this.javaPath = Util.fixEmptyAndTrim(javaPath);
         this.deploymentOption = deploymentOption;
 
         this.config = config;
@@ -284,6 +305,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.jvmOptions;
     }
 
+    public String getJavaPath() {
+        return this.javaPath;
+    }
+
     public String getDeploymentOption() {
         return this.deploymentOption;
     }
@@ -349,7 +374,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                     host, response.getSSH(), this.namespace, this.vmCredentialsId, this.numExecutors, this.remoteFS,
                     this.mode,
                     this.labelString, this.retentionStrategy,
-                    this.nodeProperties, this.jvmOptions);
+                    this.nodeProperties, this.jvmOptions, this.javaPath);
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
             this.parent.deleteVM(response.getName(), this.namespace);

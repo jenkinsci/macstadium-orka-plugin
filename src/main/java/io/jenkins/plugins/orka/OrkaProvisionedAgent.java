@@ -3,6 +3,7 @@ package io.jenkins.plugins.orka;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
@@ -35,15 +36,26 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private String vmCredentialsId;
     private String namePrefix;
     private String jvmOptions;
+    private String javaPath;
 
-    @DataBoundConstructor
+    @Deprecated
     public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort, String namespace,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
             RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions)
             throws Descriptor.FormException, IOException {
+        this(cloudId, vmId, node, host, sshPort, namespace, vmCredentialsId, numExecutors, remoteFS, mode,
+                labelString, retentionStrategy, nodeProperties, jvmOptions, null);
+    }
 
-        super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, jvmOptions));
+    @DataBoundConstructor
+    public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort, String namespace,
+            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
+            RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions, String javaPath)
+            throws Descriptor.FormException, IOException {
+
+        super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, jvmOptions, javaPath));
 
         this.setNumExecutors(numExecutors);
         this.setMode(mode);
@@ -64,6 +76,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         this.namespace = namespace;
         this.vmCredentialsId = vmCredentialsId;
         this.jvmOptions = jvmOptions;
+        this.javaPath = Util.fixEmptyAndTrim(javaPath);
     }
 
     public String getCloudId() {
@@ -100,6 +113,10 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
 
     public String getJvmOptions() {
         return this.jvmOptions;
+    }
+
+    public String getJavaPath() {
+        return this.javaPath;
     }
 
     @Override

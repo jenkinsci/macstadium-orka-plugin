@@ -1,5 +1,8 @@
 package io.jenkins.plugins.orka;
 
+import com.google.common.annotations.VisibleForTesting;
+
+import hudson.Util;
 import hudson.model.TaskListener;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
@@ -32,16 +35,22 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
     private String host;
     private int port;
     private String jvmOptions;
+    private String javaPath;
 
     public OrkaComputerLauncher(String host, int port, String redirectHost) {
         this(host, port, redirectHost, null);
     }
 
     public OrkaComputerLauncher(String host, int port, String redirectHost, String jvmOptions) {
+        this(host, port, redirectHost, jvmOptions, null);
+    }
+
+    public OrkaComputerLauncher(String host, int port, String redirectHost, String jvmOptions, String javaPath) {
         this.host = host;
         this.port = port;
         this.redirectHost = redirectHost;
         this.jvmOptions = jvmOptions;
+        this.javaPath = Util.fixEmptyAndTrim(javaPath);
     }
 
     public String getHost() {
@@ -54,6 +63,10 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
 
     public String getJvmOptions() {
         return this.jvmOptions;
+    }
+
+    public String getJavaPath() {
+        return this.javaPath;
     }
 
     @Override
@@ -131,13 +144,13 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         return deploymentResponse;
     }
 
-    private SSHLauncher getLauncher(String vmCredentialsId) {
-        String javaPath = null;
+    @VisibleForTesting
+    SSHLauncher getLauncher(String vmCredentialsId) {
         String prefixStartSlaveCmd = null;
         String suffixStartSlaveCmd = null;
 
-        return new SSHLauncher(this.host, this.port, vmCredentialsId, this.jvmOptions, javaPath, prefixStartSlaveCmd,
-                suffixStartSlaveCmd, this.launchTimeoutSeconds, this.maxRetries, this.retryWaitTime,
-                new NonVerifyingKeyVerificationStrategy());
+        return new SSHLauncher(this.host, this.port, vmCredentialsId, this.jvmOptions, this.javaPath,
+                prefixStartSlaveCmd, suffixStartSlaveCmd, this.launchTimeoutSeconds, this.maxRetries,
+                this.retryWaitTime, new NonVerifyingKeyVerificationStrategy());
     }
 }
