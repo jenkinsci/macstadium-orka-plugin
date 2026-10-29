@@ -479,6 +479,11 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         }   
 
         @POST
+        public FormValidation doCheckJavaPath(@QueryParameter String value) {
+            return FormValidator.doCheckJavaPath(value);
+        }
+
+        @POST
         public FormValidation doCheckNumExecutors(@QueryParameter String value) {
             return FormValidation.validatePositiveInteger(value);
         }

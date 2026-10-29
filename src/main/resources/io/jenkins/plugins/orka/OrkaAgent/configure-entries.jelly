@@ -142,7 +142,7 @@
     </f:entry>
 
     <f:entry title="${%Java path for the Orka agent process}" field="javaPath">
-        <f:textbox/>
+        <f:textbox checkMethod="post"/>
     </f:entry>
 
     <j:if test="${h.getRetentionStrategyDescriptors().size() gt 1}">

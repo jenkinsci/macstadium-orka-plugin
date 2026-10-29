@@ -2,7 +2,6 @@ package io.jenkins.plugins.orka;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import hudson.Util;
 import hudson.model.TaskListener;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
@@ -19,6 +18,11 @@ public final class WaitSSHLauncher extends ComputerLauncher {
 
     private SSHLauncher launcher;
 
+    @Deprecated
+    public WaitSSHLauncher(String host, int sshPort, String vmCredentialsId, String jvmOptions) {
+        this(host, sshPort, vmCredentialsId, jvmOptions, null);
+    }
+
     public WaitSSHLauncher(String host, int sshPort, String vmCredentialsId, String jvmOptions, String javaPath) {
         String prefixStartSlaveCmd = null;
         String suffixStartSlaveCmd = null;
@@ -26,8 +30,7 @@ public final class WaitSSHLauncher extends ComputerLauncher {
         int maxNumRetries = 3;
         int retryWaitTime = 30;
 
-        this.launcher = new SSHLauncher(host, sshPort, vmCredentialsId, jvmOptions,
-                Util.fixEmptyAndTrim(javaPath), prefixStartSlaveCmd,
+        this.launcher = new SSHLauncher(host, sshPort, vmCredentialsId, jvmOptions, javaPath, prefixStartSlaveCmd,
                 suffixStartSlaveCmd, launchTimeoutSeconds, maxNumRetries, retryWaitTime,
                 new NonVerifyingKeyVerificationStrategy());
     }

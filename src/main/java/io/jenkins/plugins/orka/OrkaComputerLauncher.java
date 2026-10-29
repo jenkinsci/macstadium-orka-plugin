@@ -2,7 +2,6 @@ package io.jenkins.plugins.orka;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import hudson.Util;
 import hudson.model.TaskListener;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
@@ -50,7 +49,7 @@ public final class OrkaComputerLauncher extends ComputerLauncher {
         this.port = port;
         this.redirectHost = redirectHost;
         this.jvmOptions = jvmOptions;
-        this.javaPath = Util.fixEmptyAndTrim(javaPath);
+        this.javaPath = javaPath;
     }
 
     public String getHost() {

@@ -10,8 +10,10 @@ import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
+import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 
 import java.io.IOException;
@@ -22,6 +24,8 @@ import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = -2841785002270403074L;
@@ -55,7 +59,8 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
             String jvmOptions, String javaPath)
             throws Descriptor.FormException, IOException {
 
-        super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, jvmOptions, javaPath));
+        super(vmId, remoteFS,
+                new WaitSSHLauncher(host, sshPort, vmCredentialsId, jvmOptions, Util.fixEmptyAndTrim(javaPath)));
 
         this.setNumExecutors(numExecutors);
         this.setMode(mode);
@@ -135,6 +140,11 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     public static final class DescriptorImpl extends SlaveDescriptor {
         public DescriptorImpl() {
             load();
+        }
+
+        @POST
+        public FormValidation doCheckJavaPath(@QueryParameter String value) {
+            return FormValidator.doCheckJavaPath(value);
         }
 
         @Override

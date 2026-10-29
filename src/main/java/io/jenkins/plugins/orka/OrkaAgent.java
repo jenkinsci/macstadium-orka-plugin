@@ -98,7 +98,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, node, namespace, namePrefix,
             redirectHost, image, cpu, useNetBoost, useLegacyIO, useGpuPassthrough, displayWidth, displayHeight,
             displayDpi, numExecutors, host, port, remoteFS, useJenkinsProxySettings, ignoreSSLErrors, jvmOptions,
-            null, memory, tag, tagRequired, portMappings);
+            memory, tag, tagRequired, portMappings, null);
     }
 
     @DataBoundConstructor
@@ -107,10 +107,11 @@ public class OrkaAgent extends AbstractCloudSlave {
             Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
             Integer displayWidth, Integer displayHeight, Integer displayDpi,
             int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
-            boolean ignoreSSLErrors, String jvmOptions, String javaPath, String memory, String tag,
-            Boolean tagRequired, List<PortMapping> portMappings)
+            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired,
+            List<PortMapping> portMappings, String javaPath)
             throws Descriptor.FormException, IOException {
-        super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions, javaPath));
+        super(name, remoteFS,
+                new OrkaComputerLauncher(host, port, redirectHost, jvmOptions, Util.fixEmptyAndTrim(javaPath)));
 
         this.orkaCredentialsId = orkaCredentialsId;
         this.orkaEndpoint = orkaEndpoint;
@@ -300,6 +301,11 @@ public class OrkaAgent extends AbstractCloudSlave {
         @POST
         public FormValidation doCheckMemory(@QueryParameter String memory) {
             return this.formValidator.doCheckMemory(memory);
+        }
+
+        @POST
+        public FormValidation doCheckJavaPath(@QueryParameter String value) {
+            return FormValidator.doCheckJavaPath(value);
         }
 
         public ListBoxModel doFillOrkaCredentialsIdItems() {
