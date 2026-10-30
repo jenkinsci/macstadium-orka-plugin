@@ -3,14 +3,17 @@ package io.jenkins.plugins.orka;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
+import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 
 import java.io.IOException;
@@ -21,6 +24,8 @@ import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private static final long serialVersionUID = -2841785002270403074L;
@@ -35,15 +40,27 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private String vmCredentialsId;
     private String namePrefix;
     private String jvmOptions;
+    private String javaPath;
 
-    @DataBoundConstructor
+    @Deprecated
     public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort, String namespace,
             String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
             RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,
             String jvmOptions)
             throws Descriptor.FormException, IOException {
+        this(cloudId, vmId, node, host, sshPort, namespace, vmCredentialsId, numExecutors, remoteFS, mode,
+                labelString, retentionStrategy, nodeProperties, jvmOptions, null);
+    }
 
-        super(vmId, remoteFS, new WaitSSHLauncher(host, sshPort, vmCredentialsId, jvmOptions));
+    @DataBoundConstructor
+    public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort, String namespace,
+            String vmCredentialsId, int numExecutors, String remoteFS, Mode mode, String labelString,
+            RetentionStrategy<?> retentionStrategy, List<? extends NodeProperty<?>> nodeProperties,
+            String jvmOptions, String javaPath)
+            throws Descriptor.FormException, IOException {
+
+        super(vmId, remoteFS,
+                new WaitSSHLauncher(host, sshPort, vmCredentialsId, jvmOptions, Util.fixEmptyAndTrim(javaPath)));
 
         this.setNumExecutors(numExecutors);
         this.setMode(mode);
@@ -64,6 +81,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         this.namespace = namespace;
         this.vmCredentialsId = vmCredentialsId;
         this.jvmOptions = jvmOptions;
+        this.javaPath = Util.fixEmptyAndTrim(javaPath);
     }
 
     public String getCloudId() {
@@ -102,6 +120,10 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         return this.jvmOptions;
     }
 
+    public String getJavaPath() {
+        return this.javaPath;
+    }
+
     @Override
     protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
         logger.info("Terminating agent. VM id: " + this.vmId);
@@ -118,6 +140,11 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     public static final class DescriptorImpl extends SlaveDescriptor {
         public DescriptorImpl() {
             load();
+        }
+
+        @POST
+        public FormValidation doCheckJavaPath(@QueryParameter String value) {
+            return FormValidator.doCheckJavaPath(value);
         }
 
         @Override

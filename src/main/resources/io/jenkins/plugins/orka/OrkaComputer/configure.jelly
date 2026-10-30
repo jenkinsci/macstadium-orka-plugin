@@ -69,6 +69,10 @@
             <f:textbox/>
           </f:entry>
 
+          <f:entry title="${%Java path for the Orka agent process}" field="javaPath">
+            <f:textbox checkMethod="post"/>
+          </f:entry>
+
           <j:if test="${h.getRetentionStrategyDescriptors().size() gt 1}">
             <f:dropdownList name="slave.retentionStrategy" title="${%Availability}"
                             help="/help/system-config/master-slave/availability.html">
