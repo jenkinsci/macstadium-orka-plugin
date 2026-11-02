@@ -166,6 +166,23 @@ public class FormValidator {
         return FormValidation.ok();
     }
 
+    public static FormValidation doCheckJavaPath(String javaPath) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        String path = StringUtils.trimToEmpty(javaPath);
+        if (path.isEmpty() || path.startsWith("${")) {
+            return FormValidation.ok();
+        }
+        if (!path.startsWith("/")) {
+            return FormValidation.warning("Java path should be an absolute path");
+        }
+        if (path.matches(".*\\s.*")) {
+            return FormValidation.warning(
+                    "Java path contains whitespace. It is passed to the agent start command unquoted");
+        }
+        return FormValidation.ok();
+    }
+
     public FormValidation doCheckNamespace(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
             boolean ignoreSSLErrors, String namespace) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);

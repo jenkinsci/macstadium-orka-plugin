@@ -5,6 +5,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import hudson.Extension;
 import hudson.RelativePath;
+import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
@@ -54,6 +55,7 @@ public class OrkaAgent extends AbstractCloudSlave {
     private Boolean tagRequired;
     private String namePrefix;
     private String jvmOptions;
+    private String javaPath;
 
     private final List<PortMapping> portMappings;
 
@@ -84,7 +86,7 @@ public class OrkaAgent extends AbstractCloudSlave {
             tag, tagRequired, portMappings);
     }
 
-    @DataBoundConstructor
+    @Deprecated
     public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
             String node, String namespace, String namePrefix, String redirectHost, String image,
             Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
@@ -93,7 +95,23 @@ public class OrkaAgent extends AbstractCloudSlave {
             boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired, 
             List<PortMapping> portMappings)
             throws Descriptor.FormException, IOException {
-        super(name, remoteFS, new OrkaComputerLauncher(host, port, redirectHost, jvmOptions));
+        this(name, orkaCredentialsId, orkaEndpoint, vmCredentialsId, node, namespace, namePrefix,
+            redirectHost, image, cpu, useNetBoost, useLegacyIO, useGpuPassthrough, displayWidth, displayHeight,
+            displayDpi, numExecutors, host, port, remoteFS, useJenkinsProxySettings, ignoreSSLErrors, jvmOptions,
+            memory, tag, tagRequired, portMappings, null);
+    }
+
+    @DataBoundConstructor
+    public OrkaAgent(String name, String orkaCredentialsId, String orkaEndpoint, String vmCredentialsId,
+            String node, String namespace, String namePrefix, String redirectHost, String image,
+            Integer cpu, boolean useNetBoost, boolean useLegacyIO, boolean useGpuPassthrough, 
+            Integer displayWidth, Integer displayHeight, Integer displayDpi,
+            int numExecutors, String host, int port, String remoteFS, boolean useJenkinsProxySettings, 
+            boolean ignoreSSLErrors, String jvmOptions, String memory, String tag, Boolean tagRequired,
+            List<PortMapping> portMappings, String javaPath)
+            throws Descriptor.FormException, IOException {
+        super(name, remoteFS,
+                new OrkaComputerLauncher(host, port, redirectHost, jvmOptions, Util.fixEmptyAndTrim(javaPath)));
 
         this.orkaCredentialsId = orkaCredentialsId;
         this.orkaEndpoint = orkaEndpoint;
@@ -112,6 +130,7 @@ public class OrkaAgent extends AbstractCloudSlave {
         this.displayDpi = displayDpi;
         this.ignoreSSLErrors = ignoreSSLErrors;
         this.jvmOptions = jvmOptions;
+        this.javaPath = Util.fixEmptyAndTrim(javaPath);
         this.memory = memory;
         this.tag = tag;
         this.tagRequired = tagRequired;
@@ -199,6 +218,10 @@ public class OrkaAgent extends AbstractCloudSlave {
         return this.jvmOptions;
     }
 
+    public String getJavaPath() {
+        return this.javaPath;
+    }
+
     public List<PortMapping> getPortMappins() {
         return portMappings;
     }
@@ -278,6 +301,11 @@ public class OrkaAgent extends AbstractCloudSlave {
         @POST
         public FormValidation doCheckMemory(@QueryParameter String memory) {
             return this.formValidator.doCheckMemory(memory);
+        }
+
+        @POST
+        public FormValidation doCheckJavaPath(@QueryParameter String value) {
+            return FormValidator.doCheckJavaPath(value);
         }
 
         public ListBoxModel doFillOrkaCredentialsIdItems() {
