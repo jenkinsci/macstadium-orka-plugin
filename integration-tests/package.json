@@ -9,7 +9,7 @@
     "posttest": "cd jenkins-setup && ./stop-jenkins.sh"
   },
   "dependencies": {
-    "jest": "26.5.2",
+    "jest": "29.7.0",
     "playwright": "1.4.2",
     "playwright-cli": "0.5.2",
     "axios": "0.21.2",
@@ -17,6 +17,6 @@
     "wait-for-expect": "3.0.2"
   },
   "devDependencies": {
-    "jest-circus": "26.6.1"
+    "jest-circus": "29.7.0"
   }
 }
