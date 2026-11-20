@@ -34,6 +34,9 @@ public class OrkaClient {
     private static final String VM_PATH = "vms";
     private static final String NODE_PATH = "nodes";
     private static final String IMAGE_PATH = RESOURCE_PATH + "/orka-default/images";
+    private static final String EMULATOR_PATH = "emulators/android";
+    private static final String EMULATOR_CONFIG_PATH = RESOURCE_PATH + "/orka-default/emulatorconfigs/android";
+    private static final String EMULATORS_UNSUPPORTED = "Android emulators require Orka 4.0.0 or later";
 
     private String endpoint;
     private String token;
@@ -157,6 +160,58 @@ public class OrkaClient {
         response.setHttpResponse(httpResponse);
 
         return response;
+    }
+
+    public EmulatorConfigResponse getEmulatorConfigs() throws IOException {
+        HttpResponse httpResponse = this.get(String.format("%s/%s", this.endpoint, EMULATOR_CONFIG_PATH));
+
+        EmulatorConfigResponse response = isUnsupportedRoute(httpResponse)
+                ? new EmulatorConfigResponse(null, EMULATORS_UNSUPPORTED)
+                : JsonHelper.fromJson(httpResponse.getBody(), EmulatorConfigResponse.class);
+        response.setHttpResponse(httpResponse);
+        return response;
+    }
+
+    public EmulatorDeploymentResponse deployEmulator(String namespace, String vmName, String config, String name,
+            String adbPublicKey, Integer timeout) throws IOException {
+
+        EmulatorDeploymentRequest deploymentRequest = new EmulatorDeploymentRequest(vmName, config, name,
+                adbPublicKey, timeout);
+        String deploymentRequestJson = new Gson().toJson(deploymentRequest);
+
+        HttpResponse httpResponse = this.post(
+                String.format("%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, EMULATOR_PATH),
+                deploymentRequestJson);
+        EmulatorDeploymentResponse response = isUnsupportedRoute(httpResponse)
+                ? new EmulatorDeploymentResponse(null, null, null, null, 0, EMULATORS_UNSUPPORTED)
+                : JsonHelper.fromJson(httpResponse.getBody(), EmulatorDeploymentResponse.class);
+        response.setHttpResponse(httpResponse);
+
+        return response;
+    }
+
+    public DeletionResponse deleteEmulator(String name, String namespace) throws IOException {
+        HttpResponse httpResponse = this.delete(
+                String.format("%s/%s/%s/%s/%s", this.endpoint, RESOURCE_PATH, namespace, EMULATOR_PATH, name));
+
+        String body = httpResponse.getBody();
+        DeletionResponse response;
+        if (isUnsupportedRoute(httpResponse)) {
+            response = new DeletionResponse(EMULATORS_UNSUPPORTED);
+        } else if (StringUtils.isNotBlank(body)) {
+            response = JsonHelper.fromJson(body, DeletionResponse.class);
+        } else {
+            response = new DeletionResponse(null);
+        }
+        response.setHttpResponse(httpResponse);
+
+        return response;
+    }
+
+    // Clusters without the emulator routes answer with the router's plain text 404 rather than a JSON status.
+    private static boolean isUnsupportedRoute(HttpResponse httpResponse) {
+        return httpResponse.getCode() == 404
+                && !StringUtils.startsWith(StringUtils.trimToEmpty(httpResponse.getBody()), "{");
     }
 
     public HealthCheckResponse getHealthCheck() throws IOException {

@@ -17,6 +17,7 @@ import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaRetentionStrategy;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,6 +42,7 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
     private String namePrefix;
     private String jvmOptions;
     private String javaPath;
+    private List<String> emulatorNames;
 
     @Deprecated
     public OrkaProvisionedAgent(String cloudId, String vmId, String node, String host, int sshPort, String namespace,
@@ -124,11 +126,23 @@ public class OrkaProvisionedAgent extends AbstractCloudSlave {
         return this.javaPath;
     }
 
+    public List<String> getEmulatorNames() {
+        return this.emulatorNames != null ? Collections.unmodifiableList(this.emulatorNames)
+                : Collections.emptyList();
+    }
+
+    void setEmulatorNames(List<String> emulatorNames) {
+        this.emulatorNames = new ArrayList<>(emulatorNames);
+    }
+
     @Override
     protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
         logger.info("Terminating agent. VM id: " + this.vmId);
 
-        this.getCloud().deleteVM(this.vmId, this.namespace);
+        // Deleting the VM also deletes its emulators. Deleting them first only makes teardown faster.
+        OrkaCloud cloud = this.getCloud();
+        this.getEmulatorNames().forEach(name -> cloud.deleteEmulator(name, this.namespace));
+        cloud.deleteVM(this.vmId, this.namespace);
     }
 
     @Override

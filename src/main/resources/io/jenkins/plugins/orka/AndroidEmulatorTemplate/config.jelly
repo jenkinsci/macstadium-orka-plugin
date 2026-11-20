@@ -1,0 +1,11 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <f:entry title="${%Emulator Config}" field="config">
+    <f:select />
+  </f:entry>
+  <f:entry title="">
+    <div align="right">
+      <f:repeatableDeleteButton value="${%Delete Emulator}"/>
+    </div>
+  </f:entry>
+</j:jelly>

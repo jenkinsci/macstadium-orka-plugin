@@ -14,6 +14,7 @@ import hudson.util.ListBoxModel;
 
 import io.jenkins.plugins.orka.client.DeletionResponse;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
+import io.jenkins.plugins.orka.client.EmulatorDeploymentResponse;
 import io.jenkins.plugins.orka.client.OrkaVMConfig;
 import io.jenkins.plugins.orka.helpers.CapacityHandler;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
@@ -229,6 +230,33 @@ public class OrkaCloud extends Cloud {
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Failed to delete a VM with name:" + name, ex);
+        }
+    }
+
+    public EmulatorDeploymentResponse deployEmulator(String namespace, String vmName, String config, String name,
+            String adbPublicKey, int timeoutMinutes) throws IOException {
+        // The API holds the request open until the emulator is running, so the read timeout must outlast the deploy.
+        int httpClientTimeout = Math.max(this.timeout, (timeoutMinutes + 1) * 60);
+        return new OrkaClientFactory()
+                .getOrkaClient(this.endpoint, this.credentialsId, httpClientTimeout, this.useJenkinsProxySettings,
+                        this.ignoreSSLErrors)
+                .deployEmulator(namespace, vmName, config, name, adbPublicKey, timeoutMinutes);
+    }
+
+    public void deleteEmulator(String name, String namespace) {
+        try {
+            DeletionResponse deletionResponse = new OrkaClientFactory().getOrkaClient(this.endpoint,
+                    this.credentialsId, this.httpTimeout, this.useJenkinsProxySettings, this.ignoreSSLErrors)
+                    .deleteEmulator(name, namespace);
+
+            if (deletionResponse.isSuccessful()) {
+                logger.info("Emulator " + name + " is successfully deleted.");
+            } else {
+                logger.warning("Deleting emulator " + name + " failed with: "
+                        + Utils.getErrorMessage(deletionResponse));
+            }
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Failed to delete an emulator with name:" + name, ex);
         }
     }
 

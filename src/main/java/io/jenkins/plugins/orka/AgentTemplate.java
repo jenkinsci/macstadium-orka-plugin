@@ -13,6 +13,7 @@ import hudson.model.Label;
 import hudson.model.Node.Mode;
 import hudson.model.Saveable;
 import hudson.model.labels.LabelAtom;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
 import hudson.slaves.RetentionStrategy;
@@ -20,6 +21,8 @@ import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.orka.client.DeploymentResponse;
+import io.jenkins.plugins.orka.client.EmulatorDeploymentResponse;
+import io.jenkins.plugins.orka.helpers.AndroidEmulatorEnvironment;
 import io.jenkins.plugins.orka.helpers.CredentialsHelper;
 import io.jenkins.plugins.orka.helpers.FormValidator;
 import io.jenkins.plugins.orka.helpers.OrkaClientFactory;
@@ -29,8 +32,10 @@ import io.jenkins.plugins.orka.helpers.Utils;
 import io.jenkins.plugins.orka.helpers.VMNameGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +46,7 @@ import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
@@ -50,6 +56,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private static final String orka2xOption = "orka2xOption";
     private static final String orka3xDirectOption = "orka3xDirect";
     private static final String orka3xVmConfigOption = "orka3xVmConfig";
+    private static final int defaultEmulatorDeployTimeout = 10;
     private String vmCredentialsId;
 
     private String namePrefix;
@@ -86,6 +93,10 @@ public class AgentTemplate implements Describable<AgentTemplate> {
     private DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties;
     private String jvmOptions;
     private String javaPath;
+
+    private List<AndroidEmulatorTemplate> emulators;
+    private String adbPublicKey;
+    private Integer emulatorDeployTimeout;
 
     private transient OrkaCloud parent;
 
@@ -341,6 +352,34 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return Objects.requireNonNull(this.nodeProperties);
     }
 
+    public List<AndroidEmulatorTemplate> getEmulators() {
+        return this.emulators != null ? Collections.unmodifiableList(this.emulators) : Collections.emptyList();
+    }
+
+    @DataBoundSetter
+    public void setEmulators(List<AndroidEmulatorTemplate> emulators) {
+        this.emulators = emulators != null ? new ArrayList<>(emulators) : null;
+    }
+
+    public String getAdbPublicKey() {
+        return this.adbPublicKey;
+    }
+
+    @DataBoundSetter
+    public void setAdbPublicKey(String adbPublicKey) {
+        this.adbPublicKey = Util.fixEmptyAndTrim(adbPublicKey);
+    }
+
+    public int getEmulatorDeployTimeout() {
+        return this.emulatorDeployTimeout != null && this.emulatorDeployTimeout > 0 ? this.emulatorDeployTimeout
+                : defaultEmulatorDeployTimeout;
+    }
+
+    @DataBoundSetter
+    public void setEmulatorDeployTimeout(Integer emulatorDeployTimeout) {
+        this.emulatorDeployTimeout = emulatorDeployTimeout;
+    }
+
     public Descriptor<AgentTemplate> getDescriptor() {
         return Jenkins.get().getDescriptor(getClass());
     }
@@ -369,12 +408,14 @@ public class AgentTemplate implements Describable<AgentTemplate> {
 
             String host = this.parent.getRealHost(response.getIP());
             String vmId = response.getName();
+            List<AndroidEmulatorEnvironment.Emulator> emulators = this.deployEmulators(vmId);
 
-            return new OrkaProvisionedAgent(this.parent.getDisplayName(), vmId, response.getIP(),
-                    host, response.getSSH(), this.namespace, this.vmCredentialsId, this.numExecutors, this.remoteFS,
-                    this.mode,
-                    this.labelString, this.retentionStrategy,
-                    this.nodeProperties, this.jvmOptions, this.javaPath);
+            OrkaProvisionedAgent agent = new OrkaProvisionedAgent(this.parent.getDisplayName(), vmId,
+                    response.getIP(), host, response.getSSH(), this.namespace, this.vmCredentialsId,
+                    this.numExecutors, this.remoteFS, this.mode, this.labelString, this.retentionStrategy,
+                    this.getAgentNodeProperties(emulators), this.jvmOptions, this.javaPath);
+            agent.setEmulatorNames(AndroidEmulatorEnvironment.getNames(emulators));
+            return agent;
         } catch (Exception e) {
             logger.warning("Exception while creating provisioned agent. Deleting VM.");
             this.parent.deleteVM(response.getName(), this.namespace);
@@ -401,6 +442,62 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         return this.parent.deployVM(this.namespace, name, null, this.image,
                 this.cpu, this.memory, this.scheduler, this.tag, this.tagRequired, this.useNetBoost,
                 this.useLegacyIO, this.useGpuPassthrough, this.displayWidth, this.displayHeight, this.displayDpi);
+    }
+
+    // Deploys the template's emulators one at a time, paired with the VM. A failure throws, and the caller's VM
+    // delete cascades to every emulator already deployed, because the VM owns them.
+    private List<AndroidEmulatorEnvironment.Emulator> deployEmulators(String vmName) throws IOException {
+        List<AndroidEmulatorEnvironment.Emulator> deployed = new ArrayList<>();
+        List<AndroidEmulatorTemplate> templates = this.getEmulators();
+
+        for (int i = 0; i < templates.size(); i++) {
+            String emulatorConfig = templates.get(i).getConfig();
+            String emulatorName = String.format("%s-emu-%d", vmName, i + 1);
+            logger.fine("Deploying emulator " + emulatorName + " with config " + emulatorConfig + " for VM " + vmName);
+
+            EmulatorDeploymentResponse response = this.parent.deployEmulator(this.namespace, vmName, emulatorConfig,
+                    emulatorName, this.adbPublicKey, this.getEmulatorDeployTimeout());
+            logger.fine(String.valueOf(response));
+
+            if (!response.isSuccessful()) {
+                throw new IOException(String.format("Deploying emulator %s with config %s for VM %s failed with: %s",
+                        emulatorName, emulatorConfig, vmName, Utils.getErrorMessage(response)));
+            }
+            if (StringUtils.isBlank(response.getRelayIP()) || response.getRelayPort() == 0) {
+                throw new IOException(String.format("Emulator %s for VM %s is running but has no ADB relay address",
+                        response.getName(), vmName));
+            }
+
+            deployed.add(new AndroidEmulatorEnvironment.Emulator(response.getName(), emulatorConfig,
+                    response.getRelayIP(), response.getRelayPort()));
+        }
+
+        return deployed;
+    }
+
+    // The relay address is only routable from the node, so it is passed through without address mapping.
+    private List<? extends NodeProperty<?>> getAgentNodeProperties(
+            List<AndroidEmulatorEnvironment.Emulator> emulators) {
+        if (emulators.isEmpty()) {
+            return this.nodeProperties;
+        }
+
+        List<NodeProperty<?>> properties = new ArrayList<>();
+        List<EnvironmentVariablesNodeProperty.Entry> entries = new ArrayList<>();
+        for (NodeProperty<?> property : this.nodeProperties) {
+            if (property instanceof EnvironmentVariablesNodeProperty) {
+                ((EnvironmentVariablesNodeProperty) property).getEnvVars()
+                        .forEach((key, value) -> entries.add(new EnvironmentVariablesNodeProperty.Entry(key, value)));
+            } else {
+                properties.add(property);
+            }
+        }
+        for (Map.Entry<String, String> variable : AndroidEmulatorEnvironment.build(emulators).entrySet()) {
+            entries.add(new EnvironmentVariablesNodeProperty.Entry(variable.getKey(), variable.getValue()));
+        }
+        properties.add(new EnvironmentVariablesNodeProperty(entries));
+
+        return properties;
     }
 
     void setParent(OrkaCloud parent) {
@@ -477,6 +574,16 @@ public class AgentTemplate implements Describable<AgentTemplate> {
         public FormValidation doCheckDisplayDpi(@QueryParameter String value) {
             return this.formValidator.doCheckDisplayDpi(value);
         }   
+
+        @POST
+        public FormValidation doCheckAdbPublicKey(@QueryParameter String value) {
+            return FormValidator.doCheckAdbPublicKey(value);
+        }
+
+        @POST
+        public FormValidation doCheckEmulatorDeployTimeout(@QueryParameter String value) {
+            return FormValidator.doCheckEmulatorDeployTimeout(value);
+        }
 
         @POST
         public FormValidation doCheckJavaPath(@QueryParameter String value) {
@@ -566,6 +673,7 @@ public class AgentTemplate implements Describable<AgentTemplate> {
                 + ", deploymentOption=" + deploymentOption + ", orka3xInputMode=" + orka3xInputMode
                 + ", orka3xVmConfig=" + orka3xVmConfig + ", numExecutors=" + numExecutors + ", mode=" + mode
                 + ", remoteFS=" + remoteFS + ", labelString=" + labelString + ", retentionStrategy=" + retentionStrategy
-                + "]";
+                + ", emulators=" + emulators + ", hasAdbPublicKey=" + (adbPublicKey != null)
+                + ", emulatorDeployTimeout=" + emulatorDeployTimeout + "]";
     }
 }

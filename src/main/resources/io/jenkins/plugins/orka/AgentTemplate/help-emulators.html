@@ -1,0 +1,14 @@
+<div>
+  (Optional) Android emulators to deploy with each agent's VM. Requires Orka 4.0.0 or later and Apple silicon nodes.
+  Each emulator runs on the VM's node and is reachable over ADB only from VMs on that node.
+  <p>The agent gets these environment variables, numbered from 1 in the order listed here:</p>
+  <ul>
+    <li><code>ORKA_EMULATOR_COUNT</code></li>
+    <li><code>ORKA_EMULATOR_n_ADB</code>, <code>_ADB_HOST</code>, <code>_ADB_PORT</code>, <code>_NAME</code>, <code>_CONFIG</code></li>
+    <li><code>ORKA_EMULATOR_ADB</code>, <code>_ADB_HOST</code>, <code>_ADB_PORT</code> for the first emulator, and <code>ORKA_EMULATOR_ADB_TARGETS</code> with every <code>host:port</code>, comma separated</li>
+    <li><code>ORKA_EMULATOR_&lt;CONFIG&gt;_ADB</code> and the same fields, where <code>&lt;CONFIG&gt;</code> is the config name in upper case with other characters replaced by <code>_</code></li>
+  </ul>
+  <p>The emulator is running when the build starts, but Android may still be booting. The VM image needs <code>adb</code>, and the build connects itself:</p>
+  <pre>adb connect "$ORKA_EMULATOR_ADB"
+adb -s "$ORKA_EMULATOR_ADB" shell 'while [ "$(getprop sys.boot_completed)" != 1 ]; do sleep 2; done'</pre>
+</div>

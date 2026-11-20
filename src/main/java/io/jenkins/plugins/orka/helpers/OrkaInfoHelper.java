@@ -56,6 +56,24 @@ public class OrkaInfoHelper {
         return model;
     }
 
+    public ListBoxModel doFillEmulatorConfigItems(String orkaEndpoint, String orkaCredentialsId,
+            boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
+
+        ListBoxModel model = new ListBoxModel();
+
+        try {
+            if (StringUtils.isNotBlank(orkaEndpoint) && orkaCredentialsId != null) {
+                OrkaClient client = this.clientFactory.getOrkaClient(orkaEndpoint,
+                        orkaCredentialsId, useJenkinsProxySettings, ignoreSSLErrors);
+                client.getEmulatorConfigs().getConfigs().forEach(config -> model.add(config.getName()));
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception in doFillEmulatorConfigItems", e);
+        }
+
+        return model;
+    }
+
     public ListBoxModel doFillBaseImageItems(String orkaEndpoint, String orkaCredentialsId,
             boolean useJenkinsProxySettings, boolean ignoreSSLErrors) {
 

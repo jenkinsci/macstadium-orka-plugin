@@ -9,6 +9,7 @@ import io.jenkins.plugins.orka.helpers.ImageRegexOCI;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import jenkins.model.Jenkins;
 
@@ -26,6 +27,10 @@ public class FormValidator {
     private static final int maxDisplayHeight = 2160;
     private static final int minDisplayDpi = 60;
     private static final int maxDisplayDpi = 320;
+    // Mirrors the AndroidEmulatorInstance CRD's validation of spec.adbPublicKey.
+    private static final int maxAdbPublicKeyLength = 1024;
+    private static final Pattern adbPublicKeyPattern = Pattern
+            .compile("^QAAAA[A-Za-z0-9+/]{694}=( [A-Za-z0-9@._+-]{1,256})?$");
 
     private OrkaClientFactory clientFactory;
 
@@ -181,6 +186,26 @@ public class FormValidator {
                     "Java path contains whitespace. It is passed to the agent start command unquoted");
         }
         return FormValidation.ok();
+    }
+
+    public static FormValidation doCheckAdbPublicKey(String adbPublicKey) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        String key = StringUtils.trimToEmpty(adbPublicKey);
+        if (key.isEmpty() || (key.length() <= maxAdbPublicKeyLength && adbPublicKeyPattern.matcher(key).matches())) {
+            return FormValidation.ok();
+        }
+        return FormValidation.error(
+                "ADB public key must be the contents of an adb public key file, such as ~/.android/adbkey.pub");
+    }
+
+    public static FormValidation doCheckEmulatorDeployTimeout(String emulatorDeployTimeout) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+        if (StringUtils.isBlank(emulatorDeployTimeout)) {
+            return FormValidation.ok();
+        }
+        return FormValidation.validatePositiveInteger(emulatorDeployTimeout);
     }
 
     public FormValidation doCheckNamespace(String endpoint, String credentialsId, boolean useJenkinsProxySettings,
